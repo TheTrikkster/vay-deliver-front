@@ -45,4 +45,31 @@ amplify-gradle-config.json
 amplifytools.xcconfig
 .secret-*
 **.sample
+
+amplify/team-provider-info.json
+amplify/backend/auth/**/cli-inputs.json
 #amplify-do-not-edit-end
+
+# Fichiers d'IDE
+.idea/
+.vscode/
+*.sublime-*
+
+# Fichiers d'environnement (en plus de ceux déjà ignorés)
+.env
+.env.*
+!.env.example
+
+# Logs supplémentaires
+*.log
+logs/
+
+# Fichiers de compilation et dépendances
+coverage/
+dist/
+.cache/
+.parcel-cache/
+
+# Fichiers temporaires
+.tmp/
+temp/

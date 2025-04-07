@@ -1,8 +1,9 @@
 import React, { lazy, Suspense } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import Home from './pages/Home';
 import { OfflineIndicator } from './components/OfflineIndicator';
 import { InstallPrompt } from './components/InstallPrompt';
+
+const Home = lazy(() => import('./pages/Home'));
 
 const LoadingFallback = () => (
   <div className="flex min-h-screen items-center justify-center bg-neutral-900">
