@@ -1,19 +1,16 @@
-import React from 'react'
-import { Authenticator } from '@aws-amplify/ui-react';
+import React from 'react';
+import { useAuthenticator } from '@aws-amplify/ui-react';
 import '@aws-amplify/ui-react/styles.css';
-import { withAuthenticator } from '@aws-amplify/ui-react';
 
 function Home() {
+  const { user, signOut } = useAuthenticator();
+
   return (
-    <Authenticator>
-    {({ signOut, user }) => (
-      <div className='flex flex-col items-center justify-center h-screen'>
-        <h1>Hello {user?.signInDetails?.loginId}</h1>
-        <button onClick={signOut}>Sign Out</button>
-      </div>
-    )}
-  </Authenticator>
-  )
+    <div className="flex flex-col items-center justify-center h-screen">
+      <h1>Hello {user?.signInDetails?.loginId}</h1>
+      <button onClick={signOut}>Sign Out</button>
+    </div>
+  );
 }
 
-export default withAuthenticator(Home);
+export default Home;
