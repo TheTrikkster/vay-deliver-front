@@ -4,7 +4,7 @@ import { OfflineIndicator } from './components/OfflineIndicator';
 import { InstallPrompt } from './components/InstallPrompt';
 import { Authenticator, withAuthenticator } from '@aws-amplify/ui-react';
 import '@aws-amplify/ui-react/styles.css';
-import { SyncManager } from './components/SyncManager';
+import { SyncManager } from './components/SyncManager/SyncManager';
 
 const Home = lazy(() => import('./pages/Home'));
 const AdminDeliveries = lazy(() => import('./pages/AdminDeliveries'));

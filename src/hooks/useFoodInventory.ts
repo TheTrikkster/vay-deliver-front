@@ -1,4 +1,3 @@
-// src/hooks/useFoodInventory.ts
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
@@ -50,19 +49,11 @@ export function useFoodInventory(itemsPerPage = 30) {
     return Date.now() - lastFetched > REFRESH_INTERVAL;
   }, [lastFetched]);
 
-  // Chargement des données
-  useEffect(() => {
-    const source = axios.CancelToken.source();
-
-    async function fetchInventory() {
-      // Si nous avons des données récentes et que nous ne sommes pas en ligne, utiliser les données locales
-      if (inventoryItems.length > 0 && (!isOnline || !shouldRefresh())) {
-        return;
-      }
-
+  // Fonction helper pour charger l'inventaire
+  const fetchInventory = useCallback(
+    async (source: ReturnType<typeof axios.CancelToken.source>) => {
       try {
         dispatch(setLoading(true));
-        dispatch(setError(null));
 
         const response = await axios.get('http://localhost:3300/products', {
           cancelToken: source.token,
@@ -78,32 +69,53 @@ export function useFoodInventory(itemsPerPage = 30) {
         }));
 
         dispatch(setInventoryItems(transformedItems));
+        dispatch(setError(null));
       } catch (err) {
         const errorMessage = handleApiError(err);
 
-        // Si c'est une erreur liée à l'absence de connexion et que nous avons des données,
-        // ne pas afficher d'erreur pour éviter de perturber l'expérience utilisateur
-        if (!navigator.onLine && inventoryItems.length > 0) {
-          return;
-        }
-
-        // En développement, utiliser les données mock si aucune donnée n'est disponible
-        if (process.env.NODE_ENV !== 'production' && inventoryItems.length === 0) {
-          dispatch(setInventoryItems(mockInventoryItems));
-        } else if (inventoryItems.length === 0) {
+        // Ne pas écraser les données persistées avec une erreur
+        if (inventoryItems.length === 0) {
           dispatch(setError(errorMessage));
+
+          if (process.env.NODE_ENV !== 'production') {
+            dispatch(setInventoryItems(mockInventoryItems));
+          }
         }
       } finally {
         dispatch(setLoading(false));
       }
+
+      return source;
+    },
+    [dispatch, inventoryItems.length]
+  );
+
+  // Chargement des données
+  useEffect(() => {
+    let source: ReturnType<typeof axios.CancelToken.source>;
+
+    async function loadInventory() {
+      if (inventoryItems.length > 0 && (!isOnline || !shouldRefresh())) {
+        return;
+      }
+
+      source = axios.CancelToken.source();
+      try {
+        const result = await fetchInventory(source);
+        // Utiliser directement le résultat si nécessaire
+      } catch (error) {
+        // Gérer l'erreur spécifiquement ici
+      }
     }
 
-    fetchInventory();
+    loadInventory();
 
     return () => {
-      source.cancel('Component unmounted');
+      if (source && source.cancel) {
+        source.cancel('Component unmounted');
+      }
     };
-  }, [dispatch, inventoryItems.length, isOnline, shouldRefresh]);
+  }, [dispatch, inventoryItems.length, isOnline, shouldRefresh, fetchInventory]);
 
   // Calcul de la pagination
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -138,7 +150,7 @@ export function useFoodInventory(itemsPerPage = 30) {
         dispatch(setError(`Erreur lors de la suppression: ${errorMessage}`));
 
         // Recharger les données depuis l'API en cas d'échec
-        fetchInventory();
+        fetchInventory(axios.CancelToken.source());
       }
     },
     [dispatch, isOnline]
@@ -147,6 +159,12 @@ export function useFoodInventory(itemsPerPage = 30) {
   // Fonction pour mettre à jour la quantité d'un élément
   const updateItemQuantity = useCallback(
     async (id: number, quantity: string) => {
+      // Validation de la quantité
+      if (!quantity || isNaN(Number(quantity))) {
+        dispatch(setError('Quantité invalide'));
+        return;
+      }
+
       // Trouver l'élément à mettre à jour
       const itemToUpdate = inventoryItems.find(item => item.id === id);
 
@@ -184,52 +202,12 @@ export function useFoodInventory(itemsPerPage = 30) {
           dispatch(setError(`Erreur lors de la mise à jour: ${errorMessage}`));
 
           // Recharger les données depuis l'API en cas d'échec
-          fetchInventory();
+          fetchInventory(axios.CancelToken.source());
         }
       }
     },
     [dispatch, inventoryItems, isOnline]
   );
-
-  // Fonction helper pour charger l'inventaire
-  async function fetchInventory() {
-    const source = axios.CancelToken.source();
-
-    try {
-      dispatch(setLoading(true));
-
-      const response = await axios.get('http://localhost:3300/products', {
-        cancelToken: source.token,
-      });
-
-      const transformedItems: InventoryProduct[] = response.data.products.map((item: Item) => ({
-        id: item._id || Math.random(),
-        name: item.name,
-        prix: `${item.price}₽`,
-        quantity: String(item.availableQuantity),
-        unit: item.unitExpression,
-        description: item.description || '',
-      }));
-
-      dispatch(setInventoryItems(transformedItems));
-      dispatch(setError(null));
-    } catch (err) {
-      const errorMessage = handleApiError(err);
-
-      // Ne pas écraser les données persistées avec une erreur
-      if (inventoryItems.length === 0) {
-        dispatch(setError(errorMessage));
-
-        if (process.env.NODE_ENV !== 'production') {
-          dispatch(setInventoryItems(mockInventoryItems));
-        }
-      }
-    } finally {
-      dispatch(setLoading(false));
-    }
-
-    return () => source.cancel();
-  }
 
   return {
     inventoryItems,
