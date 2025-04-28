@@ -62,7 +62,7 @@ describe('useFoodInventory hook', () => {
 
     store = mockStore({
       inventory: {
-        items: [{ id: 1, name: 'Pomme', prix: '5₽', quantity: '10', unit: 'kg' }],
+        items: [{ id: 1, name: 'Pomme', price: '5₽', quantity: '10', unitExpression: 'kg' }],
         isLoading: false,
         error: null,
         lastFetched: Date.now(),
@@ -148,9 +148,9 @@ describe('useFoodInventory hook', () => {
     const itemsArray = Array.from({ length: 40 }, (_, i) => ({
       id: i + 1,
       name: `Item ${i + 1}`,
-      prix: '5₽',
+      price: '5₽',
       quantity: '10',
-      unit: 'kg',
+      unitExpression: 'kg',
     }));
 
     const paginationStore = mockStore({
@@ -188,7 +188,7 @@ describe('useFoodInventory hook', () => {
     // Configurer un état hors ligne
     const offlineStore = mockStore({
       inventory: {
-        items: [{ id: 1, name: 'Pomme', prix: '5₽', quantity: '10', unit: 'kg' }],
+        items: [{ id: 1, name: 'Pomme', price: '5₽', quantity: '10', unitExpression: 'kg' }],
         isLoading: false,
         error: null,
         lastFetched: Date.now(),

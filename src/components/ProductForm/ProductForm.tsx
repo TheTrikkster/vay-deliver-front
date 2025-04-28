@@ -12,9 +12,9 @@ interface ProductFormProps {
 function ProductForm({ initialValues, onSubmit, isEditing }: ProductFormProps) {
   const [product, setProduct] = useState<Product>({
     name: '',
-    unit: '',
+    unitExpression: '',
     availableQuantity: '',
-    minOrderQuantity: '',
+    minOrder: '',
     price: '',
   });
 
@@ -75,8 +75,8 @@ function ProductForm({ initialValues, onSubmit, isEditing }: ProductFormProps) {
 
           <input
             type="text"
-            name="unit"
-            value={product.unit}
+            name="unitExpression"
+            value={product.unitExpression}
             onChange={handleInputChange}
             className="w-full p-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent placeholder-gray-400 focus:placeholder-transparent transition-all"
             placeholder="Единица измерения ( Штука, Грамм, Кг)"
@@ -93,8 +93,8 @@ function ProductForm({ initialValues, onSubmit, isEditing }: ProductFormProps) {
 
           <input
             type="number"
-            name="minOrderQuantity"
-            value={product.minOrderQuantity}
+            name="minOrder"
+            value={product.minOrder}
             onChange={handleInputChange}
             className="w-full p-4 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent placeholder-gray-400 focus:placeholder-transparent transition-all"
             placeholder="Минимальный объем заказа в цифрах"

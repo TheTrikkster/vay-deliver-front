@@ -15,18 +15,18 @@ describe('Inventory selectors', () => {
   const sampleItem = {
     id: 1,
     name: 'Pomme',
-    prix: '5₽',
+    price: '5₽',
     quantity: '10',
-    unit: 'kg',
+    unitExpression: 'kg',
     description: 'Pommes rouges',
   };
 
   const sampleItem2 = {
     id: 2,
     name: 'Banane',
-    prix: '3₽',
+    price: '3₽',
     quantity: '8',
-    unit: 'kg',
+    unitExpression: 'kg',
     description: 'Bananes jaunes',
   };
 

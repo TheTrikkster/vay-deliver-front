@@ -1,6 +1,5 @@
-import React, { useCallback, useState, ChangeEvent } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { roundToDecimal } from '../components/FoodItemCard/FoodItemCard';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import ProductForm from '../components/ProductForm/ProductForm';
 import axios from 'axios';
 import { Product, ProductApiData, ProductStatus, InventoryProduct } from '../types/product';
@@ -9,31 +8,13 @@ import {
   addInventoryItem,
   addPendingOperation,
   selectIsOnline,
+  deleteInventoryItem,
 } from '../store/slices/createInventorySlice';
 
 function CreateProduct() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const isOnline = useSelector(selectIsOnline);
-  const [newFood, setNewFood] = useState({
-    name: '',
-    description: '',
-    unit: '',
-    availableQuantity: '',
-    minOrderQuantity: '',
-    price: '',
-  });
-
-  const handleCreateInputChange = useCallback(
-    (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-      const { name, value } = e.target;
-      setNewFood(prev => ({
-        ...prev,
-        [name]: name === 'quantity' ? roundToDecimal(parseFloat(value) || 0) : value,
-      }));
-    },
-    []
-  );
 
   const handleCreateProduct = async (productData: Product) => {
     console.log('Creating product:', productData);
@@ -42,10 +23,10 @@ function CreateProduct() {
     const formattedData: ProductApiData = {
       name: productData.name,
       description: productData.description,
-      unitExpression: productData.unit,
+      unitExpression: productData.unitExpression,
       price: parseFloat(productData.price.replace('€', '')),
       availableQuantity: parseInt(productData.availableQuantity),
-      minOrder: parseInt(productData.minOrderQuantity),
+      minOrder: parseInt(productData.minOrder),
       status: ProductStatus.ACTIVE,
     };
 
@@ -53,10 +34,11 @@ function CreateProduct() {
     const tempProduct: InventoryProduct = {
       id: Date.now(), // ID temporaire
       name: productData.name,
-      prix: `${formattedData.price}₽`,
+      price: `${formattedData.price}₽`,
       quantity: String(formattedData.availableQuantity),
-      unit: formattedData.unitExpression,
+      unitExpression: formattedData.unitExpression,
       description: formattedData.description || '',
+      minOrder: formattedData.minOrder,
     };
 
     // Optimistic update: ajouter immédiatement à l'interface
@@ -75,17 +57,19 @@ function CreateProduct() {
           throw new Error('Failed to create product');
         }
 
-        // Mettre à jour avec l'ID réel du serveur
+        // Créer le produit avec l'ID réel du serveur
         const newProduct: InventoryProduct = {
           id: response.data._id || tempProduct.id,
           name: response.data.name,
-          prix: `${response.data.price}₽`,
+          price: response.data.price,
           quantity: String(response.data.availableQuantity),
-          unit: response.data.unitExpression,
+          unitExpression: response.data.unitExpression,
           description: response.data.description || '',
+          minOrder: response.data.minOrder,
         };
 
-        // Remplacer le produit temporaire par le produit réel
+        // Supprimer le produit temporaire et ajouter le produit réel
+        dispatch(deleteInventoryItem(tempProduct.id));
         dispatch(addInventoryItem(newProduct));
       } else {
         // Si hors ligne, ajouter aux opérations en attente
