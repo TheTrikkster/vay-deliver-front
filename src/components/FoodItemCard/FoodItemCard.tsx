@@ -28,6 +28,7 @@ const FoodItemCard: React.FC<{
       }
     });
   }, []);
+
   return (
     <div className="w-11/12 md:w-3/4 bg-white rounded-3xl p-5 relative shadow-md">
       {/* En-tête avec le nom et le menu */}
@@ -73,9 +74,13 @@ const FoodItemCard: React.FC<{
       {/* Prix/Unité */}
       <div className=" text-sm md:text-base">
         <p className="text-[#9DA0A5] mb-1">
-          {food.prix}/{food.unit} | 5 шт мин
+          {food.price}/{food.unitExpression} | {food.minOrder} шт мин
         </p>
-        <p className="text-[#9DA0A5] mb-4">Традиционная колбаса по чечен...</p>
+        <p className="text-[#9DA0A5] mb-4">
+          {food.description && food.description.length > 30
+            ? `${food.description.substring(0, 30)}...`
+            : food.description}
+        </p>
       </div>
 
       <div className="flex w-full justify-between items-center bg-[#F5F5F5] rounded-xl px-4 py-2 md:px-6 md:py-3">

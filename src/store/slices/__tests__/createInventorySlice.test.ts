@@ -25,10 +25,11 @@ describe('inventory reducer', () => {
   const sampleItem: InventoryProduct = {
     id: 1,
     name: 'Pomme',
-    prix: '5₽',
+    price: '5₽',
     quantity: '10',
-    unit: 'kg',
+    unitExpression: 'kg',
     description: 'Pommes rouges',
+    minOrder: 1,
   };
   test("devrait retourner l'état initial", () => {
     expect(inventoryReducer(undefined, { type: '' })).toEqual(initialState);
@@ -90,10 +91,11 @@ describe('inventory reducer', () => {
     const newItem: InventoryProduct = {
       id: 2,
       name: 'Orange',
-      prix: '7₽',
+      price: '7₽',
       quantity: '15',
-      unit: 'kg',
+      unitExpression: 'kg',
       description: 'Oranges juteuses',
+      minOrder: 1,
     };
 
     const actualState = inventoryReducer(initialState, addInventoryItem(newItem));
@@ -156,10 +158,11 @@ describe('inventory reducer', () => {
     const sampleItem: InventoryProduct = {
       id: 1,
       name: 'Pomme',
-      prix: '5₽',
+      price: '5₽',
       quantity: '10',
-      unit: 'kg',
+      unitExpression: 'kg',
       description: 'Pommes rouges',
+      minOrder: 1,
     };
 
     // Vérifier setInventoryItems
@@ -223,10 +226,11 @@ describe('inventory reducer', () => {
     const nonExistentItem: InventoryProduct = {
       id: 999,
       name: 'Produit inexistant',
-      prix: '10₽',
+      price: '10₽',
       quantity: '5',
-      unit: 'pc',
+      unitExpression: 'pc',
       description: "Cet item n'existe pas",
+      minOrder: 1,
     };
 
     // Ajouter un item initial pour avoir un état non vide
@@ -235,10 +239,11 @@ describe('inventory reducer', () => {
       addInventoryItem({
         id: 1,
         name: 'Test',
-        prix: '5₽',
+        price: '5₽',
         quantity: '10',
-        unit: 'kg',
+        unitExpression: 'kg',
         description: '',
+        minOrder: 1,
       })
     );
 
@@ -256,19 +261,21 @@ describe('inventory reducer', () => {
     const item1: InventoryProduct = {
       id: 1,
       name: 'Pomme',
-      prix: '5₽',
+      price: '5₽',
       quantity: '10',
-      unit: 'kg',
+      unitExpression: 'kg',
       description: 'Pommes rouges',
+      minOrder: 1,
     };
 
     const item2: InventoryProduct = {
       id: 2,
       name: 'Banane',
-      prix: '3₽',
+      price: '3₽',
       quantity: '8',
-      unit: 'kg',
+      unitExpression: 'kg',
       description: 'Bananes jaunes',
+      minOrder: 1,
     };
 
     // Séquence d'actions
@@ -288,10 +295,11 @@ describe('inventory reducer', () => {
     const item3: InventoryProduct = {
       id: 3,
       name: 'Orange',
-      prix: '7₽',
+      price: '7₽',
       quantity: '12',
-      unit: 'kg',
+      unitExpression: 'kg',
       description: 'Oranges sucrées',
+      minOrder: 1,
     };
 
     state = inventoryReducer(state, addInventoryItem(item3));

@@ -21,9 +21,10 @@ describe('Composant FoodItemCard', () => {
   const mockFood: InventoryProduct = {
     id: 1,
     name: 'Pommes',
-    prix: '2.50€',
+    price: '2.50€',
     quantity: '3',
-    unit: 'kg',
+    unitExpression: 'kg',
+    minOrder: 1,
   };
 
   const mockProps = {
@@ -44,7 +45,7 @@ describe('Composant FoodItemCard', () => {
     render(<FoodItemCard {...mockProps} />);
 
     expect(screen.getByText('Pommes')).toBeInTheDocument();
-    expect(screen.getByText('2.50€/kg | 5 шт мин')).toBeInTheDocument();
+    expect(screen.getByText('2.50€/kg | 1 шт мин')).toBeInTheDocument();
     expect(screen.getByText('3')).toBeInTheDocument();
   });
 

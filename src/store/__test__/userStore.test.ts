@@ -20,10 +20,11 @@ describe('Store Configuration', () => {
     const sampleItem = {
       id: 1,
       name: 'Test',
-      prix: '10₽',
+      price: '10₽',
       quantity: '5',
-      unit: 'pcs',
+      unitExpression: 'pcs',
       description: 'Test item',
+      minOrder: 1,
     };
 
     store.dispatch(setInventoryItems([sampleItem]));
@@ -43,18 +44,20 @@ describe('Store Configuration', () => {
       {
         id: 1,
         name: 'Test 1',
-        prix: '10₽',
+        price: '10₽',
         quantity: '5',
-        unit: 'pcs',
+        unitExpression: 'pcs',
         description: 'Test item 1',
+        minOrder: 1,
       },
       {
         id: 2,
         name: 'Test 2',
-        prix: '20₽',
+        price: '20₽',
         quantity: '10',
-        unit: 'kg',
+        unitExpression: 'kg',
         description: 'Test item 2',
+        minOrder: 1,
       },
     ];
 

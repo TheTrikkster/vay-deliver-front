@@ -25,6 +25,7 @@ interface Item {
   availableQuantity: number;
   unitExpression: number;
   description: string;
+  minOrder: number;
 }
 
 export function useFoodInventory(itemsPerPage = 30) {
@@ -62,10 +63,11 @@ export function useFoodInventory(itemsPerPage = 30) {
         const transformedItems: InventoryProduct[] = response.data.products.map((item: Item) => ({
           id: item._id || Math.random(),
           name: item.name,
-          prix: `${item.price}₽`,
+          price: `${item.price}₽`,
           quantity: String(item.availableQuantity),
-          unit: item.unitExpression,
+          unitExpression: item.unitExpression,
           description: item.description || '',
+          minOrder: item.minOrder,
         }));
 
         dispatch(setInventoryItems(transformedItems));

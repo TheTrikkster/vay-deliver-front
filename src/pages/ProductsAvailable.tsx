@@ -55,8 +55,8 @@ function ProductsAvailable() {
       id: 1,
       name: 'Pommes Bio',
       description: 'Pommes fraîches de culture biologique locale',
-      prix: 2.99,
-      unite: 'kg',
+      price: 2.99,
+      unitExpression: 'kg',
       stock: 50,
       categorie: 'Fruits',
     },
@@ -64,8 +64,8 @@ function ProductsAvailable() {
       id: 2,
       name: 'Pain Complet',
       description: 'Pain artisanal aux céréales complètes',
-      prix: 3.5,
-      unite: 'pièce',
+      price: 3.5,
+      unitExpression: 'pièce',
       stock: 15,
       categorie: 'Boulangerie',
     },
@@ -73,8 +73,8 @@ function ProductsAvailable() {
       id: 3,
       name: 'Fromage de Chèvre',
       description: 'Fromage de chèvre affiné de production locale',
-      prix: 5.75,
-      unite: '200g',
+      price: 5.75,
+      unitExpression: '200g',
       stock: 8,
       categorie: 'Produits Laitiers',
     },
@@ -82,8 +82,8 @@ function ProductsAvailable() {
       id: 4,
       name: 'Tomates Cerises',
       description: 'Tomates cerises cultivées en serre sans pesticides',
-      prix: 2.25,
-      unite: 'barquette',
+      price: 2.25,
+      unitExpression: 'barquette',
       stock: 30,
       categorie: 'Légumes',
     },
@@ -91,8 +91,8 @@ function ProductsAvailable() {
       id: 5,
       name: 'Miel de Fleurs',
       description: 'Miel artisanal récolté dans les montagnes',
-      prix: 7.8,
-      unite: 'pot de 500g',
+      price: 7.8,
+      unitExpression: 'pot de 500g',
       stock: 12,
       categorie: 'Épicerie',
     },
@@ -119,7 +119,7 @@ function ProductsAvailable() {
 
             <div className="flex justify-between mb-3">
               <p className="font-bold text-red-600 m-0">
-                {produit.prix.toFixed(2)} € / {produit.unite}
+                {produit.price.toFixed(2)} € / {produit.unitExpression}
               </p>
               <p className="text-blue-500 m-0">En stock: {produit.stock}</p>
             </div>

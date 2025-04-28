@@ -47,7 +47,22 @@ export const createInventorySlice = createSlice({
       state.isOnline = action.payload;
     },
     addInventoryItem: (state, action: PayloadAction<InventoryProduct>) => {
-      state.items.push(action.payload);
+      // Vérifier si un produit avec le même nom existe déjà
+      const existingIndex = state.items.findIndex(
+        item =>
+          item.name === action.payload.name &&
+          item.price === action.payload.price &&
+          item.unitExpression === action.payload.unitExpression
+      );
+
+      if (existingIndex !== -1) {
+        // Remplacer le produit existant
+        state.items[existingIndex] = action.payload;
+      } else {
+        // Ajouter un nouveau produit
+        state.items.push(action.payload);
+      }
+
       state.lastFetched = Date.now();
     },
     updateInventoryItem: (state, action: PayloadAction<InventoryProduct>) => {

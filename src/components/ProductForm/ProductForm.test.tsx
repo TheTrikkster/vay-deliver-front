@@ -41,9 +41,9 @@ describe('ProductForm', () => {
     const initialValues = {
       name: 'Test Product',
       description: 'Test Description',
-      unit: 'Kg',
+      unitExpression: 'Kg',
       availableQuantity: '100',
-      minOrderQuantity: '10',
+      minOrder: '10',
       price: '15€',
     };
 
@@ -62,23 +62,25 @@ describe('ProductForm', () => {
 
     const nameInput = screen.getByPlaceholderText('Название продукта');
     const descriptionInput = screen.getByPlaceholderText('Описание');
-    const unitInput = screen.getByPlaceholderText('Единица измерения ( Штука, Грамм, Кг)');
+    const unitExpressionInput = screen.getByPlaceholderText(
+      'Единица измерения ( Штука, Грамм, Кг)'
+    );
     const availableQuantityInput = screen.getByPlaceholderText('Доступное колличество в цифрах');
-    const minOrderQuantityInput = screen.getByPlaceholderText('Минимальный объем заказа в цифрах');
+    const minOrderInput = screen.getByPlaceholderText('Минимальный объем заказа в цифрах');
     const priceInput = screen.getByPlaceholderText('Цена : 18€');
 
     await userEvent.type(nameInput, 'New Product');
     await userEvent.type(descriptionInput, 'New Description');
-    await userEvent.type(unitInput, 'шт');
+    await userEvent.type(unitExpressionInput, 'шт');
     await userEvent.type(availableQuantityInput, '50');
-    await userEvent.type(minOrderQuantityInput, '5');
+    await userEvent.type(minOrderInput, '5');
     await userEvent.type(priceInput, '25€');
 
     expect(nameInput).toHaveValue('New Product');
     expect(descriptionInput).toHaveValue('New Description');
-    expect(unitInput).toHaveValue('шт');
+    expect(unitExpressionInput).toHaveValue('шт');
     expect(availableQuantityInput).toHaveValue(50);
-    expect(minOrderQuantityInput).toHaveValue(5);
+    expect(minOrderInput).toHaveValue(5);
     expect(priceInput).toHaveValue('25€');
   });
 
@@ -87,17 +89,19 @@ describe('ProductForm', () => {
 
     const nameInput = screen.getByPlaceholderText('Название продукта');
     const descriptionInput = screen.getByPlaceholderText('Описание');
-    const unitInput = screen.getByPlaceholderText('Единица измерения ( Штука, Грамм, Кг)');
+    const unitExpressionInput = screen.getByPlaceholderText(
+      'Единица измерения ( Штука, Грамм, Кг)'
+    );
     const availableQuantityInput = screen.getByPlaceholderText('Доступное колличество в цифрах');
-    const minOrderQuantityInput = screen.getByPlaceholderText('Минимальный объем заказа в цифрах');
+    const minOrderInput = screen.getByPlaceholderText('Минимальный объем заказа в цифрах');
     const priceInput = screen.getByPlaceholderText('Цена : 18€');
     const submitButton = screen.getByText('Подтвердить');
 
     await userEvent.type(nameInput, 'New Product');
     await userEvent.type(descriptionInput, 'New Description');
-    await userEvent.type(unitInput, 'шт');
+    await userEvent.type(unitExpressionInput, 'шт');
     await userEvent.type(availableQuantityInput, '50');
-    await userEvent.type(minOrderQuantityInput, '5');
+    await userEvent.type(minOrderInput, '5');
     await userEvent.type(priceInput, '25€');
 
     fireEvent.click(submitButton);
@@ -106,9 +110,9 @@ describe('ProductForm', () => {
     expect(mockSubmit).toHaveBeenCalledWith({
       name: 'New Product',
       description: 'New Description',
-      unit: 'шт',
+      unitExpression: 'шт',
       availableQuantity: '50',
-      minOrderQuantity: '5',
+      minOrder: '5',
       price: '25€',
     });
   });
@@ -121,7 +125,6 @@ describe('ProductForm', () => {
 
     fireEvent.submit(form, { preventDefault: preventDefaultMock });
 
-    // expect(preventDefaultMock).toHaveBeenCalledTimes(1);
     expect(mockSubmit).toHaveBeenCalledTimes(1);
   });
 });
