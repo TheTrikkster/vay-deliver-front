@@ -5,6 +5,8 @@ import { InstallPrompt } from './components/InstallPrompt';
 import { Authenticator, withAuthenticator } from '@aws-amplify/ui-react';
 import '@aws-amplify/ui-react/styles.css';
 import { SyncManager } from './components/SyncManager/SyncManager';
+import Orders from './pages/Orders';
+import Order from './pages/Order';
 
 const Home = lazy(() => import('./pages/Home'));
 const AdminDeliveries = lazy(() => import('./pages/AdminDeliveries'));
@@ -57,6 +59,22 @@ function App() {
       element: (
         <Suspense fallback={<LoadingFallback />}>
           <ProductsAvailable />
+        </Suspense>
+      ),
+    },
+    {
+      path: '/orders',
+      element: (
+        <Suspense fallback={<LoadingFallback />}>
+          <Orders />
+        </Suspense>
+      ),
+    },
+    {
+      path: '/order/:id',
+      element: (
+        <Suspense fallback={<LoadingFallback />}>
+          <Order />
         </Suspense>
       ),
     },

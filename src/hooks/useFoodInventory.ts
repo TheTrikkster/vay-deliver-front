@@ -5,18 +5,18 @@ import { InventoryProduct } from '../types/product';
 import { mockInventoryItems } from '../utils/inventoryData';
 import { handleApiError } from '../utils/errorHandling';
 import {
-  setInventoryItems,
+  setProductsItems,
   setLoading,
   setError,
-  updateInventoryItem,
-  deleteInventoryItem,
+  updateProductsItem,
+  deleteProductsItem,
   addPendingOperation,
-  selectInventoryItems,
-  selectInventoryLoading,
-  selectInventoryError,
-  selectInventoryLastFetched,
+  selectProductsItems,
+  selectProductsLoading,
+  selectProductsError,
+  selectProductsLastFetched,
   selectIsOnline,
-} from '../store/slices/createInventorySlice';
+} from '../store/slices/productsSlice';
 
 interface Item {
   _id: number;
@@ -32,10 +32,10 @@ export function useFoodInventory(itemsPerPage = 30) {
   const dispatch = useDispatch();
 
   // États Redux
-  const inventoryItems = useSelector(selectInventoryItems);
-  const loading = useSelector(selectInventoryLoading);
-  const error = useSelector(selectInventoryError);
-  const lastFetched = useSelector(selectInventoryLastFetched);
+  const inventoryItems = useSelector(selectProductsItems);
+  const loading = useSelector(selectProductsLoading);
+  const error = useSelector(selectProductsError);
+  const lastFetched = useSelector(selectProductsLastFetched);
   const isOnline = useSelector(selectIsOnline);
 
   // États locaux (pour la pagination uniquement)
@@ -70,7 +70,7 @@ export function useFoodInventory(itemsPerPage = 30) {
           minOrder: item.minOrder,
         }));
 
-        dispatch(setInventoryItems(transformedItems));
+        dispatch(setProductsItems(transformedItems));
         dispatch(setError(null));
       } catch (err) {
         const errorMessage = handleApiError(err);
@@ -80,7 +80,7 @@ export function useFoodInventory(itemsPerPage = 30) {
           dispatch(setError(errorMessage));
 
           if (process.env.NODE_ENV !== 'production') {
-            dispatch(setInventoryItems(mockInventoryItems));
+            dispatch(setProductsItems(mockInventoryItems));
           }
         }
       } finally {
@@ -129,7 +129,7 @@ export function useFoodInventory(itemsPerPage = 30) {
   const deleteItem = useCallback(
     async (id: number) => {
       // Optimistic update via Redux
-      dispatch(deleteInventoryItem(id));
+      dispatch(deleteProductsItem(id));
 
       try {
         if (isOnline) {
@@ -173,7 +173,7 @@ export function useFoodInventory(itemsPerPage = 30) {
       if (itemToUpdate) {
         // Optimistic update via Redux
         dispatch(
-          updateInventoryItem({
+          updateProductsItem({
             ...itemToUpdate,
             quantity,
           })

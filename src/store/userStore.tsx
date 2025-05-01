@@ -10,26 +10,32 @@ import {
   REGISTER,
 } from 'redux-persist';
 import storage from 'redux-persist/lib/storage'; // localStorage par défaut
-import inventoryReducer from './slices/createInventorySlice';
+import productsReducer from './slices/productsSlice';
+import ordersReducer from './slices/ordersSlice';
 
-// Configuration de la persistance
-const persistConfig = {
-  key: 'root',
+// Configuration pour persister sélectivement orders
+const ordersPersistConfig = {
+  key: 'orders',
   storage,
-  whitelist: ['inventory'], // Seul inventory sera persisté
-  // Optionnel: ajoutez un stateReconciler pour gérer les conflits de fusion
-  // stateReconciler: autoMergeLevel2
+  whitelist: ['orders'],
 };
 
+// Configuration pour persister les produits (si besoin de sélectivité)
+const productsPersistConfig = {
+  key: 'products',
+  storage,
+  // Si vous voulez tout persister, pas besoin de whitelist
+};
+
+// Combinaison des reducers avec persistance
 const rootReducer = combineReducers({
-  inventory: inventoryReducer,
-  // autres reducers...
+  products: persistReducer(productsPersistConfig, productsReducer),
+  orders: persistReducer(ordersPersistConfig, ordersReducer),
 });
 
-const persistedReducer = persistReducer(persistConfig, rootReducer);
-
+// Créer directement le store sans persistance globale supplémentaire
 export const store = configureStore({
-  reducer: persistedReducer,
+  reducer: rootReducer,
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
       serializableCheck: {

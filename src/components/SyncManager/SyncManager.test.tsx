@@ -4,7 +4,7 @@ import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import { SyncManager } from './SyncManager';
 import axios from 'axios';
-import { removePendingOperation, setError } from '../../store/slices/createInventorySlice';
+import { removePendingOperation, setError } from '../../store/slices/productsSlice';
 
 const mockStore = configureStore([]);
 
@@ -38,7 +38,7 @@ describe('SyncManager', () => {
   beforeEach(() => {
     // Créer un nouveau store pour chaque test
     store = mockStore({
-      inventory: {
+      products: {
         isOnline: true,
         pendingOperations: [],
       },
@@ -89,7 +89,7 @@ describe('SyncManager', () => {
   test('devrait synchroniser les opérations en attente lorsque isOnline devient true', async () => {
     // Configurer le store avec des opérations en attente et isOnline=true
     store = mockStore({
-      inventory: {
+      products: {
         isOnline: true,
         pendingOperations: [
           {
@@ -127,7 +127,7 @@ describe('SyncManager', () => {
   test('devrait appeler axios.post pour les opérations POST', async () => {
     // Configurer le store avec une opération POST en attente
     store = mockStore({
-      inventory: {
+      products: {
         isOnline: true,
         pendingOperations: [
           {
@@ -165,7 +165,7 @@ describe('SyncManager', () => {
   test('devrait appeler axios.patch pour les opérations PATCH', async () => {
     // Configurer le store avec une opération PATCH en attente
     store = mockStore({
-      inventory: {
+      products: {
         isOnline: true,
         pendingOperations: [
           {
@@ -203,7 +203,7 @@ describe('SyncManager', () => {
   test('devrait appeler axios.delete pour les opérations DELETE', async () => {
     // Configurer le store avec une opération DELETE en attente
     store = mockStore({
-      inventory: {
+      products: {
         isOnline: true,
         pendingOperations: [
           {
@@ -240,7 +240,7 @@ describe('SyncManager', () => {
 
     // Configurer le store avec une opération POST en attente
     store = mockStore({
-      inventory: {
+      products: {
         isOnline: true,
         pendingOperations: [
           {
@@ -279,7 +279,7 @@ describe('SyncManager', () => {
   test('devrait ignorer les méthodes non supportées', async () => {
     // Configurer le store avec une opération de méthode non supportée
     store = mockStore({
-      inventory: {
+      products: {
         isOnline: true,
         pendingOperations: [
           {

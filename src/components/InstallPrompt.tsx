@@ -42,7 +42,7 @@ export const InstallPrompt = () => {
   if (!showPrompt) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 bg-white p-4 rounded-lg shadow-lg">
+    <div className="fixed z-10 bottom-4 right-4 bg-white p-4 rounded-lg shadow-lg">
       <p className="mb-2">Installer Vay Deliver sur votre appareil ?</p>
       <div className="flex space-x-2">
         <button onClick={() => setShowPrompt(false)} className="px-3 py-1 bg-gray-200 rounded">

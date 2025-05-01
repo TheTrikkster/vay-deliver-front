@@ -1,19 +1,19 @@
 import { store, persistor } from '../userStore';
 import {
-  setInventoryItems,
-  updateInventoryItem,
-  deleteInventoryItem,
+  setProductsItems,
+  updateProductsItem,
+  deleteProductsItem,
   addPendingOperation,
-} from '../slices/createInventorySlice';
+} from '../slices/productsSlice';
 
 describe('Store Configuration', () => {
-  test('le store devrait avoir le reducer inventory', () => {
+  test('le store devrait avoir le reducer products', () => {
     const state = store.getState();
 
-    expect(state).toHaveProperty('inventory');
-    expect(state.inventory).toHaveProperty('items');
-    expect(state.inventory).toHaveProperty('isOnline');
-    expect(state.inventory).toHaveProperty('pendingOperations');
+    expect(state).toHaveProperty('products');
+    expect(state.products).toHaveProperty('items');
+    expect(state.products).toHaveProperty('isOnline');
+    expect(state.products).toHaveProperty('pendingOperations');
   });
 
   test('les actions devraient modifier le state correctement', () => {
@@ -27,19 +27,19 @@ describe('Store Configuration', () => {
       minOrder: 1,
     };
 
-    store.dispatch(setInventoryItems([sampleItem]));
+    store.dispatch(setProductsItems([sampleItem]));
     let state = store.getState();
 
-    expect(state.inventory.items).toEqual([sampleItem]);
+    expect(state.products.items).toEqual([sampleItem]);
 
     const updatedItem = { ...sampleItem, quantity: '10' };
-    store.dispatch(updateInventoryItem(updatedItem));
+    store.dispatch(updateProductsItem(updatedItem));
     state = store.getState();
 
-    expect(state.inventory.items[0].quantity).toBe('10');
+    expect(state.products.items[0].quantity).toBe('10');
   });
 
-  test('deleteInventoryItem devrait supprimer un élément du state', () => {
+  test('deleteProductsItem devrait supprimer un élément du state', () => {
     const sampleItems = [
       {
         id: 1,
@@ -61,12 +61,12 @@ describe('Store Configuration', () => {
       },
     ];
 
-    store.dispatch(setInventoryItems(sampleItems));
-    store.dispatch(deleteInventoryItem(1));
+    store.dispatch(setProductsItems(sampleItems));
+    store.dispatch(deleteProductsItem(1));
 
     const state = store.getState();
-    expect(state.inventory.items.length).toBe(1);
-    expect(state.inventory.items[0].id).toBe(2);
+    expect(state.products.items.length).toBe(1);
+    expect(state.products.items[0].id).toBe(2);
   });
 
   test('addPendingOperation devrait ajouter une opération en attente', () => {
@@ -81,8 +81,8 @@ describe('Store Configuration', () => {
     store.dispatch(addPendingOperation(pendingOperation));
 
     const state = store.getState();
-    expect(state.inventory.pendingOperations.length).toBeGreaterThan(0);
-    expect(state.inventory.pendingOperations).toContainEqual(pendingOperation);
+    expect(state.products.pendingOperations.length).toBeGreaterThan(0);
+    expect(state.products.pendingOperations).toContainEqual(pendingOperation);
   });
 
   test('le persistor devrait être correctement configuré', () => {

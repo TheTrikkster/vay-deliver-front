@@ -7,7 +7,7 @@ import {
   removePendingOperation,
   setError,
   selectIsOnline,
-} from '../../store/slices/createInventorySlice';
+} from '../../store/slices/productsSlice';
 
 export const SyncManager: React.FC = () => {
   const dispatch = useDispatch();
