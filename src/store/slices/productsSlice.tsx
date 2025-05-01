@@ -2,7 +2,7 @@ import { createSlice, createSelector, PayloadAction } from '@reduxjs/toolkit';
 import { InventoryProduct } from '../../types/product';
 import { RootState } from '../userStore';
 
-interface InventoryState {
+interface ProductsState {
   items: InventoryProduct[];
   lastFetched: number | null;
   isLoading: boolean;
@@ -20,7 +20,7 @@ interface PendingOperation<T = any> {
   method: string;
 }
 
-const initialState: InventoryState = {
+const initialState: ProductsState = {
   items: [],
   lastFetched: null,
   isLoading: false,
@@ -29,11 +29,11 @@ const initialState: InventoryState = {
   pendingOperations: [],
 };
 
-export const createInventorySlice = createSlice({
-  name: 'inventory',
+export const createProductsSlice = createSlice({
+  name: 'products',
   initialState,
   reducers: {
-    setInventoryItems: (state, action: PayloadAction<InventoryProduct[]>) => {
+    setProductsItems: (state, action: PayloadAction<InventoryProduct[]>) => {
       state.items = action.payload;
       state.lastFetched = Date.now();
     },
@@ -46,7 +46,7 @@ export const createInventorySlice = createSlice({
     setOnlineStatus: (state, action: PayloadAction<boolean>) => {
       state.isOnline = action.payload;
     },
-    addInventoryItem: (state, action: PayloadAction<InventoryProduct>) => {
+    addProductsItem: (state, action: PayloadAction<InventoryProduct>) => {
       // Vérifier si un produit avec le même nom existe déjà
       const existingIndex = state.items.findIndex(
         item =>
@@ -65,14 +65,14 @@ export const createInventorySlice = createSlice({
 
       state.lastFetched = Date.now();
     },
-    updateInventoryItem: (state, action: PayloadAction<InventoryProduct>) => {
+    updateProductsItem: (state, action: PayloadAction<InventoryProduct>) => {
       const index = state.items.findIndex(item => item.id === action.payload.id);
       if (index !== -1) {
         state.items[index] = action.payload;
         state.lastFetched = Date.now();
       }
     },
-    deleteInventoryItem: (state, action: PayloadAction<number>) => {
+    deleteProductsItem: (state, action: PayloadAction<number>) => {
       state.items = state.items.filter(item => item.id !== action.payload);
       state.lastFetched = Date.now();
     },
@@ -92,37 +92,37 @@ export const createInventorySlice = createSlice({
 
 // Export des actions
 export const {
-  setInventoryItems,
+  setProductsItems,
   setLoading,
   setError,
   setOnlineStatus,
-  addInventoryItem,
-  updateInventoryItem,
-  deleteInventoryItem,
+  addProductsItem,
+  updateProductsItem,
+  deleteProductsItem,
   addPendingOperation,
   removePendingOperation,
   clearPendingOperations,
-} = createInventorySlice.actions;
+} = createProductsSlice.actions;
 
 // Sélecteurs de base
-export const selectInventoryState = (state: RootState) => state.inventory;
-export const selectInventoryItems = (state: RootState) => state.inventory.items;
-export const selectInventoryLoading = (state: RootState) => state.inventory.isLoading;
-export const selectInventoryError = (state: RootState) => state.inventory.error;
-export const selectInventoryLastFetched = (state: RootState) => state.inventory.lastFetched;
-export const selectIsOnline = (state: RootState) => state.inventory.isOnline;
-export const selectPendingOperations = (state: RootState) => state.inventory.pendingOperations;
+export const selectProductsState = (state: RootState) => state.products;
+export const selectProductsItems = (state: RootState) => state.products.items;
+export const selectProductsLoading = (state: RootState) => state.products.isLoading;
+export const selectProductsError = (state: RootState) => state.products.error;
+export const selectProductsLastFetched = (state: RootState) => state.products.lastFetched;
+export const selectIsOnline = (state: RootState) => state.products.isOnline;
+export const selectPendingOperations = (state: RootState) => state.products.pendingOperations;
 
 // Sélecteurs mémoïsés utile pour le futur mais pour l'instant sont inutiles
-export const selectInventoryItemById = createSelector(
-  [selectInventoryItems, (_, id: number) => id],
+export const selectProductsItemById = createSelector(
+  [selectProductsItems, (_, id: number) => id],
   (items, id) => items.find(item => item.id === id)
 );
 
-export const selectFilteredInventoryItems = createSelector(
-  [selectInventoryItems, (_, filterText: string) => filterText],
+export const selectFilteredProductsItems = createSelector(
+  [selectProductsItems, (_, filterText: string) => filterText],
   (items, filterText) =>
     items.filter(item => item.name.toLowerCase().includes(filterText.toLowerCase()))
 );
 
-export default createInventorySlice.reducer;
+export default createProductsSlice.reducer;

@@ -61,7 +61,7 @@ describe('useFoodInventory hook', () => {
     jest.useFakeTimers();
 
     store = mockStore({
-      inventory: {
+      products: {
         items: [{ id: 1, name: 'Pomme', price: '5₽', quantity: '10', unitExpression: 'kg' }],
         isLoading: false,
         error: null,
@@ -109,7 +109,7 @@ describe('useFoodInventory hook', () => {
     // Vérifie que deleteInventoryItem a été dispatché
     expect(store.dispatch).toHaveBeenCalledWith(
       expect.objectContaining({
-        type: 'inventory/deleteInventoryItem',
+        type: 'products/deleteProductsItem',
         payload: 1,
       })
     );
@@ -131,7 +131,7 @@ describe('useFoodInventory hook', () => {
     // Vérifie que updateInventoryItem a été dispatché avec l'objet mis à jour
     expect(store.dispatch).toHaveBeenCalledWith(
       expect.objectContaining({
-        type: 'inventory/updateInventoryItem',
+        type: 'products/updateProductsItem',
         payload: expect.objectContaining({
           id: 1,
           quantity: '20',
@@ -154,7 +154,7 @@ describe('useFoodInventory hook', () => {
     }));
 
     const paginationStore = mockStore({
-      inventory: {
+      products: {
         items: itemsArray,
         isLoading: false,
         error: null,
@@ -187,7 +187,7 @@ describe('useFoodInventory hook', () => {
   test('en mode hors ligne, devrait ajouter les opérations aux pendingOperations', async () => {
     // Configurer un état hors ligne
     const offlineStore = mockStore({
-      inventory: {
+      products: {
         items: [{ id: 1, name: 'Pomme', price: '5₽', quantity: '10', unitExpression: 'kg' }],
         isLoading: false,
         error: null,
@@ -211,7 +211,7 @@ describe('useFoodInventory hook', () => {
     // Vérifie que l'action optimiste a été dispatché
     expect(offlineStore.dispatch).toHaveBeenCalledWith(
       expect.objectContaining({
-        type: 'inventory/updateInventoryItem',
+        type: 'products/updateProductsItem',
         payload: expect.objectContaining({
           id: 1,
           quantity: '20',
@@ -222,7 +222,7 @@ describe('useFoodInventory hook', () => {
     // Vérifie que l'opération a été ajoutée aux pendingOperations
     expect(offlineStore.dispatch).toHaveBeenCalledWith(
       expect.objectContaining({
-        type: 'inventory/addPendingOperation',
+        type: 'products/addPendingOperation',
         payload: expect.objectContaining({
           type: 'update',
           method: 'PATCH',
@@ -243,7 +243,7 @@ describe('useFoodInventory hook', () => {
     // Vérifie que setError a été dispatché avec le message d'erreur
     expect(store.dispatch).toHaveBeenCalledWith(
       expect.objectContaining({
-        type: 'inventory/setError',
+        type: 'products/setError',
         payload: expect.stringContaining('Erreur'),
       })
     );
@@ -259,7 +259,7 @@ describe('useFoodInventory hook', () => {
     // Vérifie que setError a été dispatché pour une quantité invalide
     expect(store.dispatch).toHaveBeenCalledWith(
       expect.objectContaining({
-        type: 'inventory/setError',
+        type: 'products/setError',
         payload: 'Quantité invalide',
       })
     );
@@ -267,7 +267,7 @@ describe('useFoodInventory hook', () => {
     // Vérifie que updateInventoryItem n'a pas été appelé
     expect(store.dispatch).not.toHaveBeenCalledWith(
       expect.objectContaining({
-        type: 'inventory/updateInventoryItem',
+        type: 'products/updateProductsItem',
       })
     );
   });
@@ -283,7 +283,7 @@ describe('useFoodInventory hook', () => {
     (mockedAxios.CancelToken.source as jest.Mock).mockReturnValue(mockCancelToken);
 
     const oldStore = mockStore({
-      inventory: {
+      products: {
         items: [],
         isLoading: false,
         error: null,
@@ -320,7 +320,7 @@ describe('useFoodInventory hook', () => {
     (mockedAxios.CancelToken.source as jest.Mock).mockReturnValue(mockCancelToken);
 
     const testStore = mockStore({
-      inventory: {
+      products: {
         items: [], // Vide pour forcer le fetch
         isLoading: false,
         error: null,

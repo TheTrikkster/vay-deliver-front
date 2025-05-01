@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { selectIsOnline, selectPendingOperations } from '../store/slices/createInventorySlice';
+import { selectIsOnline, selectPendingOperations } from '../store/slices/productsSlice';
 
 export const OfflineIndicator: React.FC = () => {
   const isOnline = useSelector(selectIsOnline);

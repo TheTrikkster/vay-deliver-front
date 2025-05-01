@@ -1,18 +1,18 @@
-import inventoryReducer, {
-  setInventoryItems,
-  updateInventoryItem,
-  deleteInventoryItem,
+import productsReducer, {
+  setProductsItems,
+  updateProductsItem,
+  deleteProductsItem,
   setLoading,
   setError,
   setOnlineStatus,
   addPendingOperation,
   removePendingOperation,
-  addInventoryItem,
+  addProductsItem,
   clearPendingOperations,
-} from '../createInventorySlice';
+} from '../productsSlice';
 import { InventoryProduct } from '../../../types/product';
 
-describe('inventory reducer', () => {
+describe('products reducer', () => {
   const initialState = {
     items: [],
     isLoading: false,
@@ -32,42 +32,42 @@ describe('inventory reducer', () => {
     minOrder: 1,
   };
   test("devrait retourner l'état initial", () => {
-    expect(inventoryReducer(undefined, { type: '' })).toEqual(initialState);
+    expect(productsReducer(undefined, { type: '' })).toEqual(initialState);
   });
 
-  test('devrait gérer setInventoryItems', () => {
+  test('devrait gérer setProductsItems', () => {
     const items = [sampleItem];
-    const actualState = inventoryReducer(initialState, setInventoryItems(items));
+    const actualState = productsReducer(initialState, setProductsItems(items));
 
     expect(actualState.items).toEqual(items);
     expect(actualState.lastFetched).not.toBeNull();
   });
 
-  test('devrait gérer updateInventoryItem', () => {
+  test('devrait gérer updateProductsItem', () => {
     const startState = {
       ...initialState,
       items: [sampleItem],
     };
 
     const updatedItem = { ...sampleItem, quantity: '20' };
-    const actualState = inventoryReducer(startState, updateInventoryItem(updatedItem));
+    const actualState = productsReducer(startState, updateProductsItem(updatedItem));
 
     expect(actualState.items[0].quantity).toBe('20');
   });
 
-  test('devrait gérer deleteInventoryItem', () => {
+  test('devrait gérer deleteProductsItem', () => {
     const startState = {
       ...initialState,
       items: [sampleItem],
     };
 
-    const actualState = inventoryReducer(startState, deleteInventoryItem(1));
+    const actualState = productsReducer(startState, deleteProductsItem(1));
 
     expect(actualState.items).toHaveLength(0);
   });
 
   test('devrait gérer setOnlineStatus', () => {
-    const actualState = inventoryReducer(initialState, setOnlineStatus(false));
+    const actualState = productsReducer(initialState, setOnlineStatus(false));
 
     expect(actualState.isOnline).toBe(false);
   });
@@ -81,13 +81,13 @@ describe('inventory reducer', () => {
       method: 'PATCH',
     };
 
-    const actualState = inventoryReducer(initialState, addPendingOperation(operation));
+    const actualState = productsReducer(initialState, addPendingOperation(operation));
 
     expect(actualState.pendingOperations).toHaveLength(1);
     expect(actualState.pendingOperations[0]).toEqual(operation);
   });
 
-  test('devrait gérer addInventoryItem', () => {
+  test('devrait gérer addProductsItem', () => {
     const newItem: InventoryProduct = {
       id: 2,
       name: 'Orange',
@@ -98,7 +98,7 @@ describe('inventory reducer', () => {
       minOrder: 1,
     };
 
-    const actualState = inventoryReducer(initialState, addInventoryItem(newItem));
+    const actualState = productsReducer(initialState, addProductsItem(newItem));
 
     expect(actualState.items).toHaveLength(1);
     expect(actualState.items[0]).toEqual(newItem);
@@ -114,11 +114,11 @@ describe('inventory reducer', () => {
       method: 'PATCH',
     };
 
-    const stateWithOperations = inventoryReducer(initialState, addPendingOperation(operation));
+    const stateWithOperations = productsReducer(initialState, addPendingOperation(operation));
 
     expect(stateWithOperations.pendingOperations).toHaveLength(1);
 
-    const clearedState = inventoryReducer(stateWithOperations, clearPendingOperations());
+    const clearedState = productsReducer(stateWithOperations, clearPendingOperations());
 
     expect(clearedState.pendingOperations).toHaveLength(0);
   });
@@ -140,12 +140,12 @@ describe('inventory reducer', () => {
       method: 'DELETE',
     };
 
-    let state = inventoryReducer(initialState, addPendingOperation(operation1));
-    state = inventoryReducer(state, addPendingOperation(operation2));
+    let state = productsReducer(initialState, addPendingOperation(operation1));
+    state = productsReducer(state, addPendingOperation(operation2));
 
     expect(state.pendingOperations).toHaveLength(2);
 
-    state = inventoryReducer(state, removePendingOperation(0));
+    state = productsReducer(state, removePendingOperation(0));
 
     expect(state.pendingOperations).toHaveLength(1);
     expect(state.pendingOperations[0]).toEqual(operation2);
@@ -165,34 +165,34 @@ describe('inventory reducer', () => {
       minOrder: 1,
     };
 
-    // Vérifier setInventoryItems
-    let state = inventoryReducer(initialState, setInventoryItems([sampleItem]));
+    // Vérifier setProductsItems
+    let state = productsReducer(initialState, setProductsItems([sampleItem]));
     expect(state.lastFetched).toBe(startTime);
 
     // Avancer le temps
     const newTime = startTime + 1000;
     jest.spyOn(Date, 'now').mockImplementation(() => newTime);
 
-    // Vérifier addInventoryItem
+    // Vérifier addProductsItem
     const newItem = { ...sampleItem, id: 2, name: 'Orange' };
-    state = inventoryReducer(state, addInventoryItem(newItem));
+    state = productsReducer(state, addProductsItem(newItem));
     expect(state.lastFetched).toBe(newTime);
 
     // Avancer le temps encore
     const newerTime = newTime + 1000;
     jest.spyOn(Date, 'now').mockImplementation(() => newerTime);
 
-    // Vérifier updateInventoryItem
+    // Vérifier updateProductsItem
     const updatedItem = { ...sampleItem, quantity: '15' };
-    state = inventoryReducer(state, updateInventoryItem(updatedItem));
+    state = productsReducer(state, updateProductsItem(updatedItem));
     expect(state.lastFetched).toBe(newerTime);
 
     // Avancer le temps une dernière fois
     const latestTime = newerTime + 1000;
     jest.spyOn(Date, 'now').mockImplementation(() => latestTime);
 
-    // Vérifier deleteInventoryItem
-    state = inventoryReducer(state, deleteInventoryItem(1));
+    // Vérifier deleteProductsItem
+    state = productsReducer(state, deleteProductsItem(1));
     expect(state.lastFetched).toBe(latestTime);
 
     // Nettoyer le mock
@@ -201,7 +201,7 @@ describe('inventory reducer', () => {
 
   test("devrait correctement initialiser l'état", () => {
     // Vérifier que l'état initial est conforme à ce qui est défini
-    const state = inventoryReducer(undefined, { type: 'unknown' });
+    const state = productsReducer(undefined, { type: 'unknown' });
     expect(state).toEqual({
       items: [],
       lastFetched: null,
@@ -214,11 +214,11 @@ describe('inventory reducer', () => {
 
   test('devrait gérer setOnlineStatus', () => {
     // État en ligne
-    let state = inventoryReducer(initialState, setOnlineStatus(true));
+    let state = productsReducer(initialState, setOnlineStatus(true));
     expect(state.isOnline).toBe(true);
 
     // État hors ligne
-    state = inventoryReducer(state, setOnlineStatus(false));
+    state = productsReducer(state, setOnlineStatus(false));
     expect(state.isOnline).toBe(false);
   });
 
@@ -234,9 +234,9 @@ describe('inventory reducer', () => {
     };
 
     // Ajouter un item initial pour avoir un état non vide
-    const initialItemState = inventoryReducer(
+    const initialItemState = productsReducer(
       initialState,
-      addInventoryItem({
+      addProductsItem({
         id: 1,
         name: 'Test',
         price: '5₽',
@@ -248,7 +248,7 @@ describe('inventory reducer', () => {
     );
 
     // Tenter de mettre à jour un item qui n'existe pas
-    const newState = inventoryReducer(initialItemState, updateInventoryItem(nonExistentItem));
+    const newState = productsReducer(initialItemState, updateProductsItem(nonExistentItem));
 
     // Vérifier que l'état n'a pas changé (à part lastFetched qui est mis à jour)
     expect(newState.items).toEqual(initialItemState.items);
@@ -279,15 +279,15 @@ describe('inventory reducer', () => {
     };
 
     // Séquence d'actions
-    let state = inventoryReducer(initialState, setInventoryItems([item1, item2]));
+    let state = productsReducer(initialState, setProductsItems([item1, item2]));
     expect(state.items).toHaveLength(2);
 
     // Mise à jour d'un item
-    state = inventoryReducer(state, updateInventoryItem({ ...item1, quantity: '5' }));
+    state = productsReducer(state, updateProductsItem({ ...item1, quantity: '5' }));
     expect(state.items[0].quantity).toBe('5');
 
     // Suppression d'un item
-    state = inventoryReducer(state, deleteInventoryItem(2));
+    state = productsReducer(state, deleteProductsItem(2));
     expect(state.items).toHaveLength(1);
     expect(state.items[0].id).toBe(1);
 
@@ -302,16 +302,16 @@ describe('inventory reducer', () => {
       minOrder: 1,
     };
 
-    state = inventoryReducer(state, addInventoryItem(item3));
+    state = productsReducer(state, addProductsItem(item3));
     expect(state.items).toHaveLength(2);
     expect(state.items[1].id).toBe(3);
 
     // Changement d'état de chargement
-    state = inventoryReducer(state, setLoading(true));
+    state = productsReducer(state, setLoading(true));
     expect(state.isLoading).toBe(true);
 
     // Erreur
-    state = inventoryReducer(state, setError('Erreur de test'));
+    state = productsReducer(state, setError('Erreur de test'));
     expect(state.error).toBe('Erreur de test');
 
     // Ajout d'opération en attente
@@ -323,11 +323,11 @@ describe('inventory reducer', () => {
       method: 'PATCH',
     };
 
-    state = inventoryReducer(state, addPendingOperation(operation));
+    state = productsReducer(state, addPendingOperation(operation));
     expect(state.pendingOperations).toHaveLength(1);
 
     // Effacement des opérations en attente
-    state = inventoryReducer(state, clearPendingOperations());
+    state = productsReducer(state, clearPendingOperations());
     expect(state.pendingOperations).toHaveLength(0);
   });
 });

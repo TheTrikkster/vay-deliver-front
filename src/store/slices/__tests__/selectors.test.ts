@@ -1,14 +1,14 @@
 import {
-  selectInventoryState,
-  selectInventoryItems,
-  selectInventoryLoading,
-  selectInventoryError,
-  selectInventoryLastFetched,
+  selectProductsState,
+  selectProductsItems,
+  selectProductsLoading,
+  selectProductsError,
+  selectProductsLastFetched,
   selectIsOnline,
   selectPendingOperations,
-  selectInventoryItemById,
-  selectFilteredInventoryItems,
-} from '../createInventorySlice';
+  selectProductsItemById,
+  selectFilteredProductsItems,
+} from '../productsSlice';
 import { RootState } from '../../userStore';
 
 describe('Inventory selectors', () => {
@@ -39,7 +39,7 @@ describe('Inventory selectors', () => {
   };
 
   const mockState = {
-    inventory: {
+    products: {
       items: [sampleItem, sampleItem2],
       isLoading: true,
       error: 'Test error',
@@ -49,24 +49,24 @@ describe('Inventory selectors', () => {
     },
   } as unknown as RootState;
 
-  test("selectInventoryState devrait retourner tout l'état inventory", () => {
-    expect(selectInventoryState(mockState)).toEqual(mockState.inventory);
+  test("selectProductsState devrait retourner tout l'état inventory", () => {
+    expect(selectProductsState(mockState)).toEqual(mockState.products);
   });
 
-  test('selectInventoryItems devrait retourner les items', () => {
-    expect(selectInventoryItems(mockState)).toEqual([sampleItem, sampleItem2]);
+  test('selectProductsItems devrait retourner les items', () => {
+    expect(selectProductsItems(mockState)).toEqual([sampleItem, sampleItem2]);
   });
 
-  test("selectInventoryLoading devrait retourner l'état de chargement", () => {
-    expect(selectInventoryLoading(mockState)).toBe(true);
+  test("selectProductsLoading devrait retourner l'état de chargement", () => {
+    expect(selectProductsLoading(mockState)).toBe(true);
   });
 
-  test("selectInventoryError devrait retourner l'erreur", () => {
-    expect(selectInventoryError(mockState)).toBe('Test error');
+  test("selectProductsError devrait retourner l'erreur", () => {
+    expect(selectProductsError(mockState)).toBe('Test error');
   });
 
-  test('selectInventoryLastFetched devrait retourner lastFetched', () => {
-    expect(selectInventoryLastFetched(mockState)).toBe(12345);
+  test('selectProductsLastFetched devrait retourner lastFetched', () => {
+    expect(selectProductsLastFetched(mockState)).toBe(12345);
   });
 
   test("selectIsOnline devrait retourner l'état de connexion", () => {
@@ -77,21 +77,21 @@ describe('Inventory selectors', () => {
     expect(selectPendingOperations(mockState)).toEqual([operation]);
   });
 
-  test("selectInventoryItemById devrait retourner l'item avec l'ID spécifié", () => {
-    expect(selectInventoryItemById(mockState, 1)).toEqual(sampleItem);
-    expect(selectInventoryItemById(mockState, 999)).toBeUndefined();
+  test("selectProductsItemById devrait retourner l'item avec l'ID spécifié", () => {
+    expect(selectProductsItemById(mockState, 1)).toEqual(sampleItem);
+    expect(selectProductsItemById(mockState, 999)).toBeUndefined();
   });
 
-  test('selectFilteredInventoryItems devrait filtrer les éléments', () => {
-    expect(selectFilteredInventoryItems(mockState, 'Pom')).toEqual([sampleItem]);
-    expect(selectFilteredInventoryItems(mockState, 'Ban')).toEqual([sampleItem2]);
-    expect(selectFilteredInventoryItems(mockState, '')).toEqual([sampleItem, sampleItem2]);
-    expect(selectFilteredInventoryItems(mockState, 'xyz')).toEqual([]);
+  test('selectFilteredProductsItems devrait filtrer les éléments', () => {
+    expect(selectFilteredProductsItems(mockState, 'Pom')).toEqual([sampleItem]);
+    expect(selectFilteredProductsItems(mockState, 'Ban')).toEqual([sampleItem2]);
+    expect(selectFilteredProductsItems(mockState, '')).toEqual([sampleItem, sampleItem2]);
+    expect(selectFilteredProductsItems(mockState, 'xyz')).toEqual([]);
   });
 
   test('les sélecteurs devraient fonctionner avec un état vide', () => {
     const emptyState = {
-      inventory: {
+      products: {
         items: [],
         isLoading: false,
         error: null,
@@ -101,8 +101,8 @@ describe('Inventory selectors', () => {
       },
     } as unknown as RootState;
 
-    expect(selectInventoryItems(emptyState)).toEqual([]);
-    expect(selectInventoryItemById(emptyState, 1)).toBeUndefined();
-    expect(selectFilteredInventoryItems(emptyState, 'test')).toEqual([]);
+    expect(selectProductsItems(emptyState)).toEqual([]);
+    expect(selectProductsItemById(emptyState, 1)).toBeUndefined();
+    expect(selectFilteredProductsItems(emptyState, 'test')).toEqual([]);
   });
 });

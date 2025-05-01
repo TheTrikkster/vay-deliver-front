@@ -30,14 +30,12 @@ function ProductsAvailable() {
     }
 
     if (newQuantity <= 0) {
-      console.log({ selectedProducts });
       // Si la quantité atteint 0, désélectionner le produit
       setSelectedProducts(selectedProducts.filter(id => id !== productId));
       const newQuantities = { ...productQuantities };
       delete newQuantities[productId];
       setProductQuantities(newQuantities);
     } else {
-      console.log({ selectedProducts });
       // Mettre à jour la quantité
       setProductQuantities({ ...productQuantities, [productId]: newQuantity });
       // S'assurer que le produit est sélectionné
@@ -146,7 +144,6 @@ function ProductsAvailable() {
                     value={productQuantities[produit.id] || 1}
                     onChange={e => {
                       const newValue = parseInt(e.target.value) || 0;
-                      console.log({ newValue });
                       updateQuantity(
                         produit.id,
                         newValue,

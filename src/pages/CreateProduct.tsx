@@ -5,11 +5,11 @@ import axios from 'axios';
 import { Product, ProductApiData, ProductStatus, InventoryProduct } from '../types/product';
 import { useDispatch, useSelector } from 'react-redux';
 import {
-  addInventoryItem,
+  addProductsItem,
   addPendingOperation,
   selectIsOnline,
-  deleteInventoryItem,
-} from '../store/slices/createInventorySlice';
+  deleteProductsItem,
+} from '../store/slices/productsSlice';
 
 function CreateProduct() {
   const navigate = useNavigate();
@@ -42,7 +42,7 @@ function CreateProduct() {
     };
 
     // Optimistic update: ajouter immédiatement à l'interface
-    dispatch(addInventoryItem(tempProduct));
+    dispatch(addProductsItem(tempProduct));
 
     try {
       if (isOnline) {
@@ -69,8 +69,8 @@ function CreateProduct() {
         };
 
         // Supprimer le produit temporaire et ajouter le produit réel
-        dispatch(deleteInventoryItem(tempProduct.id));
-        dispatch(addInventoryItem(newProduct));
+        dispatch(deleteProductsItem(tempProduct.id));
+        dispatch(addProductsItem(newProduct));
       } else {
         // Si hors ligne, ajouter aux opérations en attente
         dispatch(

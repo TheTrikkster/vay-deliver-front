@@ -4,7 +4,7 @@ import ProductForm from '../components/ProductForm/ProductForm';
 import { Product } from '../types/product';
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
-import { setError, updateInventoryItem } from '../store/slices/createInventorySlice';
+import { setError, updateProductsItem } from '../store/slices/productsSlice';
 
 function CreateProduct() {
   const { id } = useParams();
@@ -60,7 +60,7 @@ function CreateProduct() {
 
       // Utiliser l'ID tel qu'il est stocké dans MongoDB sans conversion
       dispatch(
-        updateInventoryItem({
+        updateProductsItem({
           id: response.data._id,
           name: response.data.name,
           price: `${response.data.price}₽`,
