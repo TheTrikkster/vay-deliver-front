@@ -7,7 +7,7 @@ interface AddTagModalProps {
 }
 
 const AddTagModal: React.FC<AddTagModalProps> = ({ isOpen, onClose, onConfirm }) => {
-  const [noteText, setNoteText] = useState('');
+  const [noteText, setNoteText] = useState<string>('');
 
   if (!isOpen) return null;
 
@@ -37,13 +37,13 @@ const AddTagModal: React.FC<AddTagModalProps> = ({ isOpen, onClose, onConfirm })
         <div className="flex gap-4">
           <button
             onClick={handleClose}
-            className="flex-1 py-3 px-4 rounded-lg bg-gray-100 text-gray-900"
+            className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-700 transition-colors"
           >
             Отменить
           </button>
           <button
             onClick={handleConfirm}
-            className="flex-1 py-3 px-4 rounded-lg bg-green-500 text-white"
+            className="flex-1 py-3 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors"
           >
             Подтвердить
           </button>

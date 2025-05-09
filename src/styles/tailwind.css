@@ -1,6 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
 @tailwind base;
 
 /* Your own custom base styles */
+@layer base {
+  html {
+    @apply font-sans;
+  }
+  body {
+    @apply text-gray-900 bg-white;
+  }
+}
 
 /* Start purging... */
 @tailwind components;

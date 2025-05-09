@@ -1,4 +1,4 @@
-import { createSlice, createSelector, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { InventoryProduct } from '../../types/product';
 import { RootState } from '../userStore';
 
@@ -12,12 +12,13 @@ interface ProductsState {
 }
 
 // Pour les opérations en attente quand hors ligne
-interface PendingOperation<T = any> {
+interface PendingOperation<T = unknown> {
   type: 'create' | 'update' | 'delete';
   timestamp: number;
   data: T;
   endpoint: string;
   method: string;
+  tempId?: number; // ID temporaire pour les opérations de création
 }
 
 const initialState: ProductsState = {
@@ -29,7 +30,7 @@ const initialState: ProductsState = {
   pendingOperations: [],
 };
 
-export const createProductsSlice = createSlice({
+export const productsSlice = createSlice({
   name: 'products',
   initialState,
   reducers: {
@@ -47,20 +48,20 @@ export const createProductsSlice = createSlice({
       state.isOnline = action.payload;
     },
     addProductsItem: (state, action: PayloadAction<InventoryProduct>) => {
+      const product = action.payload;
+      if (!product.id || !product.name) {
+        console.warn("Tentative d'ajout d'un produit invalide:", product);
+        return;
+      }
       // Vérifier si un produit avec le même nom existe déjà
-      const existingIndex = state.items.findIndex(
-        item =>
-          item.name === action.payload.name &&
-          item.price === action.payload.price &&
-          item.unitExpression === action.payload.unitExpression
-      );
+      const existingIndex = state.items.findIndex(item => item.id === product.id);
 
       if (existingIndex !== -1) {
         // Remplacer le produit existant
-        state.items[existingIndex] = action.payload;
+        state.items[existingIndex] = product;
       } else {
         // Ajouter un nouveau produit
-        state.items.push(action.payload);
+        state.items.push(product);
       }
 
       state.lastFetched = Date.now();
@@ -102,7 +103,7 @@ export const {
   addPendingOperation,
   removePendingOperation,
   clearPendingOperations,
-} = createProductsSlice.actions;
+} = productsSlice.actions;
 
 // Sélecteurs de base
 export const selectProductsState = (state: RootState) => state.products;
@@ -113,16 +114,4 @@ export const selectProductsLastFetched = (state: RootState) => state.products.la
 export const selectIsOnline = (state: RootState) => state.products.isOnline;
 export const selectPendingOperations = (state: RootState) => state.products.pendingOperations;
 
-// Sélecteurs mémoïsés utile pour le futur mais pour l'instant sont inutiles
-export const selectProductsItemById = createSelector(
-  [selectProductsItems, (_, id: number) => id],
-  (items, id) => items.find(item => item.id === id)
-);
-
-export const selectFilteredProductsItems = createSelector(
-  [selectProductsItems, (_, filterText: string) => filterText],
-  (items, filterText) =>
-    items.filter(item => item.name.toLowerCase().includes(filterText.toLowerCase()))
-);
-
-export default createProductsSlice.reducer;
+export default productsSlice.reducer;

@@ -42,14 +42,18 @@ export const InstallPrompt = () => {
   if (!showPrompt) return null;
 
   return (
-    <div className="fixed z-10 bottom-4 right-4 bg-white p-4 rounded-lg shadow-lg">
-      <p className="mb-2">Installer Vay Deliver sur votre appareil ?</p>
-      <div className="flex space-x-2">
-        <button onClick={() => setShowPrompt(false)} className="px-3 py-1 bg-gray-200 rounded">
-          Plus tard
+    <div className="fixed z-10 bottom-4 left-1/2 transform -translate-x-1/2 md:left-auto md:transform-none md:bottom-4 md:right-4 bg-white p-4 rounded-lg shadow-lg">
+      {' '}
+      <p className="mb-2">Установите Vay Deliver на свое устройство ?</p>
+      <div className="flex justify-center space-x-2">
+        <button
+          onClick={() => setShowPrompt(false)}
+          className="flex-1 px-3 py-1 bg-gray-200 rounded"
+        >
+          Позже
         </button>
-        <button onClick={handleInstall} className="px-3 py-1 bg-blue-500 text-white rounded">
-          Installer
+        <button onClick={handleInstall} className="flex-1 px-3 py-1 bg-blue-500 text-white rounded">
+          Установить
         </button>
       </div>
     </div>

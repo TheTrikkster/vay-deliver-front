@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
-function Menu() {
+function Menu({ showAddProd = false }: { showAddProd?: boolean }) {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
 
@@ -26,152 +26,76 @@ function Menu() {
     setIsOpen(!isOpen);
   };
 
-  const menuItems = [
-    { name: 'Продукты', path: '/products' },
-    { name: 'Заказы', path: '/orders' },
-    { name: 'Доставки', path: '/deliveries' },
-    { name: 'О нас', path: '/about' },
-    { name: 'Контакты', path: '/contact' },
-  ];
-
-  const isActive = (path: string) => {
-    return location.pathname === path;
-  };
-
   return (
     <>
-      {/* Header desktop et mobile */}
+      {/* Header */}
       <header className="bg-white shadow-sm">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center h-16">
-            {/* Logo */}
-            <a href="/create-product">
-              <div className="flex items-center gap-2 text-[#1E1E1E] hover:text-[#9DA0A5]">
-                <span className="text-xl font-medium">Добавить</span>
-                <span className="text-3xl font-light leading-none">+</span>
-              </div>
-            </a>
-
-            {/* Navigation desktop */}
-            <nav className="hidden md:flex space-x-8">
-              {menuItems.map(item => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`py-2 px-3 rounded-md transition-colors ${
-                    isActive(item.path)
-                      ? 'bg-[#22C55D] text-white'
-                      : 'text-gray-700 hover:bg-gray-100'
-                  }`}
-                >
-                  {item.name}
-                </Link>
-              ))}
-            </nav>
-
-            {/* Bouton connexion desktop */}
-            <div className="hidden md:block">
-              <Link
-                to="/login"
-                className="py-2 px-4 border border-[#22C55D] text-[#22C55D] rounded-lg hover:bg-[#22C55D] hover:text-white transition-colors"
-              >
-                Войти
-              </Link>
-            </div>
-
-            {/* Bouton hamburger mobile */}
-            <button
-              onClick={toggleMenu}
-              className="md:hidden p-2 rounded-md text-gray-700 hover:bg-gray-100 focus:outline-none"
-              aria-label={isOpen ? 'Закрыть меню' : 'Открыть меню'}
-            >
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                {isOpen ? (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                ) : (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
-                )}
-              </svg>
-            </button>
+        <div className="flex justify-between items-center py-4 pl-4 pr-2">
+          {/* Logo ou div vide */}
+          <div>
+            {showAddProd && (
+              <a href="/create-product">
+                <div className="flex justify-center items-center gap-2 text-[#1E1E1E] hover:text-[#9DA0A5]">
+                  <span className="text-base md:text-xl font-medium">Добавить</span>
+                  <span className="text-2xl md:text-3xl font-light leading-none">+</span>
+                </div>
+              </a>
+            )}
           </div>
+
+          {/* Bouton hamburger */}
+          <button
+            onClick={toggleMenu}
+            className="p-1 rounded-md text-gray-700 hover:bg-gray-100 focus:outline-none"
+            aria-label={isOpen ? 'Закрыть меню' : 'Открыть меню'}
+          >
+            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+          </button>
         </div>
       </header>
 
-      {/* Menu mobile */}
+      {/* Menu overlay */}
       <div
-        className={`fixed inset-0 bg-black bg-opacity-50 z-30 transition-opacity duration-300 ${
+        className={`fixed inset-0 bg-white z-40 transition-opacity duration-300 ${
           isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
-        onClick={toggleMenu}
-      />
-      <div
-        className={`fixed top-0 right-0 bottom-0 w-64 bg-white z-40 shadow-xl transform transition-transform duration-300 ease-in-out ${
-          isOpen ? 'translate-x-0' : 'translate-x-full'
-        }`}
       >
-        <div className="flex flex-col h-full">
-          <div className="p-4 border-b">
-            <div className="flex justify-between items-center">
-              <span className="text-xl font-semibold text-[#22C55D]">Меню</span>
-              <button
-                onClick={toggleMenu}
-                className="p-2 rounded-md text-gray-700 hover:bg-gray-100 focus:outline-none"
-              >
-                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              </button>
-            </div>
-          </div>
+        <button
+          onClick={toggleMenu}
+          className="absolute top-4 right-4 p-2 text-gray-700 hover:bg-gray-100 focus:outline-none"
+        >
+          <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
 
-          {/* Navigation mobile */}
-          <nav className="flex-1 overflow-y-auto py-4">
-            <div className="space-y-1 px-4">
-              {menuItems.map(item => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`block py-2 px-3 rounded-md transition-colors ${
-                    isActive(item.path)
-                      ? 'bg-[#22C55D] text-white'
-                      : 'text-gray-700 hover:bg-gray-100'
-                  }`}
-                >
-                  {item.name}
-                </Link>
-              ))}
-            </div>
-          </nav>
-
-          {/* Bouton connexion mobile */}
-          <div className="p-4 border-t">
-            <Link
-              to="/login"
-              className="block w-full py-2 text-center bg-[#22C55D] text-white rounded-lg hover:bg-[#1FAA4F] transition-colors"
-            >
-              Войти
-            </Link>
-          </div>
+        <div className="flex flex-col items-center justify-center h-full space-y-8 text-2xl">
+          <Link to="/products" className="hover:text-gray-600">
+            Товары
+          </Link>
+          <Link to="/orders" className="hover:text-gray-600">
+            Заказы
+          </Link>
+          <Link to="/settings" className="hover:text-gray-600">
+            Настройки
+          </Link>
+          <Link to="/logout" className="hover:text-gray-600">
+            Выйти
+          </Link>
         </div>
       </div>
-
-      {/* Espace pour compenser la hauteur du header fixe */}
-      <div className="h-16"></div>
     </>
   );
 }
