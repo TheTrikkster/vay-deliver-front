@@ -1,23 +1,60 @@
 import { useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import axios from 'axios';
+import { productsApi } from '../../api/services/productsApi';
+import { ordersApi } from '../../api/services/ordersApi';
 import {
-  setOnlineStatus,
-  selectPendingOperations,
-  removePendingOperation,
-  setError,
-  selectIsOnline,
+  setOnlineStatus as setProductsOnlineStatus,
+  selectPendingOperations as selectProductsPendingOperations,
+  removePendingOperation as removeProductPendingOperation,
+  setError as setProductError,
+  selectIsOnline as selectProductsIsOnline,
+  addProductsItem,
+  deleteProductsItem,
+  updateProductsItem,
 } from '../../store/slices/productsSlice';
+
+import {
+  setOnlineStatus as setOrdersOnlineStatus,
+  selectOrdersPendingOperations,
+  removePendingOperation as removeOrderPendingOperation,
+  selectOrdersIsOnline,
+  AddTagOperationData,
+} from '../../store/slices/ordersSlice';
+
+import { ProductApiData, ProductStatus } from '../../types/product';
+
+interface UpdateOperationData {
+  id: number;
+  name?: string;
+  description?: string;
+  unitExpression?: string;
+  price?: number;
+  availableQuantity?: number;
+  minOrder?: number;
+  status?: ProductStatus;
+}
+
+interface DeleteOperationData {
+  id: number;
+}
 
 export const SyncManager: React.FC = () => {
   const dispatch = useDispatch();
-  const pendingOperations = useSelector(selectPendingOperations) || [];
-  const isOnline = useSelector(selectIsOnline);
+  const productsPendingOperations = useSelector(selectProductsPendingOperations) || [];
+  const ordersPendingOperations = useSelector(selectOrdersPendingOperations) || [];
+  const isProductsOnline = useSelector(selectProductsIsOnline);
+  const isOrdersOnline = useSelector(selectOrdersIsOnline);
 
-  // Mettre à jour le statut en ligne/hors ligne
+  // Mettre à jour le statut en ligne/hors ligne pour les deux slices
   useEffect(() => {
-    const handleOnline = () => dispatch(setOnlineStatus(true));
-    const handleOffline = () => dispatch(setOnlineStatus(false));
+    const handleOnline = () => {
+      dispatch(setProductsOnlineStatus(true));
+      dispatch(setOrdersOnlineStatus(true));
+    };
+    const handleOffline = () => {
+      dispatch(setProductsOnlineStatus(false));
+      dispatch(setOrdersOnlineStatus(false));
+    };
 
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
@@ -28,48 +65,142 @@ export const SyncManager: React.FC = () => {
     };
   }, [dispatch]);
 
-  // Synchroniser les opérations en attente lorsque la connexion est rétablie
-  const syncPendingOperations = useCallback(async () => {
-    if (!isOnline || pendingOperations.length === 0) return;
+  // Synchroniser les opérations produits en attente
+  const syncProductsPendingOperations = useCallback(async () => {
+    if (!isProductsOnline || productsPendingOperations.length === 0) return;
 
-    for (let i = 0; i < pendingOperations.length; i++) {
-      const operation = pendingOperations[i];
+    for (let i = 0; i < productsPendingOperations.length; i++) {
+      const operation = productsPendingOperations[i];
 
       try {
+        let response;
+
         switch (operation.method) {
-          case 'POST':
-            await axios.post(operation.endpoint, operation.data, {
-              headers: { 'Content-Type': 'application/json' },
-            });
+          case 'POST': {
+            const createData = operation.data as ProductApiData;
+            response = await productsApi.create(createData);
+
+            // Gérer les données temporaires pour les créations
+            if (response?.data && operation.tempId) {
+              // Supprimer l'élément temporaire
+              dispatch(deleteProductsItem(operation.tempId));
+
+              // Ajouter l'élément avec l'ID réel si nous avons des données valides
+              if (response.data._id) {
+                const newProduct = {
+                  id: response.data._id,
+                  name: response.data.name || '',
+                  price: response.data.price || 0,
+                  availableQuantity: response.data.availableQuantity || 0,
+                  unitExpression: response.data.unitExpression || '',
+                  description: response.data.description || '',
+                  minOrder: response.data.minOrder || 0,
+                  status: response.data.status || 'ACTIVE',
+                };
+
+                dispatch(addProductsItem(newProduct));
+              }
+            }
             break;
-          case 'PATCH':
-            await axios.patch(operation.endpoint, operation.data, {
-              headers: { 'Content-Type': 'application/json' },
-            });
+          }
+
+          case 'PATCH': {
+            const updateData = operation.data as UpdateOperationData;
+            // Extraire uniquement les données compatibles avec ProductApiData
+            const { id, ...apiUpdateData } = updateData;
+
+            // Maintenant, apiUpdateData sera de type Partial<ProductApiData>
+            response = await productsApi.update(id, apiUpdateData as ProductApiData);
+
+            // Pour les mises à jour, vérifier si nous avons besoin de mettre à jour
+            // les données dans le store avec les données du serveur
+            if (response?.data && updateData && updateData.id) {
+              // Construire un objet complet avec des valeurs par défaut pour éviter les undefined
+              const updatedProduct = {
+                id: updateData.id,
+                name: response.data.name || '',
+                price: response.data.price || 0,
+                availableQuantity: response.data.availableQuantity || 0,
+                unitExpression: response.data.unitExpression || '',
+                description: response.data.description || '',
+                minOrder: response.data.minOrder || 0,
+                status: response.data.status || 'ACTIVE',
+              };
+
+              dispatch(updateProductsItem(updatedProduct));
+            }
             break;
-          case 'DELETE':
-            await axios.delete(operation.endpoint);
+          }
+
+          case 'DELETE': {
+            const deleteData = operation.data as DeleteOperationData;
+            await productsApi.delete(deleteData.id);
+
+            // Vérifier que l'opération a un ID dans les données
+            if (deleteData && deleteData.id) {
+              // Une vérification supplémentaire pour s'assurer que l'élément est bien supprimé
+              // du store Redux (pour le cas où l'optimistic update n'aurait pas fonctionné)
+              dispatch(deleteProductsItem(deleteData.id));
+            }
             break;
+          }
+
           default:
-            console.warn(`Opération non supportée: ${operation.method}`);
+            console.warn(`Opération produit non supportée: ${operation.method}`);
         }
 
         // Supprimer l'opération après réussite
-        dispatch(removePendingOperation(i));
+        dispatch(removeProductPendingOperation(i));
       } catch (error) {
-        console.error(`Erreur lors de la synchronisation: ${error}`);
-        // Ajouter une logique de réessai avec backoff exponentiel serait préférable
-        dispatch(setError(`Erreur de synchronisation: ${error}`));
+        console.error(`Erreur lors de la synchronisation des produits: ${error}`);
+        dispatch(setProductError(`Ошибка синхронизации продукта`));
       }
     }
-  }, [dispatch, isOnline, pendingOperations]);
+  }, [dispatch, isProductsOnline, productsPendingOperations]);
+
+  // Synchroniser les opérations commandes en attente - Version simplifiée
+  const syncOrdersPendingOperations = useCallback(async () => {
+    if (!isOrdersOnline || ordersPendingOperations.length === 0) return;
+
+    for (let i = 0; i < ordersPendingOperations.length; i++) {
+      const operation = ordersPendingOperations[i];
+
+      try {
+        // Actuellement, seules les opérations POST de type addTag sont utilisées
+        if (operation.method === 'POST' && operation.type === 'addTag') {
+          // Assertion de type pour les données d'opération
+          const tagData = operation.data as AddTagOperationData;
+
+          await ordersApi.addTagToOrders([tagData.tagName], tagData.orderIds);
+
+          // Supprimer l'opération après réussite
+          dispatch(removeOrderPendingOperation(i));
+        } else {
+          console.warn(`Opération non implémentée: ${operation.method}, type: ${operation.type}`);
+        }
+      } catch (error) {
+        console.error(`Erreur lors de la synchronisation des commandes: ${error}`);
+      }
+    }
+  }, [dispatch, isOrdersOnline, ordersPendingOperations]);
 
   // Effectuer la synchronisation lorsque la connexion est rétablie
   useEffect(() => {
-    if (isOnline && pendingOperations.length > 0) {
-      syncPendingOperations();
+    if (isProductsOnline && productsPendingOperations.length > 0) {
+      syncProductsPendingOperations();
     }
-  }, [isOnline, pendingOperations, syncPendingOperations]);
+
+    if (isOrdersOnline && ordersPendingOperations.length > 0) {
+      syncOrdersPendingOperations();
+    }
+  }, [
+    isProductsOnline,
+    productsPendingOperations,
+    syncProductsPendingOperations,
+    isOrdersOnline,
+    ordersPendingOperations,
+    syncOrdersPendingOperations,
+  ]);
 
   // Aucun rendu visuel
   return null;

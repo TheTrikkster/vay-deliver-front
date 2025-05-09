@@ -5,14 +5,16 @@ import { InstallPrompt } from './components/InstallPrompt';
 import { Authenticator, withAuthenticator } from '@aws-amplify/ui-react';
 import '@aws-amplify/ui-react/styles.css';
 import { SyncManager } from './components/SyncManager/SyncManager';
-import Orders from './pages/Orders';
-import Order from './pages/Order';
+import GeoPosition from './components/GeoPosition';
+import Check from './pages/Check';
 
 const Home = lazy(() => import('./pages/Home'));
-const AdminDeliveries = lazy(() => import('./pages/AdminDeliveries'));
-const CreateProduct = lazy(() => import('./pages/CreateProduct'));
-const ModifyProduct = lazy(() => import('./pages/ModifyProduct'));
+const AdminProducts = lazy(() => import('./pages/AdminProducts/AdminProducts'));
+const CreateProduct = lazy(() => import('./pages/CreateProduct/CreateProduct'));
+const ModifyProduct = lazy(() => import('./pages/ModifyProduct/ModifyProduct'));
 const ProductsAvailable = lazy(() => import('./pages/ProductsAvailable'));
+const Orders = lazy(() => import('./pages/Orders'));
+const Order = lazy(() => import('./pages/Order/Order'));
 
 const LoadingFallback = () => (
   <div className="flex min-h-screen items-center justify-center bg-neutral-900">
@@ -31,10 +33,10 @@ function App() {
       ),
     },
     {
-      path: '/deliveries',
+      path: '/admin-products',
       element: (
         <Suspense fallback={<LoadingFallback />}>
-          <AdminDeliveries />
+          <AdminProducts />
         </Suspense>
       ),
     },
@@ -75,6 +77,22 @@ function App() {
       element: (
         <Suspense fallback={<LoadingFallback />}>
           <Order />
+        </Suspense>
+      ),
+    },
+    {
+      path: '/geo',
+      element: (
+        <Suspense fallback={<LoadingFallback />}>
+          <GeoPosition />
+        </Suspense>
+      ),
+    },
+    {
+      path: '/check',
+      element: (
+        <Suspense fallback={<LoadingFallback />}>
+          <Check />
         </Suspense>
       ),
     },

@@ -8,6 +8,7 @@ import awsExports from './aws-exports';
 import { Provider } from 'react-redux';
 import { store, persistor } from './store/userStore';
 import { PersistGate } from 'redux-persist/integration/react';
+import './index.css';
 
 Amplify.configure(awsExports);
 
@@ -16,7 +17,10 @@ const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 root.render(
   <React.StrictMode>
     <Provider store={store}>
-      <PersistGate loading={<div>Chargement...</div>} persistor={persistor}>
+      <PersistGate
+        loading={<div className="flex justify-center items-center h-screen">Загрузка...</div>}
+        persistor={persistor}
+      >
         <App />
       </PersistGate>
     </Provider>

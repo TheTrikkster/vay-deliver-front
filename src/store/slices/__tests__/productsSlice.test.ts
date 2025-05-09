@@ -9,8 +9,16 @@ import productsReducer, {
   removePendingOperation,
   addProductsItem,
   clearPendingOperations,
+  selectProductsState,
+  selectProductsLoading,
+  selectProductsItems,
+  selectProductsError,
+  selectProductsLastFetched,
+  selectIsOnline,
+  selectPendingOperations,
 } from '../productsSlice';
-import { InventoryProduct } from '../../../types/product';
+import { InventoryProduct, ProductStatus } from '../../../types/product';
+import { RootState } from '../../userStore';
 
 describe('products reducer', () => {
   const initialState = {
@@ -25,11 +33,12 @@ describe('products reducer', () => {
   const sampleItem: InventoryProduct = {
     id: 1,
     name: 'Pomme',
-    price: '5₽',
-    quantity: '10',
+    price: 5,
+    availableQuantity: 10,
     unitExpression: 'kg',
     description: 'Pommes rouges',
     minOrder: 1,
+    status: ProductStatus.ACTIVE,
   };
   test("devrait retourner l'état initial", () => {
     expect(productsReducer(undefined, { type: '' })).toEqual(initialState);
@@ -49,10 +58,10 @@ describe('products reducer', () => {
       items: [sampleItem],
     };
 
-    const updatedItem = { ...sampleItem, quantity: '20' };
+    const updatedItem = { ...sampleItem, availableQuantity: 20 };
     const actualState = productsReducer(startState, updateProductsItem(updatedItem));
 
-    expect(actualState.items[0].quantity).toBe('20');
+    expect(actualState.items[0].availableQuantity).toBe(20);
   });
 
   test('devrait gérer deleteProductsItem', () => {
@@ -91,11 +100,12 @@ describe('products reducer', () => {
     const newItem: InventoryProduct = {
       id: 2,
       name: 'Orange',
-      price: '7₽',
-      quantity: '15',
+      price: 7,
+      availableQuantity: 15,
       unitExpression: 'kg',
       description: 'Oranges juteuses',
       minOrder: 1,
+      status: ProductStatus.ACTIVE,
     };
 
     const actualState = productsReducer(initialState, addProductsItem(newItem));
@@ -158,11 +168,12 @@ describe('products reducer', () => {
     const sampleItem: InventoryProduct = {
       id: 1,
       name: 'Pomme',
-      price: '5₽',
-      quantity: '10',
+      price: 5,
+      availableQuantity: 10,
       unitExpression: 'kg',
       description: 'Pommes rouges',
       minOrder: 1,
+      status: ProductStatus.ACTIVE,
     };
 
     // Vérifier setProductsItems
@@ -226,11 +237,12 @@ describe('products reducer', () => {
     const nonExistentItem: InventoryProduct = {
       id: 999,
       name: 'Produit inexistant',
-      price: '10₽',
-      quantity: '5',
+      price: 10,
+      availableQuantity: 5,
       unitExpression: 'pc',
       description: "Cet item n'existe pas",
       minOrder: 1,
+      status: ProductStatus.ACTIVE,
     };
 
     // Ajouter un item initial pour avoir un état non vide
@@ -239,11 +251,12 @@ describe('products reducer', () => {
       addProductsItem({
         id: 1,
         name: 'Test',
-        price: '5₽',
-        quantity: '10',
+        price: 5,
+        availableQuantity: 10,
         unitExpression: 'kg',
         description: '',
         minOrder: 1,
+        status: ProductStatus.ACTIVE,
       })
     );
 
@@ -261,21 +274,23 @@ describe('products reducer', () => {
     const item1: InventoryProduct = {
       id: 1,
       name: 'Pomme',
-      price: '5₽',
-      quantity: '10',
+      price: 5,
+      availableQuantity: 10,
       unitExpression: 'kg',
       description: 'Pommes rouges',
       minOrder: 1,
+      status: ProductStatus.ACTIVE,
     };
 
     const item2: InventoryProduct = {
       id: 2,
       name: 'Banane',
-      price: '3₽',
-      quantity: '8',
+      price: 3,
+      availableQuantity: 8,
       unitExpression: 'kg',
       description: 'Bananes jaunes',
       minOrder: 1,
+      status: ProductStatus.ACTIVE,
     };
 
     // Séquence d'actions
@@ -283,8 +298,8 @@ describe('products reducer', () => {
     expect(state.items).toHaveLength(2);
 
     // Mise à jour d'un item
-    state = productsReducer(state, updateProductsItem({ ...item1, quantity: '5' }));
-    expect(state.items[0].quantity).toBe('5');
+    state = productsReducer(state, updateProductsItem({ ...item1, availableQuantity: 5 }));
+    expect(state.items[0].availableQuantity).toBe(5);
 
     // Suppression d'un item
     state = productsReducer(state, deleteProductsItem(2));
@@ -295,11 +310,12 @@ describe('products reducer', () => {
     const item3: InventoryProduct = {
       id: 3,
       name: 'Orange',
-      price: '7₽',
-      quantity: '12',
+      price: 7,
+      availableQuantity: 12,
       unitExpression: 'kg',
       description: 'Oranges sucrées',
       minOrder: 1,
+      status: ProductStatus.ACTIVE,
     };
 
     state = productsReducer(state, addProductsItem(item3));
@@ -329,5 +345,93 @@ describe('products reducer', () => {
     // Effacement des opérations en attente
     state = productsReducer(state, clearPendingOperations());
     expect(state.pendingOperations).toHaveLength(0);
+  });
+});
+
+describe('Inventory selectors', () => {
+  const sampleItem: InventoryProduct = {
+    id: 1,
+    name: 'Pomme',
+    price: 5,
+    availableQuantity: 10,
+    unitExpression: 'kg',
+    description: 'Pommes rouges',
+    minOrder: 1,
+    status: ProductStatus.ACTIVE,
+  };
+
+  const sampleItem2: InventoryProduct = {
+    id: 2,
+    name: 'Banane',
+    price: 3,
+    availableQuantity: 8,
+    unitExpression: 'kg',
+    description: 'Bananes jaunes',
+    minOrder: 1,
+    status: ProductStatus.ACTIVE,
+  };
+
+  const operation = {
+    type: 'update' as const,
+    timestamp: Date.now(),
+    data: { id: 1, availableQuantity: 15 },
+    endpoint: 'products/quantity?id=1&quantity=15',
+    method: 'PATCH',
+  };
+
+  const mockState = {
+    products: {
+      items: [sampleItem, sampleItem2],
+      isLoading: true,
+      error: 'Test error',
+      lastFetched: 12345,
+      isOnline: false,
+      pendingOperations: [operation],
+    },
+    orders: {}, // Ajout pour satisfaire le type RootState
+  } as unknown as RootState;
+
+  test("selectProductsState devrait retourner tout l'état inventory", () => {
+    expect(selectProductsState(mockState)).toEqual(mockState.products);
+  });
+
+  test('selectProductsItems devrait retourner les items', () => {
+    expect(selectProductsItems(mockState)).toEqual([sampleItem, sampleItem2]);
+  });
+
+  test("selectProductsLoading devrait retourner l'état de chargement", () => {
+    expect(selectProductsLoading(mockState)).toBe(true);
+  });
+
+  test("selectProductsError devrait retourner l'erreur", () => {
+    expect(selectProductsError(mockState)).toBe('Test error');
+  });
+
+  test('selectProductsLastFetched devrait retourner lastFetched', () => {
+    expect(selectProductsLastFetched(mockState)).toBe(12345);
+  });
+
+  test("selectIsOnline devrait retourner l'état de connexion", () => {
+    expect(selectIsOnline(mockState)).toBe(false);
+  });
+
+  test('selectPendingOperations devrait retourner les opérations en attente', () => {
+    expect(selectPendingOperations(mockState)).toEqual([operation]);
+  });
+
+  test('les sélecteurs devraient fonctionner avec un état vide', () => {
+    const emptyState = {
+      products: {
+        items: [],
+        isLoading: false,
+        error: null,
+        lastFetched: null,
+        isOnline: true,
+        pendingOperations: [],
+      },
+      orders: {},
+    } as unknown as RootState;
+
+    expect(selectProductsItems(emptyState)).toEqual([]);
   });
 });

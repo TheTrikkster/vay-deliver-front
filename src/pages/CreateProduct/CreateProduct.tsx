@@ -1,15 +1,16 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import ProductForm from '../components/ProductForm/ProductForm';
-import axios from 'axios';
-import { Product, ProductApiData, ProductStatus, InventoryProduct } from '../types/product';
+import ProductForm from '../../components/ProductForm/ProductForm';
+import { Product, ProductStatus, InventoryProduct } from '../../types/product';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   addProductsItem,
   addPendingOperation,
   selectIsOnline,
   deleteProductsItem,
-} from '../store/slices/productsSlice';
+  setError,
+} from '../../store/slices/productsSlice';
+import { productsApi } from '../../api/services/productsApi';
 
 function CreateProduct() {
   const navigate = useNavigate();
@@ -17,29 +18,20 @@ function CreateProduct() {
   const isOnline = useSelector(selectIsOnline);
 
   const handleCreateProduct = async (productData: Product) => {
-    console.log('Creating product:', productData);
-
+    dispatch(setError(null));
     // Préparer les données pour l'API
-    const formattedData: ProductApiData = {
+    const formattedData = {
       name: productData.name,
       description: productData.description,
       unitExpression: productData.unitExpression,
-      price: parseFloat(productData.price.replace('€', '')),
-      availableQuantity: parseInt(productData.availableQuantity),
+      price: productData.price,
+      availableQuantity: productData.availableQuantity,
       minOrder: parseInt(productData.minOrder),
       status: ProductStatus.ACTIVE,
     };
 
     // Créer un objet temporaire avec un ID provisoire pour l'optimistic update
-    const tempProduct: InventoryProduct = {
-      id: Date.now(), // ID temporaire
-      name: productData.name,
-      price: `${formattedData.price}₽`,
-      quantity: String(formattedData.availableQuantity),
-      unitExpression: formattedData.unitExpression,
-      description: formattedData.description || '',
-      minOrder: formattedData.minOrder,
-    };
+    const tempProduct: InventoryProduct = { ...formattedData, id: Date.now() };
 
     // Optimistic update: ajouter immédiatement à l'interface
     dispatch(addProductsItem(tempProduct));
@@ -47,11 +39,7 @@ function CreateProduct() {
     try {
       if (isOnline) {
         // Si en ligne, envoyer au serveur
-        const response = await axios.post('http://localhost:3300/products', formattedData, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
+        const response = await productsApi.create(formattedData);
 
         if (response.status !== 200 && response.status !== 201) {
           throw new Error('Failed to create product');
@@ -59,13 +47,14 @@ function CreateProduct() {
 
         // Créer le produit avec l'ID réel du serveur
         const newProduct: InventoryProduct = {
-          id: response.data._id || tempProduct.id,
+          id: response.data._id,
           name: response.data.name,
           price: response.data.price,
-          quantity: String(response.data.availableQuantity),
+          availableQuantity: response.data.availableQuantity,
           unitExpression: response.data.unitExpression,
           description: response.data.description || '',
           minOrder: response.data.minOrder,
+          status: response.data.status,
         };
 
         // Supprimer le produit temporaire et ajouter le produit réel
@@ -78,17 +67,17 @@ function CreateProduct() {
             type: 'create',
             timestamp: Date.now(),
             data: formattedData,
-            endpoint: 'http://localhost:3300/products',
+            endpoint: 'products',
             method: 'POST',
+            tempId: tempProduct.id, // Ajouter l'ID temporaire pour le retrouver plus tard
           })
         );
       }
 
-      navigate('/deliveries');
+      navigate('/admin-products');
     } catch (error) {
-      console.error('Erreur lors de la création du produit:', error);
-      // Note: nous conservons l'élément dans l'interface même en cas d'erreur
-      // car l'optimistic update est déjà fait, et ce sera corrigé lors de la prochaine synchro
+      dispatch(setError('Продукт больше не существует или был удален'));
+      dispatch(deleteProductsItem(tempProduct.id));
     }
   };
 

@@ -17,7 +17,7 @@ import ordersReducer from './slices/ordersSlice';
 const ordersPersistConfig = {
   key: 'orders',
   storage,
-  whitelist: ['orders'],
+  whitelist: ['orders', 'currentFilters', 'filtersObject'],
 };
 
 // Configuration pour persister les produits (si besoin de sélectivité)

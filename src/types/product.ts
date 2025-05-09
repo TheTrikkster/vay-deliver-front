@@ -15,9 +15,9 @@ export interface BaseProduct {
 
 export interface Product extends BaseProduct {
   unitExpression: string;
-  availableQuantity: string;
+  availableQuantity: number;
   minOrder: string;
-  price: string;
+  price: number;
 }
 
 // Interface pour les données envoyées à l'API
@@ -26,16 +26,17 @@ export interface ProductApiData extends BaseProduct {
   price: number;
   availableQuantity: number;
   minOrder: number;
-  status: ProductStatus;
+  status?: ProductStatus;
 }
 
 // Interface pour les produits affichés dans l'inventaire
 export interface InventoryProduct extends BaseProduct {
   id: number;
-  price: string;
-  quantity: string;
+  price: number;
+  availableQuantity: number;
   unitExpression: string;
   minOrder: number;
+  status: ProductStatus;
 }
 
 // Interface pour les produits disponibles à la commande

@@ -4,28 +4,54 @@ interface OrderCardProps {
   firstName: string;
   lastName: string;
   address: string;
-  distance: string;
   tagNames: string[];
+  products: any;
+  isSelectionMode?: boolean;
+  isSelected?: boolean;
 }
 
 const OrderCard: React.FC<OrderCardProps> = ({
   firstName,
   lastName,
   address,
-  distance,
   tagNames,
+  products,
+  isSelectionMode = false,
+  isSelected = false,
 }) => {
   return (
-    <div className="bg-white rounded-xl p-4 shadow-md cursor-pointer">
+    <div className="bg-white rounded-xl p-4 shadow-md cursor-pointer relative hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-green-500">
+      {/* Checkbox en mode sélection */}
+      {isSelectionMode && (
+        <div className="absolute top-4 right-4">
+          <div
+            className="w-5 h-5 rounded border-2 flex items-center justify-center border-green-500"
+            role="checkbox"
+            aria-checked={isSelected}
+            tabIndex={isSelectionMode ? 0 : -1}
+          >
+            {isSelected && (
+              <svg className="w-4 h-4 text-green-500" viewBox="0 0 20 20" fill="currentColor">
+                <path
+                  fillRule="evenodd"
+                  d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            )}
+          </div>
+        </div>
+      )}
+
       <div className="flex justify-between items-center mb-2">
         <h2 className="text-lg font-medium m-0">
           {firstName} {lastName}
         </h2>
-        {/* <span className="text-gray-600">disrtance</span> */}
       </div>
 
       <div className="flex items-center gap-2 text-gray-600">
         <svg
+          className="w-5 h-5"
           xmlns="http://www.w3.org/2000/svg"
           width="16"
           height="17"
@@ -43,13 +69,11 @@ const OrderCard: React.FC<OrderCardProps> = ({
 
       <div className="flex flex-wrap gap-2">
         {tagNames.map(tag => (
-          <span key={tag} className="bg-gray-100 rounded-full px-2 py-1 text-sm">
+          <span key={tag} className="font-light bg-gray-100 rounded-lg px-2 py-1 text-sm">
             {tag}
           </span>
         ))}
       </div>
-
-      {/* <p className="m-0 text-gray-700 text-sm">{description}</p> */}
     </div>
   );
 };

@@ -2,8 +2,8 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { useNavigate } from 'react-router-dom';
 import OrderCard from '../components/OrderCard/OrderCard';
-import OrdersFilterModal from '../components/OrdersFilterModal';
-import AddTagModal from '../components/AddTagModal';
+import OrdersFilterModal from '../components/OrdersFilterModal/OrdersFilterModal';
+import AddTagModal from '../components/AddTagModal/AddTagModal';
 
 import {
   fetchOrders,
@@ -12,7 +12,6 @@ import {
   toggleSelectionMode,
   toggleOrderSelection,
   selectAllOrders,
-  clearSelection,
   setCurrentFilters,
   selectOrders,
   selectOrdersLoading,
@@ -23,9 +22,11 @@ import {
   selectSelectedOrderIds,
   selectCurrentFilters,
 } from '../store/slices/ordersSlice';
+import Pagination from '../components/PaginationComp/PaginationComp';
+import Loading from '../components/Loading';
+import Menu from '../components/Menu/Menu';
 
 function Orders() {
-  // Hooks
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
@@ -40,12 +41,13 @@ function Orders() {
   const currentFilters = useAppSelector(selectCurrentFilters);
 
   // États locaux pour les modals
-  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
-  const [isAddTagModalOpen, setIsAddTagModalOpen] = useState(false);
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState<boolean>(false);
+  const [isAddTagModalOpen, setIsAddTagModalOpen] = useState<boolean>(false);
 
   // Chargement initial des données
   useEffect(() => {
-    dispatch(fetchOrders({ page: currentPage, filters: currentFilters }));
+    console.log({ currentFilters });
+    dispatch(fetchOrders({ page: currentPage, filters: currentFilters, limit: 30 }));
   }, [dispatch, currentPage, currentFilters]);
 
   // Handlers mémorisés
@@ -66,6 +68,7 @@ function Orders() {
 
   const handleFilterApply = useCallback(
     (filters: string) => {
+      console.log({ filters });
       dispatch(setCurrentFilters(filters));
       dispatch(setCurrentPage(1));
       setIsFilterModalOpen(false);
@@ -87,29 +90,19 @@ function Orders() {
     [dispatch, selectedOrderIds]
   );
 
-  const handlePreviousPage = useCallback(() => {
-    if (currentPage > 1) {
-      dispatch(setCurrentPage(currentPage - 1));
-    }
-  }, [dispatch, currentPage]);
-
-  const handleNextPage = useCallback(() => {
-    if (currentPage < totalPages) {
-      dispatch(setCurrentPage(currentPage + 1));
-    }
-  }, [dispatch, currentPage, totalPages]);
-
-  // Header conditionnel
   const renderHeader = () => {
     if (isSelectionMode) {
       return (
         <>
-          <button onClick={() => dispatch(toggleSelectionMode(false))} className="text-gray-700">
+          <button
+            onClick={() => dispatch(toggleSelectionMode(false))}
+            className="text-base font-medium"
+          >
             Отменить
           </button>
-          <span className="text-xl">{selectedOrderIds.length}</span>
-          <button onClick={handleSelectAll} className="text-gray-700">
-            Выделить все
+          <span className="text-base">{selectedOrderIds.length}</span>
+          <button onClick={handleSelectAll} className="text-base font-medium">
+            {selectedOrderIds.length !== orders.length ? 'Выделить все' : 'Убрать все'}
           </button>
         </>
       );
@@ -117,11 +110,11 @@ function Orders() {
 
     return (
       <>
-        <button className="text-xl m-0" onClick={() => setIsFilterModalOpen(true)}>
+        <button className="text-base font-medium" onClick={() => setIsFilterModalOpen(true)}>
           Фильтры
         </button>
         <button
-          className="bg-transparent border-none text-base text-gray-700 cursor-pointer flex items-center"
+          className="text-base font-medium"
           onClick={() => dispatch(toggleSelectionMode(true))}
         >
           Заметка +
@@ -130,72 +123,85 @@ function Orders() {
     );
   };
 
-  return (
-    <div className="min-h-screen bg-gray-100 relative">
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          {renderHeader()}
-        </div>
-      </header>
+  if (loading) {
+    return <Loading />;
+  }
 
-      <div className="max-w-7xl mx-auto py-4 px-0 md:px-5">
-        {loading ? (
-          <div className="text-center py-10">Chargement...</div>
-        ) : error ? (
-          <div className="text-center py-10 text-red-500">
-            {error}
-            <button
-              onClick={() => dispatch(fetchOrders({ page: currentPage, filters: currentFilters }))}
-              className="ml-4 px-4 py-2 bg-green-500 text-white rounded-lg"
-            >
-              Réessayer
-            </button>
-          </div>
-        ) : (
+  return (
+    <div className="min-h-screen bg-gray-100 relative pb-6">
+      <Menu />
+      {error ? (
+        <div className="text-center py-10 text-red-500">
+          {error}
+          <button
+            onClick={() =>
+              dispatch(fetchOrders({ page: currentPage, filters: currentFilters, limit: 30 }))
+            }
+            className="ml-4 px-4 py-2 bg-green-500 text-white rounded-lg"
+          >
+            Попробуйте еще раз
+          </button>
+        </div>
+      ) : (
+        <>
+          <header className="bg-white border-b border-gray-200 mb-5">
+            <hr className="border-gray-200" />
+            <div className="px-4 py-4 flex justify-between items-center">{renderHeader()}</div>
+          </header>
           <div className="flex flex-col gap-5">
             {orders.map(order => (
               <div
+                className="md:px-5 px-4"
                 key={order._id}
-                className={`transition-all duration-200 ${
-                  selectedOrderIds.includes(order._id)
-                    ? 'border-2 border-green-500 rounded-xl'
-                    : 'border-2 border-transparent rounded-xl'
-                }`}
                 onClick={() => handleCardClick(order._id)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={e => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    handleCardClick(order._id);
+                  }
+                }}
               >
                 <OrderCard
                   firstName={order.firstName}
                   lastName={order.lastName}
+                  products={order.items}
                   address={order.address}
-                  distance={`${order.address} €/${order.unitExpression}`}
                   tagNames={order.tagNames}
+                  isSelectionMode={isSelectionMode}
+                  isSelected={selectedOrderIds.includes(order._id)}
                 />
               </div>
             ))}
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={page => dispatch(setCurrentPage(page))}
+            />
+
+            {isSelectionMode && selectedOrderIds.length > 0 && (
+              <button
+                className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-green-500 text-white flex items-center justify-center text-4xl shadow-lg"
+                onClick={() => setIsAddTagModalOpen(true)}
+              >
+                +
+              </button>
+            )}
+
+            <OrdersFilterModal
+              isOpen={isFilterModalOpen}
+              onClose={() => setIsFilterModalOpen(false)}
+              onApply={handleFilterApply}
+            />
+
+            <AddTagModal
+              isOpen={isAddTagModalOpen}
+              onClose={() => setIsAddTagModalOpen(false)}
+              onConfirm={handleAddNote}
+            />
           </div>
-        )}
-      </div>
-
-      {isSelectionMode && selectedOrderIds.length > 0 && (
-        <button
-          className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-green-500 text-white flex items-center justify-center text-3xl shadow-lg"
-          onClick={() => setIsAddTagModalOpen(true)}
-        >
-          +
-        </button>
+        </>
       )}
-
-      <OrdersFilterModal
-        isOpen={isFilterModalOpen}
-        onClose={() => setIsFilterModalOpen(false)}
-        onApply={handleFilterApply}
-      />
-
-      <AddTagModal
-        isOpen={isAddTagModalOpen}
-        onClose={() => setIsAddTagModalOpen(false)}
-        onConfirm={handleAddNote}
-      />
     </div>
   );
 }
