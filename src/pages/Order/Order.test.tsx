@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import Order from './Order';
 import { ordersApi } from '../../api/services/ordersApi';
 import { AxiosResponse } from 'axios';
@@ -10,16 +10,27 @@ jest.mock('../../api/services/ordersApi');
 jest.mock('react-router-dom', () => ({
   useParams: jest.fn(),
   useNavigate: jest.fn(),
+  useLocation: jest.fn().mockReturnValue({ pathname: '/order/123' }),
+  Link: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 jest.mock('../../api/config');
+
+// 1. Ajouter le mock pour le composant Menu
+jest.mock('../../components/Menu/Menu', () => {
+  return function MockMenu() {
+    return <div data-testid="mock-menu">Menu</div>;
+  };
+});
 
 const mockedOrdersApi = ordersApi as jest.Mocked<typeof ordersApi>;
 const mockedUseParams = useParams as jest.Mock;
 const mockedUseNavigate = useNavigate as jest.Mock;
+const mockedUseLocation = useLocation as jest.Mock;
 
 describe('Order', () => {
   const mockNavigate = jest.fn();
   const mockOrderId = '123';
+  const mockLocation = { pathname: '/order/123' };
 
   const mockOrderData = {
     firstName: 'Jean',
@@ -53,6 +64,7 @@ describe('Order', () => {
     jest.clearAllMocks();
     mockedUseParams.mockReturnValue({ id: mockOrderId });
     mockedUseNavigate.mockReturnValue(mockNavigate);
+    mockedUseLocation.mockReturnValue(mockLocation);
     mockedOrdersApi.getById.mockResolvedValue(createAxiosResponse(mockOrderData));
   });
 

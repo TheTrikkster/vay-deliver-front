@@ -4,7 +4,7 @@ export interface GeoLocation {
 }
 
 export interface Item {
-  _id: string;
+  productId: string;
   quantity: number;
 }
 
@@ -19,6 +19,14 @@ export interface Order {
   items: Item[];
   unitExpression: string;
   geoLocation: GeoLocation;
+}
+
+export interface OrderDetails {
+  address: string;
+  firstName: string;
+  lastName: string;
+  phoneNumber: string;
+  items: Item[];
 }
 
 export interface Tag {

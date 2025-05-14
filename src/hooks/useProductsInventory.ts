@@ -55,6 +55,7 @@ export function useProductsInventory(itemsPerPage = 30) {
   const fetchInventory = useCallback(
     async (page = 1) => {
       try {
+        dispatch(setError(null));
         dispatch(setLoading(true));
 
         // Modifier l'URL pour inclure les paramètres de pagination
@@ -76,8 +77,7 @@ export function useProductsInventory(itemsPerPage = 30) {
         dispatch(setProductsItems(transformedItems));
         dispatch(setError(null));
       } catch (err) {
-        const errorMessage = handleApiError(err);
-        dispatch(setError(errorMessage));
+        dispatch(setError('Не удалось получить продукты'));
       } finally {
         dispatch(setLoading(false));
       }
@@ -115,7 +115,7 @@ export function useProductsInventory(itemsPerPage = 30) {
           );
         }
       } catch (err) {
-        const errorMessage = handleApiError(err);
+        console.log('Error deleting item:', err);
         dispatch(setError('Ошибка при удалении'));
 
         // Recharger les données depuis l'API en cas d'échec
@@ -148,15 +148,7 @@ export function useProductsInventory(itemsPerPage = 30) {
   // Fonction pour mettre à jour la quantité d'un élément
   const updateItemQuantity = useCallback(
     async (id: number, availableQuantity: number) => {
-      // Validation de la quantité
-      if (!availableQuantity || availableQuantity < 0 || isNaN(Number(availableQuantity))) {
-        dispatch(setError('Неверное количество'));
-        return;
-      }
-
-      // Trouver l'élément à mettre à jour
       const itemToUpdate = inventoryItems.find(item => item.id === id);
-
       if (itemToUpdate) {
         performOptimisticUpdate(
           itemToUpdate,

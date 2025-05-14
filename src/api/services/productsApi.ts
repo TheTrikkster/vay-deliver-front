@@ -6,6 +6,9 @@ export const productsApi = {
   getAll: (page = 1, limit = 30) =>
     api.get(`${ENDPOINTS.PRODUCTS.BASE}`, { params: { page, limit } }),
 
+  getClientProducts: (page = 1, limit = 30) =>
+    api.get(`${ENDPOINTS.PRODUCTS.CLIENT}`, { params: { page, limit } }),
+
   getById: (id: string | number) => api.get(`${ENDPOINTS.PRODUCTS.BASE}/${id}`),
 
   create: (productData: ProductApiData) => api.post(ENDPOINTS.PRODUCTS.BASE, productData),

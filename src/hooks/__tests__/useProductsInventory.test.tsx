@@ -240,29 +240,6 @@ describe('useProductsInventory hook', () => {
     );
   });
 
-  test('updateItemQuantity devrait valider les entrées', async () => {
-    const { result } = renderHook(() => useProductsInventory(), { wrapper });
-
-    await act(async () => {
-      await result.current.updateItemQuantity(1, 0);
-    });
-
-    // Vérifie que setError a été dispatché pour une quantité invalide
-    expect(store.dispatch).toHaveBeenCalledWith(
-      expect.objectContaining({
-        type: 'products/setError',
-        payload: 'Неверное количество',
-      })
-    );
-
-    // Vérifie que updateInventoryItem n'a pas été appelé
-    expect(store.dispatch).not.toHaveBeenCalledWith(
-      expect.objectContaining({
-        type: 'products/updateProductsItem',
-      })
-    );
-  });
-
   test('devrait rafraîchir les données selon shouldRefresh', async () => {
     const getMock = (productsApi.getAll as jest.Mock).mockResolvedValue({
       data: {

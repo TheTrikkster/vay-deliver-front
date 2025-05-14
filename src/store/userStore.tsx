@@ -12,6 +12,7 @@ import {
 import storage from 'redux-persist/lib/storage'; // localStorage par défaut
 import productsReducer from './slices/productsSlice';
 import ordersReducer from './slices/ordersSlice';
+import clientReducer from './slices/clientSlice';
 
 // Configuration pour persister sélectivement orders
 const ordersPersistConfig = {
@@ -27,10 +28,17 @@ const productsPersistConfig = {
   // Si vous voulez tout persister, pas besoin de whitelist
 };
 
+const clientPersistConfig = {
+  key: 'client',
+  storage,
+  // Si vous voulez tout persister, pas besoin de whitelistf
+};
+
 // Combinaison des reducers avec persistance
 const rootReducer = combineReducers({
   products: persistReducer(productsPersistConfig, productsReducer),
   orders: persistReducer(ordersPersistConfig, ordersReducer),
+  client: persistReducer(clientPersistConfig, clientReducer),
 });
 
 // Créer directement le store sans persistance globale supplémentaire

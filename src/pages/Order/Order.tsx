@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ordersApi } from '../../api/services/ordersApi';
 import Loading from '../../components/Loading';
+import Menu from '../../components/Menu/Menu';
 
 interface OrderProps {
   firstName: string;
@@ -85,15 +86,12 @@ const Order: React.FC = () => {
     return <Loading />;
   }
 
-  if (error) {
-    return <div className="text-center text-red-500 p-4">{error}</div>;
-  }
-
   return orderDetails ? (
-    <div className="w-full min-h-screen flex flex-col md:bg-[#F5F5F5] pt-16 md:pt-0">
+    <div className="w-full min-h-screen flex flex-col md:bg-[#F5F5F5] md:pt-0">
+      <Menu />
       <button
         onClick={() => navigate(-1)}
-        className="fixed md:absolute top-4 left-4 p-2 rounded-full transition-colors z-10 md:bg-transparent"
+        className="absolute top-3 left-4 p-2 rounded-full transition-colors z-10 md:bg-transparent"
       >
         <svg
           width="24"
@@ -260,8 +258,11 @@ const Order: React.FC = () => {
       </div>
     </div>
   ) : (
-    <div>
-      <p>Erreur lors de la récupération de la commande</p>
+    <div
+      data-testid="error-message"
+      className="absolute top-60 left-1/2 transform -translate-x-1/2 bg-red-100 px-6 py-3 rounded-lg shadow-md"
+    >
+      <p className="text-red-500">{error}</p>
     </div>
   );
 };

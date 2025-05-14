@@ -1,53 +1,73 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
-function Menu({ showAddProd = false }: { showAddProd?: boolean }) {
+interface MenuProps {
+  showAddProd?: boolean;
+}
+
+const MENU_LINKS = [
+  { path: '/admin-products', label: 'Товары' },
+  { path: '/admin-orders', label: 'Заказы' },
+  { path: '/settings', label: 'Настройки' },
+  { path: '/logout', label: 'Выйти' },
+] as const;
+
+function Menu({ showAddProd = false }: MenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const menuRef = useRef<HTMLDivElement>(null);
 
-  // Ferme le menu mobile quand on change de page
-  useEffect(() => {
-    setIsOpen(false);
-  }, [location]);
+  const isActivePage = (path: string) => location.pathname === path;
 
-  // Empêche le défilement du body quand le menu mobile est ouvert
   useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isOpen) {
+        setIsOpen(false);
+      }
+    };
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
     if (isOpen) {
       document.body.style.overflow = 'hidden';
+      document.addEventListener('keydown', handleKeyDown);
+      document.addEventListener('mousedown', handleClickOutside);
     } else {
       document.body.style.overflow = 'auto';
     }
+
     return () => {
       document.body.style.overflow = 'auto';
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isOpen]);
 
-  const toggleMenu = () => {
-    setIsOpen(!isOpen);
-  };
-
   return (
     <>
-      {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="flex justify-between items-center py-4 pl-4 pr-2">
-          {/* Logo ou div vide */}
           <div>
             {showAddProd && (
-              <a href="/create-product">
-                <div className="flex justify-center items-center gap-2 text-[#1E1E1E] hover:text-[#9DA0A5]">
-                  <span className="text-base md:text-xl font-medium">Добавить</span>
-                  <span className="text-2xl md:text-3xl font-light leading-none">+</span>
-                </div>
-              </a>
+              <Link
+                to="/create-product"
+                className="flex items-center gap-2 text-[#1E1E1E] hover:text-[#9DA0A5] transition-colors"
+              >
+                <span className="text-base md:text-xl font-medium">Добавить</span>
+                <span className="text-2xl md:text-3xl font-light leading-none">+</span>
+              </Link>
             )}
           </div>
 
-          {/* Bouton hamburger */}
           <button
-            onClick={toggleMenu}
-            className="p-1 rounded-md text-gray-700 hover:bg-gray-100 focus:outline-none"
-            aria-label={isOpen ? 'Закрыть меню' : 'Открыть меню'}
+            onClick={() => setIsOpen(true)}
+            className="p-1 rounded-md text-gray-700 hover:bg-gray-100"
+            aria-label={isOpen ? 'Переключить меню' : 'Открыть меню'}
+            aria-expanded={isOpen}
           >
             <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
@@ -61,15 +81,20 @@ function Menu({ showAddProd = false }: { showAddProd?: boolean }) {
         </div>
       </header>
 
-      {/* Menu overlay */}
       <div
-        className={`fixed inset-0 bg-white z-40 transition-opacity duration-300 ${
-          isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        ref={menuRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Menu principal"
+        className={`fixed inset-0 bg-white z-40 transform transition-all duration-300 ${
+          isOpen ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full pointer-events-none'
         }`}
       >
         <button
-          onClick={toggleMenu}
-          className="absolute top-4 right-4 p-2 text-gray-700 hover:bg-gray-100 focus:outline-none"
+          onClick={() => setIsOpen(false)}
+          className="absolute top-5 right-2 p-1 text-gray-700 hover:bg-gray-100"
+          aria-label="Закрыть меню"
+          data-testid="close-menu-button"
         >
           <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path
@@ -81,20 +106,19 @@ function Menu({ showAddProd = false }: { showAddProd?: boolean }) {
           </svg>
         </button>
 
-        <div className="flex flex-col items-center justify-center h-full space-y-8 text-2xl">
-          <Link to="/products" className="hover:text-gray-600">
-            Товары
-          </Link>
-          <Link to="/orders" className="hover:text-gray-600">
-            Заказы
-          </Link>
-          <Link to="/settings" className="hover:text-gray-600">
-            Настройки
-          </Link>
-          <Link to="/logout" className="hover:text-gray-600">
-            Выйти
-          </Link>
-        </div>
+        <nav className="flex flex-col items-center justify-center h-full space-y-8 text-2xl">
+          {MENU_LINKS.map(({ path, label }) => (
+            <Link
+              key={path}
+              to={path}
+              className={`hover:text-gray-600 transition-colors ${
+                isActivePage(path) ? 'text-[#4F46E5] font-medium' : ''
+              }`}
+            >
+              {label}
+            </Link>
+          ))}
+        </nav>
       </div>
     </>
   );

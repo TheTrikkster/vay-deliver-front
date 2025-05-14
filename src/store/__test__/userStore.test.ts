@@ -18,15 +18,48 @@ describe('Store Configuration', () => {
   test('le store devrait avoir tous les reducers nécessaires', () => {
     const state = store.getState();
 
-    // Vérifier présence des deux reducers
+    // Vérifier la structure du state products
     expect(state).toHaveProperty('products');
-    expect(state).toHaveProperty('orders');
+    expect(state.products).toEqual(
+      expect.objectContaining({
+        error: null,
+        isLoading: false,
+        isOnline: true,
+        items: [],
+        lastFetched: null,
+        pendingOperations: [],
+      })
+    );
 
-    // Vérifier structure de base des reducers
-    expect(state.products).toHaveProperty('items');
-    expect(state.products).toHaveProperty('pendingOperations');
-    expect(state.orders).toHaveProperty('orders');
-    expect(state.orders).toHaveProperty('selectedOrderIds');
+    // Vérifier la structure du state orders
+    expect(state).toHaveProperty('orders');
+    expect(state.orders).toEqual(
+      expect.objectContaining({
+        _persist: {
+          rehydrated: true,
+          version: -1,
+        },
+        currentFilters: 'status=ACTIVE',
+        currentPage: 1,
+        error: null,
+        filtersObject: {
+          position: {
+            address: '',
+            lat: '',
+            lng: '',
+          },
+          status: 'ACTIVE',
+          tagNames: [],
+        },
+        isOnline: true,
+        isSelectionMode: false,
+        loading: false,
+        orders: [],
+        pendingOperations: [],
+        selectedOrderIds: [],
+        totalPages: 1,
+      })
+    );
   });
 
   // Test d'intégration - actions fonctionnent sur tous les reducers
