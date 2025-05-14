@@ -3,6 +3,7 @@ export const ENDPOINTS = {
     BASE: '/products',
     QUANTITY: '/products/quantity',
     STATUS: '/products/status',
+    CLIENT: '/products/client',
   },
   ORDERS: {
     BASE: '/orders',

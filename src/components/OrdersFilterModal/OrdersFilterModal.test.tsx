@@ -3,25 +3,51 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import OrdersFilterModal from './OrdersFilterModal';
 import { tagsApi } from '../../api/services/tagsApi';
 import * as filterUtils from '../../utils/filterUtils';
+import { useSelector } from 'react-redux';
 
 // Mock les services et les utilitaires
 jest.mock('../../api/services/tagsApi');
 jest.mock('../../utils/filterUtils');
 jest.mock('lodash', () => ({
-  debounce: (fn: any) => fn, // Simplifier debounce pour les tests
+  debounce:
+    (fn: any) =>
+    (...args: any[]) => {
+      return new Promise(resolve => {
+        setTimeout(() => {
+          resolve(fn(...args));
+        }, 0);
+      });
+    },
 }));
 
 // Mock react-redux
 jest.mock('react-redux', () => ({
   useDispatch: () => jest.fn(),
-  useSelector: jest.fn().mockImplementation(() => {
-    // Retourne l'objet de filtres avec la nouvelle structure
-    return {
-      status: 'ACTIVE',
-      tagNames: [],
-      position: { lat: '', lng: '', address: '' },
-    };
-  }),
+  useSelector: jest.fn(),
+}));
+
+// 1. Définissez le type pour les filtres
+type MockFilters = {
+  status: string;
+  tagNames: string[];
+  position: {
+    lat: string;
+    lng: string;
+    address: string;
+  };
+};
+
+// 2. Créez l'objet de filtres par défaut
+const defaultFilters: MockFilters = {
+  status: 'ACTIVE',
+  tagNames: [],
+  position: { lat: '', lng: '', address: '' },
+};
+
+// 3. Modifiez le mock de react-redux
+jest.mock('react-redux', () => ({
+  useDispatch: () => jest.fn(),
+  useSelector: jest.fn(() => defaultFilters),
 }));
 
 describe('OrdersFilterModal', () => {
@@ -30,14 +56,8 @@ describe('OrdersFilterModal', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-
-    // Réinitialiser le mock de useSelector avec la nouvelle structure
-    const { useSelector } = require('react-redux');
-    useSelector.mockImplementation(() => ({
-      status: 'ACTIVE',
-      tagNames: [],
-      position: { lat: '', lng: '', address: '' },
-    }));
+    // Cast en unknown d'abord, puis en jest.Mock
+    (useSelector as unknown as jest.Mock).mockReturnValue(defaultFilters);
 
     // Simuler les suggestions de tags
     (tagsApi.suggest as jest.Mock).mockResolvedValue({
@@ -227,9 +247,12 @@ describe('OrdersFilterModal', () => {
     fireEvent.change(tagInput, { target: { value: 'test' } });
 
     // Vérifier que l'erreur est gérée sans crash
-    await waitFor(() => {
-      expect(tagsApi.suggest).toHaveBeenCalledWith('test');
-    });
+    await waitFor(
+      () => {
+        expect(tagsApi.suggest).toHaveBeenCalledWith('test');
+      },
+      { timeout: 1000 }
+    );
     // Vérifier qu'aucune suggestion n'est affichée
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
   });
@@ -349,8 +372,9 @@ describe('OrdersFilterModal', () => {
 
     render(<OrdersFilterModal isOpen={true} onClose={mockOnClose} onApply={mockOnApply} />);
 
-    // Cliquer sur le bouton de géolocalisation
-    const geoButton = screen.getByRole('button', { name: /геолокация/i });
+    // Utiliser un seul sélecteur pour le bouton de géolocalisation
+    const geoButton = screen.getByTestId('geolocation-button');
+
     fireEvent.click(geoButton);
 
     // Appliquer les filtres
@@ -423,7 +447,8 @@ describe('OrdersFilterModal', () => {
     fireEvent.change(addressInput, { target: { value: 'Paris' } });
 
     // Puis cliquer sur le bouton de géolocalisation
-    const geoButton = screen.getByRole('button', { name: /геолокация/i });
+    const geoButton = screen.getByTestId('geolocation-button');
+
     fireEvent.click(geoButton);
 
     // L'adresse doit rester, mais les coordonnées ont été ajoutées

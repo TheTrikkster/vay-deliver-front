@@ -6,16 +6,15 @@ import { Authenticator, withAuthenticator } from '@aws-amplify/ui-react';
 import '@aws-amplify/ui-react/styles.css';
 import { SyncManager } from './components/SyncManager/SyncManager';
 import GeoPosition from './components/GeoPosition';
-import Check from './pages/Check';
 
 const Home = lazy(() => import('./pages/Home'));
 const AdminProducts = lazy(() => import('./pages/AdminProducts/AdminProducts'));
 const CreateProduct = lazy(() => import('./pages/CreateProduct/CreateProduct'));
 const ModifyProduct = lazy(() => import('./pages/ModifyProduct/ModifyProduct'));
-const ProductsAvailable = lazy(() => import('./pages/ProductsAvailable'));
-const Orders = lazy(() => import('./pages/Orders'));
+const Orders = lazy(() => import('./pages/Orders/Orders'));
 const Order = lazy(() => import('./pages/Order/Order'));
-
+const ClientProducts = lazy(() => import('./pages/ClientProducts/ClientProducts'));
+const ClientOrder = lazy(() => import('./pages/ClientOrder/ClientOrder'));
 const LoadingFallback = () => (
   <div className="flex min-h-screen items-center justify-center bg-neutral-900">
     <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
@@ -28,7 +27,7 @@ function App() {
       path: '/',
       element: (
         <Suspense fallback={<LoadingFallback />}>
-          <Home />
+          <ClientProducts />
         </Suspense>
       ),
     },
@@ -57,15 +56,7 @@ function App() {
       ),
     },
     {
-      path: '/products-available',
-      element: (
-        <Suspense fallback={<LoadingFallback />}>
-          <ProductsAvailable />
-        </Suspense>
-      ),
-    },
-    {
-      path: '/orders',
+      path: '/admin-orders',
       element: (
         <Suspense fallback={<LoadingFallback />}>
           <Orders />
@@ -73,7 +64,7 @@ function App() {
       ),
     },
     {
-      path: '/order/:id',
+      path: '/admin-order/:id',
       element: (
         <Suspense fallback={<LoadingFallback />}>
           <Order />
@@ -89,10 +80,10 @@ function App() {
       ),
     },
     {
-      path: '/check',
+      path: '/order',
       element: (
         <Suspense fallback={<LoadingFallback />}>
-          <Check />
+          <ClientOrder />
         </Suspense>
       ),
     },

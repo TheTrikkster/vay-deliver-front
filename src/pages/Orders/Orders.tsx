@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { useNavigate } from 'react-router-dom';
-import OrderCard from '../components/OrderCard/OrderCard';
-import OrdersFilterModal from '../components/OrdersFilterModal/OrdersFilterModal';
-import AddTagModal from '../components/AddTagModal/AddTagModal';
+import OrderCard from '../../components/OrderCard/OrderCard';
+import OrdersFilterModal from '../../components/OrdersFilterModal/OrdersFilterModal';
+import AddTagModal from '../../components/AddTagModal/AddTagModal';
 
 import {
   fetchOrders,
@@ -21,10 +21,10 @@ import {
   selectIsSelectionMode,
   selectSelectedOrderIds,
   selectCurrentFilters,
-} from '../store/slices/ordersSlice';
-import Pagination from '../components/PaginationComp/PaginationComp';
-import Loading from '../components/Loading';
-import Menu from '../components/Menu/Menu';
+} from '../../store/slices/ordersSlice';
+import Pagination from '../../components/PaginationComp/PaginationComp';
+import Loading from '../../components/Loading';
+import Menu from '../../components/Menu/Menu';
 
 function Orders() {
   const dispatch = useAppDispatch();
@@ -47,7 +47,7 @@ function Orders() {
   // Chargement initial des données
   useEffect(() => {
     console.log({ currentFilters });
-    dispatch(fetchOrders({ page: currentPage, filters: currentFilters, limit: 30 }));
+    dispatch(fetchOrders({ page: currentPage, filters: currentFilters }));
   }, [dispatch, currentPage, currentFilters]);
 
   // Handlers mémorisés
@@ -56,7 +56,7 @@ function Orders() {
       if (isSelectionMode) {
         dispatch(toggleOrderSelection(id));
       } else {
-        navigate(`/order/${id}`);
+        navigate(`/admin-order/${id}`);
       }
     },
     [dispatch, isSelectionMode, navigate]
@@ -127,20 +127,17 @@ function Orders() {
     return <Loading />;
   }
 
+  console.log({ orders });
+
   return (
     <div className="min-h-screen bg-gray-100 relative pb-6">
       <Menu />
       {error ? (
-        <div className="text-center py-10 text-red-500">
-          {error}
-          <button
-            onClick={() =>
-              dispatch(fetchOrders({ page: currentPage, filters: currentFilters, limit: 30 }))
-            }
-            className="ml-4 px-4 py-2 bg-green-500 text-white rounded-lg"
-          >
-            Попробуйте еще раз
-          </button>
+        <div
+          data-testid="error-message"
+          className="absolute top-60 left-1/2 transform -translate-x-1/2 bg-red-100 px-6 py-3 rounded-lg shadow-md"
+        >
+          <p className="text-red-500">{error}</p>
         </div>
       ) : (
         <>

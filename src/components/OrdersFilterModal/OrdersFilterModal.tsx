@@ -23,16 +23,24 @@ const OrdersFilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onAppl
 
   useEffect(() => {
     if (isOpen) {
-      setStatus(filtersFromRedux.status);
-      setSelectedTags(filtersFromRedux.tagNames);
-      setPosition(filtersFromRedux.position);
-      setSearchValue('');
+      if (status !== filtersFromRedux.status) {
+        setStatus(filtersFromRedux.status);
+      }
+      if (JSON.stringify(selectedTags) !== JSON.stringify(filtersFromRedux.tagNames)) {
+        setSelectedTags(filtersFromRedux.tagNames);
+      }
+      if (JSON.stringify(position) !== JSON.stringify(filtersFromRedux.position)) {
+        setPosition(filtersFromRedux.position);
+      }
     }
   }, [isOpen, filtersFromRedux]);
 
   const debouncedSearchTag = useCallback(
     debounce((value: string) => {
-      if (!value) return;
+      if (!value || value.trim() === '') {
+        setSuggestedTags([]);
+        return;
+      }
       searchTag(value);
     }, 300),
     []
@@ -179,6 +187,7 @@ const OrdersFilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onAppl
               <button
                 onClick={getCurrentLocation}
                 className="w-full text-green-500 h-full px-2 transition-colors"
+                data-testid="geolocation-button"
               >
                 <svg
                   className="w-6 h-6"
@@ -250,7 +259,7 @@ const OrdersFilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onAppl
             </div>
 
             {/* Suggestions dropdown */}
-            {suggestedTags.length > 0 && searchValue && (
+            {suggestedTags.length > 0 && searchValue && searchValue.trim() !== '' && (
               <div className="absolute left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-sm z-10 max-h-48 overflow-y-auto mt-1">
                 {' '}
                 {suggestedTags.map(tag => (

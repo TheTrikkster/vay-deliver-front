@@ -44,7 +44,7 @@ describe('orders reducer', () => {
     totalPages: 1,
     isSelectionMode: false,
     selectedOrderIds: [],
-    currentFilters: '',
+    currentFilters: 'status=ACTIVE',
     isOnline: true,
     pendingOperations: [],
     filtersObject: {
@@ -62,7 +62,7 @@ describe('orders reducer', () => {
     phoneNumber: '0123456789',
     status: 'ACTIVE',
     tagNames: ['test'],
-    items: [{ _id: 'prod1', quantity: 5 }],
+    items: [{ productId: 'prod1', quantity: 5 }],
     unitExpression: 'kg',
     geoLocation: { lat: 1, lng: 1 },
   };
@@ -250,7 +250,7 @@ describe('orders reducer', () => {
         totalPages: 5,
         isSelectionMode: true,
         selectedOrderIds: ['order1'],
-        currentFilters: 'status=pending',
+        currentFilters: 'status=ACTIVE',
         isOnline: false,
         pendingOperations: [
           {
@@ -298,7 +298,7 @@ describe('orders reducer', () => {
     });
 
     test('selectCurrentFilters devrait retourner les filtres actuels', () => {
-      expect(selectCurrentFilters(mockState)).toBe('status=pending');
+      expect(selectCurrentFilters(mockState)).toBe('status=ACTIVE');
     });
 
     test('selectOrdersIsOnline devrait retourner le statut de connexion', () => {
