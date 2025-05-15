@@ -1,0 +1,6 @@
+{
+  "fetchError": "Failed to retrieve products",
+  "deleteError": "Error while deleting",
+  "updateError": "Error while updating",
+  "statusUpdateError": "Status update error"
+}

@@ -1,0 +1,12 @@
+{
+  "errorLoadingOrder": "Fehler beim Laden der Bestellung",
+  "active": "Aktiv",
+  "completed": "Abgeschlossen",
+  "canceled": "Storniert",
+  "products": "Produkte",
+  "total": "Gesamt",
+  "notes": "Notizen",
+  "cancel": "Stornieren",
+  "complete": "Abschließen",
+  "whatsapp": "WhatsApp"
+}

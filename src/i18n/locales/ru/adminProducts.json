@@ -1,0 +1,12 @@
+{
+  "mustAddProduct": "Вы должны добавить продукт",
+  "addProduct": "Добавить продукт",
+  "productInStock": "Товар в наличии",
+  "unitOfMeasure": "Единица измерения:",
+  "cancel": "Отменить",
+  "confirm": "Подтвердить",
+  "deleteConfirmation": "Подтверждение удаления",
+  "deleteConfirmationText": "Вы уверены, что хотите удалить этот элемент?",
+  "delete": "Удалить",
+  "productNoLongerExists": "Продукт больше не существует или был удален"
+}

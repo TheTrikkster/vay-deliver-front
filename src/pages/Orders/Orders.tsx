@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import OrderCard from '../../components/OrderCard/OrderCard';
 import OrdersFilterModal from '../../components/OrdersFilterModal/OrdersFilterModal';
 import AddTagModal from '../../components/AddTagModal/AddTagModal';
+import { useTranslation } from 'react-i18next';
 
 import {
   fetchOrders,
@@ -27,6 +28,7 @@ import Loading from '../../components/Loading';
 import Menu from '../../components/Menu/Menu';
 
 function Orders() {
+  const { t } = useTranslation('orders');
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
@@ -46,7 +48,6 @@ function Orders() {
 
   // Chargement initial des données
   useEffect(() => {
-    console.log({ currentFilters });
     dispatch(fetchOrders({ page: currentPage, filters: currentFilters }));
   }, [dispatch, currentPage, currentFilters]);
 
@@ -98,11 +99,11 @@ function Orders() {
             onClick={() => dispatch(toggleSelectionMode(false))}
             className="text-base font-medium"
           >
-            Отменить
+            {t('cancel')}
           </button>
           <span className="text-base">{selectedOrderIds.length}</span>
           <button onClick={handleSelectAll} className="text-base font-medium">
-            {selectedOrderIds.length !== orders.length ? 'Выделить все' : 'Убрать все'}
+            {selectedOrderIds.length !== orders.length ? t('selectAll') : t('deselectAll')}
           </button>
         </>
       );
@@ -111,13 +112,13 @@ function Orders() {
     return (
       <>
         <button className="text-base font-medium" onClick={() => setIsFilterModalOpen(true)}>
-          Фильтры
+          {t('filters')}
         </button>
         <button
           className="text-base font-medium"
           onClick={() => dispatch(toggleSelectionMode(true))}
         >
-          Заметка +
+          {t('addNote')}
         </button>
       </>
     );
@@ -126,8 +127,6 @@ function Orders() {
   if (loading) {
     return <Loading />;
   }
-
-  console.log({ orders });
 
   return (
     <div className="min-h-screen bg-gray-100 relative pb-6">
@@ -162,7 +161,7 @@ function Orders() {
                 <OrderCard
                   firstName={order.firstName}
                   lastName={order.lastName}
-                  products={order.items}
+                  description={order.items.map((item: any) => item.product.name).join(', ')}
                   address={order.address}
                   tagNames={order.tagNames}
                   isSelectionMode={isSelectionMode}

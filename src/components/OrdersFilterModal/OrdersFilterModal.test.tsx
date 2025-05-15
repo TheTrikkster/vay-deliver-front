@@ -20,6 +20,35 @@ jest.mock('lodash', () => ({
     },
 }));
 
+// Mock react-i18next
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => {
+      const translations: { [key: string]: string } = {
+        reset: 'Сбросить',
+        orders: 'Заказы',
+        active: 'Активные',
+        completed: 'Завершенные',
+        all: 'Все',
+        addressSort: 'Сортировка по адресу',
+        enterAddress: 'Введите адрес или название города',
+        notesSort: 'Сортировка заметок',
+        enterNote: 'Введите название заметки',
+        cancel: 'Отменить',
+        confirm: 'Подтвердить',
+        geoNotSupported: 'Геолокация не поддерживается вашим браузером',
+        geoError:
+          'Не удалось определить ваше местоположение. Проверьте настройки конфиденциальности.',
+      };
+      return translations[key] || key;
+    },
+    i18n: {
+      changeLanguage: jest.fn(),
+      language: 'ru',
+    },
+  }),
+}));
+
 // Mock react-redux
 jest.mock('react-redux', () => ({
   useDispatch: () => jest.fn(),

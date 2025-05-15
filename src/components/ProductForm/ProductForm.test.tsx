@@ -19,6 +19,32 @@ jest.mock('react-redux', () => ({
   }),
 }));
 
+// Mock react-i18next
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => {
+      const translations: { [key: string]: string } = {
+        editProduct: 'Изменить продукт',
+        addNewProduct: 'Добавить новый продукт',
+        productName: 'Название продукта *',
+        description: 'Описание',
+        unitMeasure: 'Единица измерения (Штука, Грамм, Кг) *',
+        availableQuantity: 'Доступное колличество в цифрах *',
+        minOrderVolume: 'Минимальный объем заказа в цифрах *',
+        price: 'Цена : 18 *',
+        requiredFields: 'Поля, отмеченные *, обязательны для заполнения.',
+        cancel: 'Отменить',
+        confirm: 'Подтвердить',
+      };
+      return translations[key] || key;
+    },
+    i18n: {
+      changeLanguage: jest.fn(),
+      language: 'ru',
+    },
+  }),
+}));
+
 const mockSubmit = jest.fn();
 
 describe('ProductForm', () => {
@@ -35,7 +61,7 @@ describe('ProductForm', () => {
     expect(screen.getByPlaceholderText('Название продукта *')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Описание')).toBeInTheDocument();
     expect(
-      screen.getByPlaceholderText('Единица измерения ( Штука, Грамм, Кг) *')
+      screen.getByPlaceholderText('Единица измерения (Штука, Грамм, Кг) *')
     ).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Доступное колличество в цифрах *')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Минимальный объем заказа в цифрах *')).toBeInTheDocument();
@@ -76,7 +102,7 @@ describe('ProductForm', () => {
     const nameInput = screen.getByPlaceholderText('Название продукта *');
     const descriptionInput = screen.getByPlaceholderText('Описание');
     const unitExpressionInput = screen.getByPlaceholderText(
-      'Единица измерения ( Штука, Грамм, Кг) *'
+      'Единица измерения (Штука, Грамм, Кг) *'
     );
     const availableQuantityInput = screen.getByPlaceholderText('Доступное колличество в цифрах *');
     const minOrderInput = screen.getByPlaceholderText('Минимальный объем заказа в цифрах *');
@@ -103,7 +129,7 @@ describe('ProductForm', () => {
     const nameInput = screen.getByPlaceholderText('Название продукта *');
     const descriptionInput = screen.getByPlaceholderText('Описание');
     const unitExpressionInput = screen.getByPlaceholderText(
-      'Единица измерения ( Штука, Грамм, Кг) *'
+      'Единица измерения (Штука, Грамм, Кг) *'
     );
     const availableQuantityInput = screen.getByPlaceholderText('Доступное колличество в цифрах *');
     const minOrderInput = screen.getByPlaceholderText('Минимальный объем заказа в цифрах *');

@@ -1,0 +1,13 @@
+{
+  "welcome": "Bienvenue",
+  "loading": "Chargement...",
+  "changeLanguage": "Changer de langue",
+  "language": {
+    "fr": "Français",
+    "en": "Anglais"
+  },
+  "buttons": {
+    "save": "Enregistrer",
+    "cancel": "Annuler"
+  }
+}

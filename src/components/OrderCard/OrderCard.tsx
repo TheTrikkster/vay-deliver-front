@@ -5,7 +5,7 @@ interface OrderCardProps {
   lastName: string;
   address: string;
   tagNames: string[];
-  products: any;
+  description?: string;
   isSelectionMode?: boolean;
   isSelected?: boolean;
 }
@@ -15,7 +15,7 @@ const OrderCard: React.FC<OrderCardProps> = ({
   lastName,
   address,
   tagNames,
-  products,
+  description,
   isSelectionMode = false,
   isSelected = false,
 }) => {
@@ -65,11 +65,18 @@ const OrderCard: React.FC<OrderCardProps> = ({
         </svg>{' '}
         <span className="text-sm">{address}</span>
       </div>
+
       <hr className="w-full my-3" />
+
+      {description && (
+        <div className="mb-2 text-gray-500 text-sm">
+          <p>{description}</p>
+        </div>
+      )}
 
       <div className="flex flex-wrap gap-2">
         {tagNames.map(tag => (
-          <span key={tag} className="font-light bg-gray-100 rounded-lg px-2 py-1 text-sm">
+          <span key={tag} className="font-light bg-gray-100 rounded-lg p-2 text-sm">
             {tag}
           </span>
         ))}

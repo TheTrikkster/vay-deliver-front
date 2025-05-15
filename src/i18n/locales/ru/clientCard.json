@@ -1,0 +1,8 @@
+{
+  "productUnavailable": "Продукт недоступен",
+  "minOrder": "Мин. заказ: ",
+  "price": "Цена: ",
+  "add": "Добавить",
+  "ariaLabel": "Продукт: {{name}}",
+  "ariaAddToCart": "Добавить {{name}} в корзину"
+}

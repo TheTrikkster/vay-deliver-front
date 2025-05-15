@@ -14,6 +14,37 @@ jest.mock('react-router-dom', () => ({
   useNavigate: () => jest.fn(),
 }));
 
+// Mock react-i18next
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => {
+      const translations: { [key: string]: string } = {
+        orderSuccess: 'Ваш заказ успешно оформлен!',
+        redirecting: 'Перенаправление на главную страницу...',
+        emptyCart: 'Ваша корзина пуста',
+        addProducts: 'Пожалуйста, добавьте товары перед оформлением заказа.',
+        backToHome: 'Вернуться на главную страницу',
+        yourOrder: 'Ваш заказ',
+        total: 'Итого',
+        shippingInfo: 'Информация для отправки',
+        firstName: 'Имя',
+        lastName: 'Фамилия',
+        phoneNumber: 'Номер телефона',
+        address: 'Напишите полный и правильный адрес для быстрой доставки',
+        requiredField: 'Обязательное поле',
+        invalidPhoneFormat: 'Неверный формат номера',
+        cancel: 'Аннулировать',
+        order: 'Заказать',
+      };
+      return translations[key] || key;
+    },
+    i18n: {
+      changeLanguage: jest.fn(),
+      language: 'ru',
+    },
+  }),
+}));
+
 const mockStore = configureStore([]);
 
 describe('ClientOrder', () => {
@@ -106,7 +137,7 @@ describe('ClientOrder', () => {
       target: { value: '+33612345678' },
     });
     fireEvent.change(
-      screen.getByPlaceholderText('Напишите полный и правильный адрес для быстрой доставки.'),
+      screen.getByPlaceholderText('Напишите полный и правильный адрес для быстрой доставки'),
       {
         target: { value: '123 Rue Test' },
       }
@@ -128,7 +159,7 @@ describe('ClientOrder', () => {
     const firstNameInput = screen.getByPlaceholderText('Имя');
     const phoneInput = screen.getByPlaceholderText('Номер телефона');
     const addressInput = screen.getByPlaceholderText(
-      'Напишите полный и правильный адрес для быстрой доставки.'
+      'Напишите полный и правильный адрес для быстрой доставки'
     );
 
     // Vider les champs requis
@@ -166,7 +197,7 @@ describe('ClientOrder', () => {
       target: { value: '+33612345678' },
     });
     fireEvent.change(
-      screen.getByPlaceholderText('Напишите полный и правильный адрес для быстрой доставки.'),
+      screen.getByPlaceholderText('Напишите полный и правильный адрес для быстрой доставки'),
       {
         target: { value: '123 Rue Test' },
       }
@@ -220,7 +251,7 @@ describe('ClientOrder', () => {
       target: { value: '+33612345678' },
     });
     fireEvent.change(
-      screen.getByPlaceholderText('Напишите полный и правильный адрес для быстрой доставки.'),
+      screen.getByPlaceholderText('Напишите полный и правильный адрес для быстрой доставки'),
       {
         target: { value: '123 Rue Test' },
       }

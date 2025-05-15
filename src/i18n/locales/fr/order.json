@@ -1,0 +1,12 @@
+{
+  "errorLoadingOrder": "Erreur de chargement de la commande",
+  "active": "Active",
+  "completed": "Terminée",
+  "canceled": "Annulée",
+  "products": "Produits",
+  "total": "Total",
+  "notes": "Notes",
+  "cancel": "Annuler",
+  "complete": "Terminer",
+  "whatsapp": "WhatsApp"
+}

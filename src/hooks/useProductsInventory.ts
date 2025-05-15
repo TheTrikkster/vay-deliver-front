@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { InventoryProduct, ProductStatus } from '../types/product';
 import { handleApiError } from '../utils/errorHandling';
 import {
@@ -30,6 +31,7 @@ interface Item {
 
 export function useProductsInventory(itemsPerPage = 30) {
   const dispatch = useDispatch();
+  const { t } = useTranslation('productsInventory');
 
   // États Redux
   const inventoryItems = useSelector(selectProductsItems);
@@ -77,7 +79,7 @@ export function useProductsInventory(itemsPerPage = 30) {
         dispatch(setProductsItems(transformedItems));
         dispatch(setError(null));
       } catch (err) {
-        dispatch(setError('Не удалось получить продукты'));
+        dispatch(setError(t('fetchError')));
       } finally {
         dispatch(setLoading(false));
       }
@@ -116,7 +118,7 @@ export function useProductsInventory(itemsPerPage = 30) {
         }
       } catch (err) {
         console.log('Error deleting item:', err);
-        dispatch(setError('Ошибка при удалении'));
+        dispatch(setError(t('deleteError')));
 
         // Recharger les données depuis l'API en cas d'échec
         fetchInventory(currentPage);
@@ -170,7 +172,7 @@ export function useProductsInventory(itemsPerPage = 30) {
               );
             }
           },
-          'Ошибка при обновлении'
+          t('updateError')
         );
       }
     },
@@ -203,7 +205,7 @@ export function useProductsInventory(itemsPerPage = 30) {
               );
             }
           },
-          'Ошибка обновления статуса'
+          t('statusUpdateError')
         );
       }
     },

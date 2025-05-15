@@ -1,4 +1,5 @@
 import React, { useState, useRef, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { InventoryProduct } from '../../types/product';
 import ProductCard from '../../components/ProductCard/ProductCard';
 import { useOutsideClick } from '../../hooks/useOutsideClick';
@@ -11,6 +12,7 @@ import { setError } from '../../store/slices/productsSlice';
 import Loading from '../../components/Loading';
 
 function AdminProducts() {
+  const { t } = useTranslation('adminProducts');
   const [isQuantityPopupOpen, setIsQuantityPopupOpen] = useState<boolean>(false);
   const [quantityToEdit, setQuantityToEdit] = useState<{ id: number; availableQuantity: number }>({
     id: 0,
@@ -66,7 +68,7 @@ function AdminProducts() {
     (id: number, currentQuantity: number) => {
       const productExists = currentItems.some(item => item.id === id);
       if (!productExists) {
-        dispatch(setError('Продукт больше не существует или был удален'));
+        dispatch(setError(t('productNoLongerExists')));
         return;
       }
 
@@ -76,19 +78,19 @@ function AdminProducts() {
       });
       setIsQuantityPopupOpen(true);
     },
-    [currentItems]
+    [currentItems, dispatch]
   );
 
   const updateQuantity = useCallback(() => {
     if (!currentItems.some(item => item.id === quantityToEdit.id)) {
       setIsQuantityPopupOpen(false);
-      dispatch(setError('Продукт больше не существует или был удален'));
+      dispatch(setError(t('productNoLongerExists')));
       return;
     }
 
     updateItemQuantity(quantityToEdit.id, quantityToEdit.availableQuantity);
     setIsQuantityPopupOpen(false);
-  }, [quantityToEdit, updateItemQuantity, currentItems]);
+  }, [quantityToEdit, updateItemQuantity, currentItems, dispatch]);
 
   const handleQuantityChange = useCallback((value: string) => {
     setQuantityToEdit(prev => ({ ...prev, availableQuantity: Number(value) }));
@@ -99,6 +101,8 @@ function AdminProducts() {
   if (loading) {
     return <Loading />;
   }
+
+  console.log({ currentItems });
 
   return (
     <div className="w-full min-h-screen bg-gray-100 pb-6">
@@ -113,12 +117,12 @@ function AdminProducts() {
         <div className="flex flex-col items-center gap-3 mt-14">
           {currentItems.length === 0 ? (
             <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] w-full">
-              <p className="text-xl text-gray-600 mb-4">Вы должны добавить продукт</p>
+              <p className="text-xl text-gray-600 mb-4">{t('mustAddProduct')}</p>
               <Link
                 to="/create-product"
                 className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
               >
-                Добавить продукт
+                {t('addProduct')}
               </Link>
             </div>
           ) : (
@@ -149,13 +153,13 @@ function AdminProducts() {
       {isQuantityPopupOpen && (
         <div className="px-4 md:px-0 fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-            <h3 className="text-lg font-bold mb-2">Товар в наличии</h3>
+            <h3 className="text-lg font-bold mb-2">{t('productInStock')}</h3>
             <p className="text-[#9DA0A5] mb-5">
-              Единица измерения: {currentProduct?.unitExpression}
+              {t('unitOfMeasure')} {currentProduct?.unitExpression}
             </p>
             <input
               type="number"
-              className="w-full border  border-[#9DA0A5] rounded-md p-3 mb-5"
+              className="w-full border border-[#9DA0A5] rounded-md p-3 mb-5"
               value={quantityToEdit.availableQuantity}
               onChange={e => handleQuantityChange(e.target.value)}
             />
@@ -164,13 +168,13 @@ function AdminProducts() {
                 className="flex-1 py-3 bg-gray-200 rounded-lg hover:bg-gray-300"
                 onClick={() => setIsQuantityPopupOpen(false)}
               >
-                Отменить
+                {t('cancel')}
               </button>
               <button
                 className="flex-1 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600"
                 onClick={updateQuantity}
               >
-                Подтвердить
+                {t('confirm')}
               </button>
             </div>
           </div>
@@ -180,20 +184,20 @@ function AdminProducts() {
       {isDeletePopupOpen && (
         <div className="px-4 md:px-0 fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-            <h3 className="text-lg font-bold mb-4">Подтверждение удаления</h3>
-            <p className="mb-4">Вы уверены, что хотите удалить этот элемент ?</p>
+            <h3 className="text-lg font-bold mb-4">{t('deleteConfirmation')}</h3>
+            <p className="mb-4">{t('deleteConfirmationText')}</p>
             <div className="flex justify-center gap-2">
               <button
                 className="flex-1 px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300"
                 onClick={() => setIsDeletePopupOpen(false)}
               >
-                Отмена
+                {t('cancel')}
               </button>
               <button
                 className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
                 onClick={confirmDelete}
               >
-                Удалить
+                {t('delete')}
               </button>
             </div>
           </div>

@@ -1,0 +1,4 @@
+{
+  "offlineMessage": "You are currently offline. Your changes will be synchronized when the connection is restored.",
+  "syncInProgress": "Synchronization in progress... {{total}} pending operations ({{products}} products, {{orders}} orders)."
+}

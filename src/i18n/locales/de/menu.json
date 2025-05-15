@@ -1,0 +1,17 @@
+{
+  "links": {
+    "products": "Produkte",
+    "orders": "Bestellungen",
+    "settings": "Einstellungen",
+    "logout": "Abmelden"
+  },
+  "actions": {
+    "add": "Hinzufügen"
+  },
+  "aria": {
+    "toggleMenu": "Menü umschalten",
+    "openMenu": "Menü öffnen",
+    "mainMenu": "Hauptmenü",
+    "closeMenu": "Menü schließen"
+  }
+}

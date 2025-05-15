@@ -1,21 +1,24 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '../LanguageSwitcher';
 
 interface MenuProps {
   showAddProd?: boolean;
 }
 
-const MENU_LINKS = [
-  { path: '/admin-products', label: 'Товары' },
-  { path: '/admin-orders', label: 'Заказы' },
-  { path: '/settings', label: 'Настройки' },
-  { path: '/logout', label: 'Выйти' },
-] as const;
-
 function Menu({ showAddProd = false }: MenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const menuRef = useRef<HTMLDivElement>(null);
+  const { t } = useTranslation('menu');
+
+  const MENU_LINKS = [
+    { path: '/admin-products', label: t('links.products') },
+    { path: '/admin-orders', label: t('links.orders') },
+    { path: '/settings', label: t('links.settings') },
+    { path: '/logout', label: t('links.logout') },
+  ];
 
   const isActivePage = (path: string) => location.pathname === path;
 
@@ -57,7 +60,7 @@ function Menu({ showAddProd = false }: MenuProps) {
                 to="/create-product"
                 className="flex items-center gap-2 text-[#1E1E1E] hover:text-[#9DA0A5] transition-colors"
               >
-                <span className="text-base md:text-xl font-medium">Добавить</span>
+                <span className="text-base md:text-xl font-medium">{t('actions.add')}</span>
                 <span className="text-2xl md:text-3xl font-light leading-none">+</span>
               </Link>
             )}
@@ -66,7 +69,7 @@ function Menu({ showAddProd = false }: MenuProps) {
           <button
             onClick={() => setIsOpen(true)}
             className="p-1 rounded-md text-gray-700 hover:bg-gray-100"
-            aria-label={isOpen ? 'Переключить меню' : 'Открыть меню'}
+            aria-label={isOpen ? t('aria.toggleMenu') : t('aria.openMenu')}
             aria-expanded={isOpen}
           >
             <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -85,7 +88,7 @@ function Menu({ showAddProd = false }: MenuProps) {
         ref={menuRef}
         role="dialog"
         aria-modal="true"
-        aria-label="Menu principal"
+        aria-label={t('aria.mainMenu')}
         className={`fixed inset-0 bg-white z-40 transform transition-all duration-300 ${
           isOpen ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full pointer-events-none'
         }`}
@@ -93,7 +96,7 @@ function Menu({ showAddProd = false }: MenuProps) {
         <button
           onClick={() => setIsOpen(false)}
           className="absolute top-5 right-2 p-1 text-gray-700 hover:bg-gray-100"
-          aria-label="Закрыть меню"
+          aria-label={t('aria.closeMenu')}
           data-testid="close-menu-button"
         >
           <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -120,6 +123,7 @@ function Menu({ showAddProd = false }: MenuProps) {
           ))}
         </nav>
       </div>
+      <LanguageSwitcher />
     </>
   );
 }

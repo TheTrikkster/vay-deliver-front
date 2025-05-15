@@ -15,4 +15,7 @@ export const ordersApi = {
 
   addTagToOrders: (tagNames: string[], orderIds: string[]) =>
     api.post(`${ENDPOINTS.ORDERS.BASE}/tags`, { tagNames, orderIds }),
+
+  removeTagFromOrders: (orderId: string, tagName: string) =>
+    api.delete(`${ENDPOINTS.ORDERS.BASE}/${orderId}/tags/${tagName}`),
 };

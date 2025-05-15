@@ -1,0 +1,18 @@
+{
+  "orderSuccess": "Ihre Bestellung wurde erfolgreich aufgegeben!",
+  "redirecting": "Weiterleitung zur Startseite...",
+  "emptyCart": "Ihr Warenkorb ist leer",
+  "addProducts": "Bitte fügen Sie Produkte hinzu, bevor Sie eine Bestellung aufgeben.",
+  "backToHome": "Zurück zur Startseite",
+  "yourOrder": "Ihre Bestellung",
+  "total": "Gesamt",
+  "shippingInfo": "Versandinformationen",
+  "firstName": "Vorname",
+  "lastName": "Nachname",
+  "phoneNumber": "Telefonnummer",
+  "address": "Vollständige Adresse für schnelle Lieferung",
+  "requiredField": "Pflichtfeld",
+  "invalidPhoneFormat": "Ungültiges Telefonformat",
+  "cancel": "Stornieren",
+  "order": "Bestellen"
+}

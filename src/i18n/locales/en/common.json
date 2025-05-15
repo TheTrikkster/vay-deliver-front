@@ -1,0 +1,13 @@
+{
+  "welcome": "Welcome",
+  "loading": "Loading...",
+  "changeLanguage": "Change language",
+  "language": {
+    "fr": "French",
+    "en": "English"
+  },
+  "buttons": {
+    "save": "Save",
+    "cancel": "Cancel"
+  }
+}

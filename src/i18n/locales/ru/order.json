@@ -1,0 +1,12 @@
+{
+  "errorLoadingOrder": "Ошибка загрузки команды",
+  "active": "Активный",
+  "completed": "Завершено",
+  "canceled": "Отменено",
+  "products": "Товары",
+  "total": "Итого",
+  "notes": "Заметки",
+  "cancel": "Отменить",
+  "complete": "Завершить",
+  "whatsapp": "WhatsApp"
+}

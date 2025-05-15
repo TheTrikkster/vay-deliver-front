@@ -34,6 +34,22 @@ jest.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
 }));
 
+// Mock pour react-i18next
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => {
+      const translations: { [key: string]: string } = {
+        productNoLongerExists: 'Продукт больше не существует или был удален',
+      };
+      return translations[key] || key;
+    },
+    i18n: {
+      changeLanguage: jest.fn(),
+      language: 'ru',
+    },
+  }),
+}));
+
 // Imports
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';

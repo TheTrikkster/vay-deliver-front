@@ -9,6 +9,7 @@ import { Provider } from 'react-redux';
 import { store, persistor } from './store/userStore';
 import { PersistGate } from 'redux-persist/integration/react';
 import './index.css';
+import './i18n';
 
 Amplify.configure(awsExports);
 

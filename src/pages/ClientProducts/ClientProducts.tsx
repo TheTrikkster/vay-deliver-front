@@ -13,8 +13,11 @@ import {
 } from '../../store/slices/clientSlice';
 import { toCents, fromCents, calculatePrice } from '../../utils/orderCalcul';
 import Loading from '../../components/Loading';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '../../components/LanguageSwitcher';
 
 function ClientProducts() {
+  const { t } = useTranslation('clientProducts');
   const [products, setProducts] = useState<ProductType[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -70,7 +73,7 @@ function ClientProducts() {
         setError(null);
       } catch (error) {
         console.log('Error fetching products:', error);
-        setError('Невозможно загрузить продукты');
+        setError(t('errorLoading'));
       } finally {
         setIsLoading(false);
       }
@@ -101,8 +104,8 @@ function ClientProducts() {
     );
 
   return (
-    <main className="min-h-screen bg-[#F5F5F5] p-4">
-      <header className="fixed top-0 left-0 right-0 bg-white p-4 shadow-md z-10 flex justify-between items-center">
+    <main className="min-h-screen bg-[#F5F5F5]">
+      <header className="bg-white p-4 shadow-md z-10 flex justify-between items-center">
         <div className="flex items-center">
           <svg className="w-6 h-6 text-[#4F46E5] mr-2" viewBox="0 0 24 24" fill="none">
             <path
@@ -120,12 +123,14 @@ function ClientProducts() {
           disabled={commandDesable}
           className={`${commandDesable ? 'bg-gray-300 text-gray-600 border-gray-300' : 'text-[#4355DA] border-[#4355DA]'} font-semibold border px-6 py-2 rounded-full`}
         >
-          Заказать
+          {t('order')}
         </button>
       </header>
 
-      <section className="mt-20">
-        <ul className="space-y-4 py-5">
+      <LanguageSwitcher />
+
+      <section className="p-4">
+        <ul className="space-y-4 pb-5">
           {products.map(product => (
             <li key={product._id}>
               <ClientCard

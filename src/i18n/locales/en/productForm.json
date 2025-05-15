@@ -1,0 +1,13 @@
+{
+  "editProduct": "Edit product",
+  "addNewProduct": "Add new product",
+  "productName": "Product name *",
+  "description": "Description",
+  "unitMeasure": "Unit of measure (Piece, Gram, Kg) *",
+  "availableQuantity": "Available quantity in figures *",
+  "minOrderVolume": "Minimum order volume in figures *",
+  "price": "Price: 18 *",
+  "requiredFields": "Fields marked with * are required.",
+  "cancel": "Cancel",
+  "confirm": "Confirm"
+}

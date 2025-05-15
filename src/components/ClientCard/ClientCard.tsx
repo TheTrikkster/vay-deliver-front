@@ -1,28 +1,31 @@
 import React, { memo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ClientCardProps } from '../../types/client';
 import { fromCents, toCents } from '../../utils/orderCalcul';
 
 const ClientCard: React.FC<ClientCardProps> = memo(({ product, quantity, cartActions }) => {
-  if (!product) return <div className="bg-gray-100 rounded-3xl p-6">Продукт недоступен</div>;
+  const { t } = useTranslation('clientCard');
+
+  if (!product) return <div className="bg-gray-100 rounded-3xl p-6">{t('productUnavailable')}</div>;
 
   const { _id, name, description, minOrder, price, unitExpression } = product;
   const { onAdd, onRemove } = cartActions;
 
   return (
-    <article aria-label={`Produit: ${name}`} className="bg-white rounded-3xl p-6 shadow-sm">
+    <article aria-label={t('ariaLabel', { name })} className="bg-white rounded-3xl p-6 shadow-sm">
       <h2 className="text-base font-semibold mb-2">{name}</h2>
       <p className="text-sm text-gray-600 mb-6">{description}</p>
 
       <div className="flex flex-col gap-2">
         <div className="flex items-center text-gray-600">
-          <span className="text-sm font-semibold">Мин. заказ : </span>
+          <span className="text-sm font-semibold">{t('minOrder')}</span>
           <span className="ml-1 text-sm font-semibold">
             {minOrder} {unitExpression}
           </span>
         </div>
 
         <div className="flex items-center">
-          <span className="text-sm text-gray-600 font-semibold">Цена: </span>
+          <span className="text-sm text-gray-600 font-semibold">{t('price')}</span>
           <span className="ml-1 text-sm text-[#4F46E5] font-semibold">
             {fromCents(toCents(price))}/{unitExpression}
           </span>
@@ -31,11 +34,11 @@ const ClientCard: React.FC<ClientCardProps> = memo(({ product, quantity, cartAct
 
       {!quantity ? (
         <button
-          aria-label={`Ajouter ${name} au panier`}
+          aria-label={t('ariaAddToCart', { name })}
           onClick={() => onAdd(_id)}
           className="w-full text-[#4355DA] font-bold border border-[#4355DA] py-3 rounded-full text-base mt-6 hover:bg-gray-100 transition-colors"
         >
-          Добавить
+          {t('add')}
         </button>
       ) : (
         <div className="flex items-center justify-between mt-6 bg-white border border-gray-200 rounded-full overflow-hidden">
@@ -110,7 +113,5 @@ const ClientCard: React.FC<ClientCardProps> = memo(({ product, quantity, cartAct
     </article>
   );
 });
-
-ClientCard.displayName = 'ClientCard';
 
 export default ClientCard;

@@ -1,0 +1,6 @@
+{
+  "fetchError": "Impossible de récupérer les produits",
+  "deleteError": "Erreur lors de la suppression",
+  "updateError": "Erreur lors de la mise à jour",
+  "statusUpdateError": "Erreur lors de la mise à jour du statut"
+}

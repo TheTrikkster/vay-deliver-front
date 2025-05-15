@@ -1,0 +1,17 @@
+{
+  "links": {
+    "products": "Products",
+    "orders": "Orders",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "actions": {
+    "add": "Add"
+  },
+  "aria": {
+    "toggleMenu": "Toggle menu",
+    "openMenu": "Open menu",
+    "mainMenu": "Main menu",
+    "closeMenu": "Close menu"
+  }
+}

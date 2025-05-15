@@ -13,6 +13,25 @@ jest.mock('react-router-dom', () => ({
   useNavigate: () => jest.fn(),
 }));
 
+// Mock pour react-i18next
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => {
+      const translations: { [key: string]: string } = {
+        cancel: 'Annuler',
+        selectAll: 'Sélectionner tout',
+        deselectAll: 'Désélectionner tout',
+        filters: 'Filtres',
+        addNote: 'Ajouter une note',
+      };
+      return translations[key] || key;
+    },
+    i18n: {
+      changeLanguage: () => new Promise(() => {}),
+    },
+  }),
+}));
+
 // Mock du composant Menu
 jest.mock('../../components/Menu/Menu', () => {
   return function MockMenu() {
@@ -41,7 +60,7 @@ jest.mock('../../components/Loading', () => {
 // Mock du composant OrdersFilterModal
 jest.mock('../../components/OrdersFilterModal/OrdersFilterModal', () => {
   return function MockOrdersFilterModal({ isOpen }: { isOpen: boolean }) {
-    return isOpen ? <div data-testid="filter-modal">Заказы</div> : null;
+    return isOpen ? <div data-testid="filter-modal">Commandes</div> : null;
   };
 });
 
@@ -111,7 +130,7 @@ describe('Orders', () => {
     });
 
     // Trouver le bouton de filtres par son rôle et son texte
-    const filterButton = screen.getByRole('button', { name: /фильтры/i });
+    const filterButton = screen.getByRole('button', { name: /Filtres/i });
     fireEvent.click(filterButton);
 
     // Vérifier que le modal est ouvert
@@ -127,17 +146,18 @@ describe('Orders', () => {
     });
 
     // Trouver le bouton de sélection par son rôle et son texte
-    const selectionButton = screen.getByRole('button', { name: /заметка/i });
+    const selectionButton = screen.getByRole('button', { name: /Ajouter une note/i });
     fireEvent.click(selectionButton);
 
     // Vérifier que le mode sélection est activé
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /отменить/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Annuler/i })).toBeInTheDocument();
       expect(screen.getByText('0')).toBeInTheDocument();
     });
   });
 
   test("devrait afficher un message d'erreur en cas d'échec", async () => {
+    // Le message d'erreur affiché est en russe car il provient du store Redux et non du composant
     const errorMessage = 'Невозможно загрузить заказы';
     (ordersApi.getAll as jest.Mock).mockRejectedValue(new Error(errorMessage));
 

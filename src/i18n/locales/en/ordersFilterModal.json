@@ -1,0 +1,15 @@
+{
+  "reset": "Reset",
+  "orders": "Orders",
+  "active": "Active",
+  "completed": "Completed",
+  "all": "All",
+  "addressSort": "Sort by address",
+  "enterAddress": "Enter an address or city name",
+  "notesSort": "Sort by notes",
+  "enterNote": "Enter note name",
+  "cancel": "Cancel",
+  "confirm": "Confirm",
+  "geoNotSupported": "Geolocation is not supported by your browser",
+  "geoError": "Unable to determine your location. Check your privacy settings."
+}

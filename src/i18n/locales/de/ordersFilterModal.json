@@ -1,0 +1,15 @@
+{
+  "reset": "Zurücksetzen",
+  "orders": "Bestellungen",
+  "active": "Aktiv",
+  "completed": "Abgeschlossen",
+  "all": "Alle",
+  "addressSort": "Nach Adresse sortieren",
+  "enterAddress": "Geben Sie eine Adresse oder einen Stadtnamen ein",
+  "notesSort": "Nach Notizen sortieren",
+  "enterNote": "Geben Sie den Notizennamen ein",
+  "cancel": "Abbrechen",
+  "confirm": "Bestätigen",
+  "geoNotSupported": "Geolokalisierung wird von Ihrem Browser nicht unterstützt",
+  "geoError": "Ihr Standort konnte nicht ermittelt werden. Überprüfen Sie Ihre Datenschutzeinstellungen."
+}
