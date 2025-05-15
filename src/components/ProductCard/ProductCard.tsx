@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { InventoryProduct, ProductStatus } from '../../types/product';
 import { Link } from 'react-router-dom';
 
@@ -21,6 +22,8 @@ const ProductCard: React.FC<ProductCardProps> = ({
   openQuantityPopup,
   updateItemStatus,
 }) => {
+  const { t } = useTranslation('productCard');
+
   return (
     <div className="min-w-[343px] w-11/12 md:w-3/4 bg-white rounded-3xl p-5 relative shadow-md">
       <div className="flex justify-between items-start mb-2">
@@ -28,7 +31,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         <button
           onClick={e => toggleCardMenu(product.id, e)}
           className="text-gray-400 p-1"
-          aria-label="Options"
+          aria-label={t('options')}
         >
           <svg
             className="w-5 md:w-6 h-5 md:h-6"
@@ -64,7 +67,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
       {/* Prix/Unité */}
       <div className=" text-sm md:text-base">
         <p className="text-[#9DA0A5] mb-1 text-sm">
-          {product.price}₽/{product.unitExpression} | {product.minOrder} шт мин
+          {product.price}₽/{product.unitExpression} | {product.minOrder} {t('minOrder')}
         </p>
         <p className="text-[#9DA0A5] mb-4 text-sm">{product.description}</p>
       </div>
@@ -77,7 +80,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         >
           <div
             className="min-w-16 w-fit bg-white border border-[#D6D9E2] rounded-lg text-base text-center md:text-xl py-1.5 px-2.5 font-medium"
-            aria-label="Quantité"
+            aria-label={t('quantity')}
           >
             {product.availableQuantity}
           </div>
@@ -98,7 +101,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
               product.status == ProductStatus.ACTIVE ? 'bg-[#22C55D]' : 'bg-[#9DA0A5]'
             }`}
             aria-pressed={product.status === ProductStatus.ACTIVE}
-            aria-label={product.status === ProductStatus.ACTIVE ? 'Désactiver' : 'Activer'}
+            aria-label={product.status === ProductStatus.ACTIVE ? t('disable') : t('enable')}
           >
             <span
               className={`inline-block h-5 md:h-6 w-5 md:w-6 transform rounded-full bg-white transition-transform shadow-sm ${
@@ -123,13 +126,13 @@ const ProductCard: React.FC<ProductCardProps> = ({
               to={`/modify-product/${product.id}`}
               className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
             >
-              Изменять
+              {t('modify')}
             </Link>
             <button
               onClick={e => handleDelete(product.id, e)}
               className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50"
             >
-              Удалить
+              {t('delete')}
             </button>
           </div>
         </div>

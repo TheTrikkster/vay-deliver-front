@@ -1,0 +1,13 @@
+{
+  "editProduct": "Produkt bearbeiten",
+  "addNewProduct": "Neues Produkt hinzufügen",
+  "productName": "Produktname *",
+  "description": "Beschreibung",
+  "unitMeasure": "Maßeinheit (Stück, Gramm, Kg) *",
+  "availableQuantity": "Verfügbare Menge in Ziffern *",
+  "minOrderVolume": "Mindestbestellmenge in Ziffern *",
+  "price": "Preis: 18 *",
+  "requiredFields": "Mit * markierte Felder sind Pflichtfelder.",
+  "cancel": "Abbrechen",
+  "confirm": "Bestätigen"
+}

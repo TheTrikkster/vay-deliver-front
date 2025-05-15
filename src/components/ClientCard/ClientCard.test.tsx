@@ -14,6 +14,28 @@ jest.mock('../../utils/orderCalcul', () => ({
   toCents: jest.fn(amount => Math.round(amount * 100)),
 }));
 
+// Mock i18next
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string, options?: any) => {
+      const translations: { [key: string]: string } = {
+        // Traductions pour clientCard
+        productUnavailable: 'Продукт недоступен',
+        minOrder: 'Мин. заказ : ',
+        price: 'Цена: ',
+        add: 'Добавить',
+        ariaLabel: options?.name ? `Продукт: ${options.name}` : 'Продукт',
+        ariaAddToCart: options?.name ? `Добавить ${options.name} в корзину` : 'Добавить в корзину',
+      };
+      return translations[key] || key;
+    },
+    i18n: {
+      changeLanguage: jest.fn(),
+      language: 'ru',
+    },
+  }),
+}));
+
 describe('ClientCard Component', () => {
   const mockProduct: ProductType = {
     _id: '123',

@@ -1,0 +1,8 @@
+{
+  "productUnavailable": "Product unavailable",
+  "minOrder": "Min. order: ",
+  "price": "Price: ",
+  "add": "Add",
+  "ariaLabel": "Product: {{name}}",
+  "ariaAddToCart": "Add {{name}} to cart"
+}

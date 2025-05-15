@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { OrderStatus, Position, Tag } from '../../types/order';
 import { tagsApi } from '../../api/services/tagsApi';
 import { useDispatch, useSelector } from 'react-redux';
@@ -13,6 +14,7 @@ interface FilterModalProps {
 }
 
 const OrdersFilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) => {
+  const { t } = useTranslation('ordersFilterModal');
   const dispatch = useDispatch();
   const filtersFromRedux = useSelector(selectFiltersObject);
   const [status, setStatus] = useState<OrderStatus | ''>('ACTIVE');
@@ -108,7 +110,7 @@ const OrdersFilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onAppl
 
   const getCurrentLocation = () => {
     if (!navigator.geolocation) {
-      alert('Геолокация не поддерживается вашим браузером');
+      alert(t('geoNotSupported'));
       return;
     }
 
@@ -119,7 +121,7 @@ const OrdersFilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onAppl
       },
       error => {
         console.error('Erreur de géolocalisation :', error);
-        alert('Не удалось определить ваше местоположение. Проверьте настройки конфиденциальности.');
+        alert(t('geoError'));
       }
     );
   };
@@ -149,13 +151,13 @@ const OrdersFilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onAppl
                 fill="#8C8F94"
               />
             </svg>
-            <span className="text-xs">Сбросить</span>
+            <span className="text-xs">{t('reset')}</span>
           </button>
         </div>
 
         {/* Status Tabs */}
         <div className="mb-6">
-          <h2 className="text-lg font-medium mb-3">Заказы</h2>
+          <h2 className="text-lg font-medium mb-3">{t('orders')}</h2>
           <select
             value={status}
             onChange={e => setStatus(e.target.value as OrderStatus | '')}
@@ -166,21 +168,21 @@ const OrdersFilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onAppl
               backgroundPosition: 'right 10px center',
             }}
           >
-            <option value="ACTIVE">Активные</option>
-            <option value="COMPLETED">Завершенные</option>
-            <option value="">Все</option>
+            <option value="ACTIVE">{t('active')}</option>
+            <option value="COMPLETED">{t('completed')}</option>
+            <option value="">{t('all')}</option>
           </select>
         </div>
 
         {/* Address Search */}
         <div className="mb-6">
-          <h3 className="text-lg font-medium mb-3">Сортировка по адресу</h3>
+          <h3 className="text-lg font-medium mb-3">{t('addressSort')}</h3>
           <div className="relative">
             <input
               value={position.address}
               onChange={e => setPosition(prev => ({ ...prev, address: e.target.value }))}
               type="text"
-              placeholder="Введите адрес или название города"
+              placeholder={t('enterAddress')}
               className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent placeholder-gray-400 focus:placeholder-transparent transition-all pr-3 text-sm"
             />
             <div className="absolute right-0 inset-y-0 flex items-center border-l border-gray-200">
@@ -226,14 +228,14 @@ const OrdersFilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onAppl
 
         {/* Note Search */}
         <div className="mb-6">
-          <h3 className="text-lg font-medium mb-3">Сортировка заметок</h3>
+          <h3 className="text-lg font-medium mb-3">{t('notesSort')}</h3>
           <div className="relative">
             <div className="relative border border-gray-200 rounded-lg">
               <div className="absolute inset-y-0 left-3 flex items-center"></div>
               <input
                 type="text"
                 value={searchValue}
-                placeholder="Введите название заметки"
+                placeholder={t('enterNote')}
                 className="w-full p-3 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm"
                 onChange={e => {
                   setSearchValue(e.target.value);
@@ -292,14 +294,11 @@ const OrdersFilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onAppl
           <div className="flex flex-wrap gap-2 mb-8">
             {selectedTags.map((tag, index) => {
               return (
-                <div
-                  key={index}
-                  className="bg-gray-100 rounded-full px-4 py-2 flex items-center gap-2"
-                >
+                <div key={index} className="font-light bg-gray-100 rounded-lg p-2 text-sm">
                   {tag}
                   <button
                     onClick={() => setSelectedTags(tags => tags.filter(theTag => theTag !== tag))}
-                    className="text-gray-500"
+                    className="text-gray-500 ml-2"
                   >
                     ×
                   </button>
@@ -315,13 +314,13 @@ const OrdersFilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onAppl
             onClick={onClose}
             className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-700 transition-colors"
           >
-            Отменить
+            {t('cancel')}
           </button>
           <button
             onClick={handleApply}
             className="flex-1 py-3 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors"
           >
-            Подтвердить
+            {t('confirm')}
           </button>
         </div>
       </div>

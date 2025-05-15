@@ -13,6 +13,32 @@ jest.mock('react-router-dom', () => ({
   useNavigate: () => jest.fn(),
 }));
 
+// Mock react-i18next
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string, options?: any) => {
+      const translations: { [key: string]: string } = {
+        // Traductions pour clientCard
+        productUnavailable: 'Produit indisponible',
+        minOrder: 'Commande min. : ',
+        price: 'Prix : ',
+        add: 'Ajouter',
+        ariaLabel: options?.name ? `Produit: ${options.name}` : 'Produit',
+        ariaAddToCart: options?.name ? `Ajouter ${options.name} au panier` : 'Ajouter au panier',
+
+        // Traductions pour clientProducts
+        errorLoading: 'Impossible de charger les produits',
+        order: 'Commander',
+      };
+      return translations[key] || key;
+    },
+    i18n: {
+      changeLanguage: jest.fn(),
+      language: 'fr',
+    },
+  }),
+}));
+
 const mockStore = configureStore([]);
 
 describe('ClientProducts Component', () => {
@@ -108,6 +134,7 @@ describe('ClientProducts Component', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('error-message')).toBeInTheDocument();
+      expect(screen.getByText('Impossible de charger les produits')).toBeInTheDocument();
     });
   });
 
@@ -125,12 +152,34 @@ describe('ClientProducts Component', () => {
       expect(screen.getByText('Test Product')).toBeInTheDocument();
     });
 
-    // Trouver le bouton par son texte au lieu de utiliser data-testid
-    const addButton = screen.getByText('Добавить');
+    // Trouver le bouton par son texte (maintenant traduit)
+    const addButton = screen.getByText('Ajouter');
     fireEvent.click(addButton);
 
     // Vérifier que l'action a été dispatché au store
     const actions = store.getActions();
     expect(actions[0].type).toBe('clientOrder/addToClientOrder');
+  });
+
+  it('devrait activer le bouton Commander quand le panier contient des articles', async () => {
+    store = mockStore({
+      client: {
+        items: { '1': 2 },
+        products: [],
+      },
+    });
+
+    render(
+      <Provider store={store}>
+        <BrowserRouter>
+          <ClientProducts />
+        </BrowserRouter>
+      </Provider>
+    );
+
+    await waitFor(() => {
+      const orderButton = screen.getByText('Commander');
+      expect(orderButton).not.toBeDisabled();
+    });
   });
 });

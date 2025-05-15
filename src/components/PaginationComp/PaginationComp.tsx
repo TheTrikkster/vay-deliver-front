@@ -1,3 +1,6 @@
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+
 interface PaginationProps {
   currentPage: number;
   totalPages: number;
@@ -5,6 +8,8 @@ interface PaginationProps {
 }
 
 const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPageChange }) => {
+  const { t } = useTranslation('pagination');
+
   if (totalPages <= 1) return null;
 
   const renderPageNumbers = () => {
@@ -22,14 +27,14 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
   };
 
   return (
-    <div className="mt-6 flex justify-center">
+    <div className="mt-6 pb-4 flex justify-center">
       <div className="flex space-x-1 md:space-x-2">
         <button
           onClick={() => onPageChange(Math.max(1, currentPage - 1))}
           disabled={currentPage === 1}
           className="px-2 py-1 md:px-3 text-sm md:text-base bg-gray-200 rounded-md hover:bg-gray-300 disabled:opacity-50"
         >
-          Предыдущий
+          {t('previous')}
         </button>
         {renderPageNumbers().map(page => (
           <button
@@ -47,7 +52,7 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPage
           disabled={currentPage === totalPages}
           className="px-3 py-1 bg-gray-200 rounded-md hover:bg-gray-300 disabled:opacity-50"
         >
-          Следующий
+          {t('next')}
         </button>
       </div>
     </div>

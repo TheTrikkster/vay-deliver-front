@@ -1,0 +1,9 @@
+{
+  "options": "Options",
+  "minOrder": "min",
+  "quantity": "Quantity",
+  "enable": "Enable",
+  "disable": "Disable",
+  "modify": "Modify",
+  "delete": "Delete"
+}

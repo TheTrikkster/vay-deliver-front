@@ -1,11 +1,12 @@
-import React, { lazy, Suspense } from 'react';
+import React, { lazy, Suspense, ReactNode } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { OfflineIndicator } from './components/OfflineIndicator';
 import { InstallPrompt } from './components/InstallPrompt';
-import { Authenticator, withAuthenticator } from '@aws-amplify/ui-react';
+import { withAuthenticator } from '@aws-amplify/ui-react';
 import '@aws-amplify/ui-react/styles.css';
 import { SyncManager } from './components/SyncManager/SyncManager';
 import GeoPosition from './components/GeoPosition';
+import LanguageSwitcher from './components/LanguageSwitcher';
 
 const Home = lazy(() => import('./pages/Home'));
 const AdminProducts = lazy(() => import('./pages/AdminProducts/AdminProducts'));
@@ -21,61 +22,38 @@ const LoadingFallback = () => (
   </div>
 );
 
+const NotFound = () => {
+  return (
+    <div className="flex min-h-screen items-center justify-center flex-col">
+      <h1 className="text-3xl font-bold mb-4">Страница не найдена</h1>
+      <p className="text-lg">Страница, которую вы ищете, не существует.</p>
+    </div>
+  );
+};
+
+// Composant pour les routes protégées
+const ProtectedRoutes = ({ children }: { children: ReactNode }) => {
+  return (
+    <div>
+      <OfflineIndicator />
+      <InstallPrompt />
+      <SyncManager />
+      {children}
+    </div>
+  );
+};
+
+// Enveloppez le composant avec withAuthenticator
+const AuthProtectedRoutes = withAuthenticator(ProtectedRoutes);
+
 function App() {
   const router = createBrowserRouter([
+    // Routes publiques (sans authentification)
     {
       path: '/',
       element: (
         <Suspense fallback={<LoadingFallback />}>
           <ClientProducts />
-        </Suspense>
-      ),
-    },
-    {
-      path: '/admin-products',
-      element: (
-        <Suspense fallback={<LoadingFallback />}>
-          <AdminProducts />
-        </Suspense>
-      ),
-    },
-    {
-      path: '/create-product',
-      element: (
-        <Suspense fallback={<LoadingFallback />}>
-          <CreateProduct />
-        </Suspense>
-      ),
-    },
-    {
-      path: '/modify-product/:id',
-      element: (
-        <Suspense fallback={<LoadingFallback />}>
-          <ModifyProduct />
-        </Suspense>
-      ),
-    },
-    {
-      path: '/admin-orders',
-      element: (
-        <Suspense fallback={<LoadingFallback />}>
-          <Orders />
-        </Suspense>
-      ),
-    },
-    {
-      path: '/admin-order/:id',
-      element: (
-        <Suspense fallback={<LoadingFallback />}>
-          <Order />
-        </Suspense>
-      ),
-    },
-    {
-      path: '/geo',
-      element: (
-        <Suspense fallback={<LoadingFallback />}>
-          <GeoPosition />
         </Suspense>
       ),
     },
@@ -87,20 +65,94 @@ function App() {
         </Suspense>
       ),
     },
+    {
+      path: '/geo',
+      element: (
+        <Suspense fallback={<LoadingFallback />}>
+          <GeoPosition />
+        </Suspense>
+      ),
+    },
+
+    // Routes protégées (avec authentification)
+    {
+      path: '/home',
+      element: (
+        <Suspense fallback={<LoadingFallback />}>
+          <AuthProtectedRoutes>
+            <Home />
+          </AuthProtectedRoutes>
+        </Suspense>
+      ),
+    },
+    {
+      path: '/admin-products',
+      element: (
+        <Suspense fallback={<LoadingFallback />}>
+          <AuthProtectedRoutes>
+            <AdminProducts />
+          </AuthProtectedRoutes>
+        </Suspense>
+      ),
+    },
+    {
+      path: '/create-product',
+      element: (
+        <Suspense fallback={<LoadingFallback />}>
+          <AuthProtectedRoutes>
+            <CreateProduct />
+          </AuthProtectedRoutes>
+        </Suspense>
+      ),
+    },
+    {
+      path: '/modify-product/:id',
+      element: (
+        <Suspense fallback={<LoadingFallback />}>
+          <AuthProtectedRoutes>
+            <ModifyProduct />
+          </AuthProtectedRoutes>
+        </Suspense>
+      ),
+    },
+    {
+      path: '/admin-orders',
+      element: (
+        <Suspense fallback={<LoadingFallback />}>
+          <AuthProtectedRoutes>
+            <Orders />
+          </AuthProtectedRoutes>
+        </Suspense>
+      ),
+    },
+    {
+      path: '/admin-order/:id',
+      element: (
+        <Suspense fallback={<LoadingFallback />}>
+          <AuthProtectedRoutes>
+            <Order />
+          </AuthProtectedRoutes>
+        </Suspense>
+      ),
+    },
+    {
+      path: '*',
+      element: (
+        <Suspense fallback={<LoadingFallback />}>
+          <NotFound />
+        </Suspense>
+      ),
+    },
   ]);
 
   return (
-    <Authenticator>
-      {({ signOut, user }) => (
-        <div>
-          <OfflineIndicator />
-          <InstallPrompt />
-          <SyncManager />
-          <RouterProvider router={router} />
-        </div>
-      )}
-    </Authenticator>
+    <>
+      <OfflineIndicator />
+      <InstallPrompt />
+      <SyncManager />
+      <RouterProvider router={router} />
+    </>
   );
 }
 
-export default withAuthenticator(App);
+export default App;

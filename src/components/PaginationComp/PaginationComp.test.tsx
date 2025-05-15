@@ -1,6 +1,23 @@
 import { render, fireEvent, screen } from '@testing-library/react';
 import Pagination from './PaginationComp';
 
+// Mock react-i18next
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => {
+      const translations: { [key: string]: string } = {
+        previous: 'Предыдущий',
+        next: 'Следующий',
+      };
+      return translations[key] || key;
+    },
+    i18n: {
+      changeLanguage: jest.fn(),
+      language: 'ru',
+    },
+  }),
+}));
+
 describe('Composant Pagination', () => {
   const mockOnPageChange = jest.fn();
 

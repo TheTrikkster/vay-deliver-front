@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { clearClientOrder } from '../../store/slices/clientSlice';
 import { toCents, fromCents } from '../../utils/orderCalcul';
 import { ordersApi } from '../../api/services/ordersApi';
+import { useTranslation } from 'react-i18next';
 
 // Typage des données de formulaire
 interface FormData {
@@ -22,6 +23,7 @@ const FORM_FIELDS: Record<string, keyof FormData> = {
 };
 
 function ClientOrder() {
+  const { t } = useTranslation('clientOrder');
   const { items, products } = useSelector((state: RootState) => state.client);
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const dispatch = useDispatch();
@@ -77,17 +79,17 @@ function ClientOrder() {
     const newErrors: Partial<FormData> = {};
 
     if (!formData[FORM_FIELDS.FIRST_NAME].trim()) {
-      newErrors[FORM_FIELDS.FIRST_NAME] = 'Обязательное поле';
+      newErrors[FORM_FIELDS.FIRST_NAME] = t('requiredField');
     }
 
     if (!formData[FORM_FIELDS.PHONE_NUMBER].trim()) {
-      newErrors[FORM_FIELDS.PHONE_NUMBER] = 'Обязательное поле';
+      newErrors[FORM_FIELDS.PHONE_NUMBER] = t('requiredField');
     } else if (!/^\+?[0-9]{10,12}$/.test(formData[FORM_FIELDS.PHONE_NUMBER].trim())) {
-      newErrors[FORM_FIELDS.PHONE_NUMBER] = 'Неверный формат номера';
+      newErrors[FORM_FIELDS.PHONE_NUMBER] = t('invalidPhoneFormat');
     }
 
     if (!formData[FORM_FIELDS.ADDRESS].trim()) {
-      newErrors[FORM_FIELDS.ADDRESS] = 'Обязательное поле';
+      newErrors[FORM_FIELDS.ADDRESS] = t('requiredField');
     }
 
     setErrors(newErrors);
@@ -136,23 +138,19 @@ function ClientOrder() {
     <div className="min-h-screen md:bg-[#F5F7FA]">
       {showSuccess ? (
         <div className="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center">
-          <div className="text-2xl font-semibold text-[#4F46E5] mb-4">
-            Ваш заказ успешно оформлен!
-          </div>
-          <div className="text-gray-600">Перенаправление на главную страницу...</div>
+          <div className="text-2xl font-semibold text-[#4F46E5] mb-4">{t('orderSuccess')}</div>
+          <div className="text-gray-600">{t('redirecting')}</div>
         </div>
       ) : products.length === 0 ? (
         <div className="min-h-screen flex flex-col items-center justify-center p-5">
           <div className="text-center">
-            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Ваша корзина пуста</h2>
-            <p className="text-gray-600 mb-6">
-              Пожалуйста, добавьте товары перед оформлением заказа.
-            </p>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">{t('emptyCart')}</h2>
+            <p className="text-gray-600 mb-6">{t('addProducts')}</p>
             <button
               onClick={() => navigate('/')}
               className="bg-[#4F46E5] text-white py-3 px-6 rounded-full text-lg font-medium hover:bg-[#4338CA] transition-colors"
             >
-              Вернуться на главную страницу
+              {t('backToHome')}
             </button>
           </div>
         </div>
@@ -165,7 +163,7 @@ function ClientOrder() {
           <div className="max-w-lg mx-auto p-5 py-10">
             {/* Section Commande */}
             <div className="md:bg-white md:rounded-lg md:shadow-sm md:p-6 md:mb-6">
-              <h1 className="text-xl font-semibold text-center mb-6">Ваш заказ</h1>
+              <h1 className="text-xl font-semibold text-center mb-6">{t('yourOrder')}</h1>
 
               {/* Liste des articles avec table */}
               <div className="mb-7 overflow-hidden">
@@ -191,7 +189,7 @@ function ClientOrder() {
                   <tfoot>
                     <tr>
                       <td colSpan={2} className="pt-4 text-base font-bold">
-                        Итого
+                        {t('total')}
                       </td>
                       <td className="pt-4 text-lg font-bold text-right whitespace-nowrap">
                         {fromCents(toCents(total))}
@@ -208,7 +206,7 @@ function ClientOrder() {
               onSubmit={handleSubmit}
               className="md:bg-white md:rounded-lg md:shadow-sm md:p-6"
             >
-              <h2 className="text-xl font-semibold text-center mb-6">Информация для отправки</h2>
+              <h2 className="text-xl font-semibold text-center mb-6">{t('shippingInfo')}</h2>
 
               <div className="space-y-4">
                 {/* Premier champ */}
@@ -237,7 +235,7 @@ function ClientOrder() {
                       name={FORM_FIELDS.FIRST_NAME}
                       value={formData[FORM_FIELDS.FIRST_NAME]}
                       onChange={handleChange}
-                      placeholder="Имя"
+                      placeholder={t('firstName')}
                       className={`w-full pl-10 pr-4 py-3 border ${errors[FORM_FIELDS.FIRST_NAME] ? 'border-red-500' : 'border-gray-300'} ring-0 ring-offset-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent focus:placeholder-transparent`}
                       onFocus={() => setFocusedField(FORM_FIELDS.FIRST_NAME)}
                       onBlur={() => setFocusedField(null)}
@@ -275,7 +273,7 @@ function ClientOrder() {
                       name="lastName"
                       value={formData.lastName}
                       onChange={handleChange}
-                      placeholder="Фамилия"
+                      placeholder={t('lastName')}
                       className="w-full pl-10 pr-4 py-3 border border-gray-300 ring-0 ring-offset-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent focus:placeholder-transparent"
                       onFocus={() => setFocusedField('lastName')}
                       onBlur={() => setFocusedField(null)}
@@ -307,7 +305,7 @@ function ClientOrder() {
                       name="phoneNumber"
                       value={formData.phoneNumber}
                       onChange={handleChange}
-                      placeholder="Номер телефона"
+                      placeholder={t('phoneNumber')}
                       className={`w-full pl-10 pr-4 py-3 border ${errors.phoneNumber ? 'border-red-500' : 'border-gray-300'} ring-0 ring-offset-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent focus:placeholder-transparent`}
                       onFocus={() => setFocusedField('phoneNumber')}
                       onBlur={() => setFocusedField(null)}
@@ -340,7 +338,7 @@ function ClientOrder() {
                       name="address"
                       value={formData.address}
                       onChange={handleChange}
-                      placeholder="Напишите полный и правильный адрес для быстрой доставки."
+                      placeholder={t('address')}
                       className={`w-full pl-10 pr-4 py-3 border ${errors.address ? 'border-red-500' : 'border-gray-300'} ring-0 ring-offset-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent focus:placeholder-transparent min-h-[100px]`}
                       onFocus={() => setFocusedField('address')}
                       onBlur={() => setFocusedField(null)}
@@ -359,14 +357,14 @@ function ClientOrder() {
                   onClick={handleCancel}
                   className="w-full bg-[#4F46E5] text-white py-3 px-6 rounded-full text-lg font-medium hover:bg-[#4338CA] transition-colors mt-8"
                 >
-                  Аннулировать
+                  {t('cancel')}
                 </button>
                 <button
                   disabled={buttonDisabled}
                   type="submit"
                   className={`${buttonDisabled ? 'bg-gray-300 text-gray-600 border-gray-300' : 'text-whiteborder-[#4355DA] hover:bg-[#4338CA]'} w-full bg-[#4F46E5] text-white py-3 px-6 rounded-full text-lg font-medium transition-colors mt-8`}
                 >
-                  Заказать
+                  {t('order')}
                 </button>
               </div>
             </form>

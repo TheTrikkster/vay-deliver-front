@@ -1,4 +1,5 @@
 import React, { useCallback, useState, ChangeEvent, FormEvent, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Product } from '../../types/product';
 import { useSelector } from 'react-redux';
 import { selectProductsError } from '../../store/slices/productsSlice';
@@ -22,6 +23,7 @@ type ProductType = {
 };
 
 function ProductForm({ initialValues, onSubmit, isEditing, isLoading = false }: ProductFormProps) {
+  const { t } = useTranslation('productForm');
   const error = useSelector(selectProductsError);
   const [product, setProduct] = useState<ProductType>({
     name: '',
@@ -81,7 +83,7 @@ function ProductForm({ initialValues, onSubmit, isEditing, isLoading = false }: 
     <div className="flex justify-center items-center min-h-screen bg-gray-50">
       <div className="md:bg-white md:rounded-xl md:shadow-sm max-w-lg p-6">
         <h1 className="text-center text-xl font-bold mb-5">
-          {isEditing ? 'Изменить продукт' : 'Добавить новый продукт'}
+          {isEditing ? t('editProduct') : t('addNewProduct')}
         </h1>
 
         {error && (
@@ -98,7 +100,7 @@ function ProductForm({ initialValues, onSubmit, isEditing, isLoading = false }: 
               value={product.name}
               onChange={handleChange}
               className="w-full p-3 border border-[#9DA0A5] rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent placeholder-gray-400 focus:placeholder-transparent transition-all"
-              placeholder="Название продукта *"
+              placeholder={t('productName')}
               required
             />
 
@@ -107,7 +109,7 @@ function ProductForm({ initialValues, onSubmit, isEditing, isLoading = false }: 
               value={product.description}
               onChange={handleChange}
               className="w-full p-3 border border-[#9DA0A5] rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent min-h-[100px] placeholder-gray-400 focus:placeholder-transparent transition-all"
-              placeholder="Описание"
+              placeholder={t('description')}
             />
 
             <input
@@ -116,7 +118,7 @@ function ProductForm({ initialValues, onSubmit, isEditing, isLoading = false }: 
               value={product.unitExpression}
               onChange={handleChange}
               className="w-full p-3 border border-[#9DA0A5] rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent placeholder-gray-400 focus:placeholder-transparent transition-all"
-              placeholder="Единица измерения ( Штука, Грамм, Кг) *"
+              placeholder={t('unitMeasure')}
               required
             />
 
@@ -126,7 +128,7 @@ function ProductForm({ initialValues, onSubmit, isEditing, isLoading = false }: 
               value={product.availableQuantity}
               onChange={handleChange}
               className="w-full p-3 border border-[#9DA0A5] rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent placeholder-gray-400 focus:placeholder-transparent transition-all"
-              placeholder="Доступное колличество в цифрах *"
+              placeholder={t('availableQuantity')}
               required
             />
 
@@ -136,7 +138,7 @@ function ProductForm({ initialValues, onSubmit, isEditing, isLoading = false }: 
               value={product.minOrder}
               onChange={handleChange}
               className="w-full p-3 border border-[#9DA0A5] rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent placeholder-gray-400 focus:placeholder-transparent transition-all"
-              placeholder="Минимальный объем заказа в цифрах *"
+              placeholder={t('minOrderVolume')}
               required
             />
 
@@ -146,27 +148,25 @@ function ProductForm({ initialValues, onSubmit, isEditing, isLoading = false }: 
               value={product.price}
               onChange={handleChange}
               className="w-full p-3 border border-[#9DA0A5] rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent placeholder-gray-400 focus:placeholder-transparent transition-all"
-              placeholder="Цена : 18 *"
+              placeholder={t('price')}
               required
             />
           </div>
 
-          <p className="text-sm text-gray-500 mt-3">
-            Поля, отмеченные *, обязательны для заполнения.
-          </p>
+          <p className="text-sm text-gray-500 mt-3">{t('requiredFields')}</p>
 
           <div className="flex gap-4 mt-5">
             <Link
               to="/admin-products"
               className="flex-1 text-center p-4 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
             >
-              Отменить
+              {t('cancel')}
             </Link>
             <button
               type="submit"
               className="flex-1 p-4 bg-[#22C55D] text-white rounded-lg hover:bg-[#1FAA4F] transition-colors"
             >
-              Подтвердить
+              {t('confirm')}
             </button>
           </div>
         </form>

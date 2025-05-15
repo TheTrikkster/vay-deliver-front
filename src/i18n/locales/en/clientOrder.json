@@ -1,0 +1,18 @@
+{
+  "orderSuccess": "Your order has been placed successfully!",
+  "redirecting": "Redirecting to home page...",
+  "emptyCart": "Your cart is empty",
+  "addProducts": "Please add products before placing an order.",
+  "backToHome": "Return to home page",
+  "yourOrder": "Your order",
+  "total": "Total",
+  "shippingInfo": "Shipping information",
+  "firstName": "First name",
+  "lastName": "Last name",
+  "phoneNumber": "Phone number",
+  "address": "Complete address for quick delivery",
+  "requiredField": "Required field",
+  "invalidPhoneFormat": "Invalid phone format",
+  "cancel": "Cancel",
+  "order": "Order"
+}

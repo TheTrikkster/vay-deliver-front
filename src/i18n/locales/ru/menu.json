@@ -1,0 +1,17 @@
+{
+  "links": {
+    "products": "Товары",
+    "orders": "Заказы",
+    "settings": "Настройки",
+    "logout": "Выйти"
+  },
+  "actions": {
+    "add": "Добавить"
+  },
+  "aria": {
+    "toggleMenu": "Переключить меню",
+    "openMenu": "Открыть меню",
+    "mainMenu": "Главное меню",
+    "closeMenu": "Закрыть меню"
+  }
+}

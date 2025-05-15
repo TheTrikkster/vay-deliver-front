@@ -11,11 +11,13 @@ import {
   setError,
 } from '../../store/slices/productsSlice';
 import { productsApi } from '../../api/services/productsApi';
+import { useTranslation } from 'react-i18next';
 
 function CreateProduct() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const isOnline = useSelector(selectIsOnline);
+  const { t } = useTranslation('createProduct');
 
   const handleCreateProduct = async (productData: Product) => {
     dispatch(setError(null));
@@ -76,7 +78,7 @@ function CreateProduct() {
 
       navigate('/admin-products');
     } catch (error) {
-      dispatch(setError('Продукт больше не существует или был удален'));
+      dispatch(setError(t('productNoLongerExists')));
       dispatch(deleteProductsItem(tempProduct.id));
     }
   };

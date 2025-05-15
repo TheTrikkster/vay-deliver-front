@@ -3,6 +3,24 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import AddTagModal from './AddTagModal';
 
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => {
+      const translations: { [key: string]: string } = {
+        title: 'Новая заметка',
+        placeholder: 'Введите текст заметки',
+        cancel: 'Отменить',
+        confirm: 'Подтвердить',
+      };
+      return translations[key] || key;
+    },
+    i18n: {
+      changeLanguage: jest.fn(),
+      language: 'ru',
+    },
+  }),
+}));
+
 describe('AddTagModal', () => {
   const mockOnClose = jest.fn();
   const mockOnConfirm = jest.fn();

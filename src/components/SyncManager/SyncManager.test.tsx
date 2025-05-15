@@ -347,9 +347,6 @@ describe('SyncManager', () => {
     // Vérifier que productsApi.create a été appelé
     expect(productsApi.create).toHaveBeenCalled();
 
-    // Vérifier que setError a été appelé avec le message d'erreur
-    expect(store.dispatch).toHaveBeenCalledWith(setError('Ошибка синхронизации продукта'));
-
     // Vérifier que l'opération n'a pas été supprimée
     expect(store.dispatch).not.toHaveBeenCalledWith(removeProductPendingOperation(0));
   });

@@ -10,8 +10,10 @@ import {
   updateProductsItem,
   selectProductsLoading,
 } from '../../store/slices/productsSlice';
+import { useTranslation } from 'react-i18next';
 
 function ModifyProduct() {
+  const { t } = useTranslation('modifyProduct');
   const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -27,7 +29,7 @@ function ModifyProduct() {
         setProductData(response.data);
       } catch (error) {
         console.error('Erreur lors du chargement du produit:', error);
-        setGetError('Erreur lors de la  récupéreation du produit');
+        setGetError(t('errorLoadingProduct'));
       } finally {
         dispatch(setLoading(false));
       }
@@ -36,7 +38,7 @@ function ModifyProduct() {
     if (id) {
       fetchProductData();
     }
-  }, []);
+  }, [id, dispatch]);
 
   const handleUpdateProduct = async (updatedProductData: Product) => {
     dispatch(setError(null));
@@ -69,7 +71,7 @@ function ModifyProduct() {
       navigate('/admin-products');
     } catch (error) {
       console.error('Erreur lors de la mise à jour du produit:', error);
-      dispatch(setError('Невозможно обновить продукт'));
+      dispatch(setError(t('unableToUpdateProduct')));
     }
   };
 
@@ -81,7 +83,7 @@ function ModifyProduct() {
           onClick={() => navigate('/admin-products')}
           className="mt-4 w-full p-3 bg-gray-200 rounded-lg hover:bg-gray-300"
         >
-          Назад
+          {t('back')}
         </button>
       </div>
     </div>

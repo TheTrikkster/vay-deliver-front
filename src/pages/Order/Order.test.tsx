@@ -22,6 +22,30 @@ jest.mock('../../components/Menu/Menu', () => {
   };
 });
 
+// Mock pour react-i18next
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => {
+      const translations: { [key: string]: string } = {
+        errorLoadingOrder: 'Erreur de chargement de la commande',
+        active: 'Active',
+        completed: 'Terminée',
+        canceled: 'Annulée',
+        products: 'Produits',
+        total: 'Total',
+        notes: 'Notes',
+        cancel: 'Annuler',
+        complete: 'Terminer',
+        whatsapp: 'WhatsApp',
+      };
+      return translations[key] || key;
+    },
+    i18n: {
+      changeLanguage: () => new Promise(() => {}),
+    },
+  }),
+}));
+
 const mockedOrdersApi = ordersApi as jest.Mocked<typeof ordersApi>;
 const mockedUseParams = useParams as jest.Mock;
 const mockedUseNavigate = useNavigate as jest.Mock;
@@ -180,7 +204,7 @@ describe('Order', () => {
     render(<Order />);
 
     await waitFor(() => {
-      const completeButton = screen.getByText('Завершить');
+      const completeButton = screen.getByText('Terminer');
       fireEvent.click(completeButton);
     });
 
@@ -198,7 +222,7 @@ describe('Order', () => {
     render(<Order />);
 
     await waitFor(() => {
-      const cancelButton = screen.getByText('Отменить');
+      const cancelButton = screen.getByText('Annuler');
       fireEvent.click(cancelButton);
     });
 
@@ -218,8 +242,8 @@ describe('Order', () => {
     render(<Order />);
 
     await waitFor(() => {
-      expect(screen.queryByText('Завершить')).not.toBeInTheDocument();
-      expect(screen.queryByText('Отменить')).not.toBeInTheDocument();
+      expect(screen.queryByText('Terminer')).not.toBeInTheDocument();
+      expect(screen.queryByText('Annuler')).not.toBeInTheDocument();
     });
   });
 });

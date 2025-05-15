@@ -1,0 +1,12 @@
+{
+  "mustAddProduct": "Sie müssen ein Produkt hinzufügen",
+  "addProduct": "Produkt hinzufügen",
+  "productInStock": "Produkt auf Lager",
+  "unitOfMeasure": "Maßeinheit:",
+  "cancel": "Abbrechen",
+  "confirm": "Bestätigen",
+  "deleteConfirmation": "Löschbestätigung",
+  "deleteConfirmationText": "Sind Sie sicher, dass Sie diesen Artikel löschen möchten?",
+  "delete": "Löschen",
+  "productNoLongerExists": "Das Produkt existiert nicht mehr oder wurde gelöscht"
+}

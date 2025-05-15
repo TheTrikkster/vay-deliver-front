@@ -3,6 +3,28 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import ProductCard from './ProductCard';
 import { InventoryProduct, ProductStatus } from '../../types/product';
 
+// Mock react-i18next
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => {
+      const translations: { [key: string]: string } = {
+        options: 'Опции',
+        minOrder: 'мин',
+        quantity: 'Количество',
+        enable: 'Включить',
+        disable: 'Отключить',
+        modify: 'Изменять',
+        delete: 'Удалить',
+      };
+      return translations[key] || key;
+    },
+    i18n: {
+      changeLanguage: jest.fn(),
+      language: 'ru',
+    },
+  }),
+}));
+
 describe('Composant ProductCard', () => {
   const mockFood: InventoryProduct = {
     id: 1,
@@ -33,14 +55,20 @@ describe('Composant ProductCard', () => {
     render(<ProductCard {...mockProps} />);
 
     expect(screen.getByText('Pommes')).toBeInTheDocument();
-    expect(screen.getByText(/2.5.+kg.+1.+шт мин/)).toBeInTheDocument();
-    expect(screen.getByText(3)).toBeInTheDocument();
+
+    // Modifier la façon de vérifier le texte
+    const priceElement = screen.getByText(/2.5₽\/kg/);
+    expect(priceElement).toBeInTheDocument();
+    expect(priceElement.textContent).toContain('1');
+    expect(priceElement.textContent).toContain('мин');
+
+    expect(screen.getByText('3')).toBeInTheDocument();
   });
 
   test('appelle toggleCardMenu lorsque le bouton de menu est cliqué', () => {
     render(<ProductCard {...mockProps} />);
 
-    const menuButton = screen.getByLabelText('Options');
+    const menuButton = screen.getByLabelText('Опции');
     fireEvent.click(menuButton);
 
     expect(mockProps.toggleCardMenu).toHaveBeenCalledWith(mockFood.id, expect.any(Object));
@@ -72,7 +100,7 @@ describe('Composant ProductCard', () => {
   test('appelle openQuantityPopup lorsque la zone de quantité est cliquée', () => {
     render(<ProductCard {...mockProps} />);
 
-    const quantityField = screen.getByLabelText('Quantité');
+    const quantityField = screen.getByLabelText('Количество');
     fireEvent.click(quantityField.parentElement!);
 
     expect(mockProps.openQuantityPopup).toHaveBeenCalledWith(

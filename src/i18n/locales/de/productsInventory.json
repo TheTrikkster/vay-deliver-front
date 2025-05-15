@@ -1,0 +1,6 @@
+{
+  "fetchError": "Produkte konnten nicht abgerufen werden",
+  "deleteError": "Fehler beim Löschen",
+  "updateError": "Fehler bei der Aktualisierung",
+  "statusUpdateError": "Fehler bei der Statusaktualisierung"
+}

@@ -6,6 +6,24 @@ import { useProductsInventory } from '../useProductsInventory';
 import { Store, UnknownAction } from 'redux';
 import { productsApi } from '../../api/services/productsApi';
 
+// Mock pour react-i18next
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => {
+      const translations: { [key: string]: string } = {
+        fetchError: 'Ошибка при загрузке',
+        deleteError: 'Ошибка при удалении',
+        updateError: 'Ошибка при обновлении',
+        statusUpdateError: 'Ошибка при обновлении статуса',
+      };
+      return translations[key] || key;
+    },
+    i18n: {
+      changeLanguage: () => new Promise(() => {}),
+    },
+  }),
+}));
+
 // Préparation du mock store
 const mockStore = configureStore();
 
@@ -231,7 +249,7 @@ describe('useProductsInventory hook', () => {
       await result.current.updateItemQuantity(1, 20);
     });
 
-    // Vérifie que setError a été dispatché avec le message d'erreur russe
+    // Vérifie que setError a été dispatché avec le message d'erreur traduit
     expect(store.dispatch).toHaveBeenCalledWith(
       expect.objectContaining({
         type: 'products/setError',

@@ -1,0 +1,18 @@
+{
+  "orderSuccess": "Votre commande a été passée avec succès !",
+  "redirecting": "Redirection vers la page d'accueil...",
+  "emptyCart": "Votre panier est vide",
+  "addProducts": "Veuillez ajouter des produits avant de passer commande.",
+  "backToHome": "Retourner à la page d'accueil",
+  "yourOrder": "Votre commande",
+  "total": "Total",
+  "shippingInfo": "Informations d'expédition",
+  "firstName": "Prénom",
+  "lastName": "Nom de famille",
+  "phoneNumber": "Numéro de téléphone",
+  "address": "Adresse complète pour une livraison rapide",
+  "requiredField": "Champ obligatoire",
+  "invalidPhoneFormat": "Format de numéro invalide",
+  "cancel": "Annuler",
+  "order": "Commander"
+}

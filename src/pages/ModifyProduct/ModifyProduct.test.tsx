@@ -16,6 +16,24 @@ jest.mock('react-router-dom', () => ({
   useParams: () => mockParams,
 }));
 
+// Mock pour react-i18next
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => {
+      const translations: { [key: string]: string } = {
+        errorLoadingProduct: 'Ошибка при загрузке продукта',
+        unableToUpdateProduct: 'Невозможно обновить продукт',
+        back: 'Назад',
+      };
+      return translations[key] || key;
+    },
+    i18n: {
+      changeLanguage: jest.fn(),
+      language: 'ru',
+    },
+  }),
+}));
+
 // Mock du composant ProductForm
 jest.mock('../../components/ProductForm/ProductForm', () => ({
   __esModule: true,
@@ -167,15 +185,21 @@ describe('ModifyProduct', () => {
 
     render(<ModifyProduct />);
 
-    // Attendre que le chargement soit terminé
+    // Attendre que le chargement soit terminé et que l'erreur soit affichée
     await waitFor(() => {
-      expect(screen.queryByText('Chargement...')).not.toBeInTheDocument();
+      // Vérifier que l'erreur a été loggée
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        'Erreur lors du chargement du produit:',
+        expect.any(Error)
+      );
     });
 
-    // Vérifier que l'erreur a été loggée
-    expect(consoleErrorSpy).toHaveBeenCalledWith(
-      'Erreur lors du chargement du produit:',
-      expect.any(Error)
+    // Vérifier que le dispatch a été appelé avec setLoading(false)
+    expect(mockDispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: expect.stringContaining('setLoading'),
+        payload: false,
+      })
     );
 
     consoleErrorSpy.mockRestore();
@@ -218,10 +242,11 @@ describe('ModifyProduct', () => {
         expect.any(Error)
       );
 
-      // Vérifier que l'action setError a été dispatchée
+      // Vérifier que l'action setError a été dispatchée avec le message traduit
       expect(mockDispatch).toHaveBeenCalledWith(
         expect.objectContaining({
           type: expect.stringContaining('setError'),
+          payload: 'Невозможно обновить продукт',
         })
       );
     });

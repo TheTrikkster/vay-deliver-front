@@ -1,5 +1,6 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import {
   selectIsOnline as selectProductsIsOnline,
   selectPendingOperations as selectProductsPendingOperations,
@@ -7,6 +8,8 @@ import {
 import { selectOrdersIsOnline, selectOrdersPendingOperations } from '../store/slices/ordersSlice';
 
 export const OfflineIndicator: React.FC = () => {
+  const { t } = useTranslation('offlineIndicator');
+
   // États de connexion des deux slices
   const isProductsOnline = useSelector(selectProductsIsOnline);
   const isOrdersOnline = useSelector(selectOrdersIsOnline);
@@ -29,14 +32,14 @@ export const OfflineIndicator: React.FC = () => {
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-yellow-500 text-white p-2 text-center z-50">
       {!isFullyOnline ? (
-        <p>
-          В данный момент вы не в сети. Ваши изменения будут синхронизированы, когда соединение
-          будет восстановлено.
-        </p>
+        <p>{t('offlineMessage')}</p>
       ) : totalPendingOperations > 0 ? (
         <p>
-          Синхронизация в процессе... {totalPendingOperations} ожидающие операции (
-          {productsPendingOperations.length} продукты, {ordersPendingOperations.length} заказы).
+          {t('syncInProgress', {
+            total: totalPendingOperations,
+            products: productsPendingOperations.length,
+            orders: ordersPendingOperations.length,
+          })}
         </p>
       ) : null}
     </div>

@@ -1,0 +1,12 @@
+{
+  "mustAddProduct": "Vous devez ajouter un produit",
+  "addProduct": "Ajouter un produit",
+  "productInStock": "Produit en stock",
+  "unitOfMeasure": "Unité de mesure :",
+  "cancel": "Annuler",
+  "confirm": "Confirmer",
+  "deleteConfirmation": "Confirmation de suppression",
+  "deleteConfirmationText": "Êtes-vous sûr de vouloir supprimer cet élément?",
+  "delete": "Supprimer",
+  "productNoLongerExists": "Le produit n'existe plus ou a été supprimé"
+}

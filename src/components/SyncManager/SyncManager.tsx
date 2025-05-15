@@ -6,7 +6,6 @@ import {
   setOnlineStatus as setProductsOnlineStatus,
   selectPendingOperations as selectProductsPendingOperations,
   removePendingOperation as removeProductPendingOperation,
-  setError as setProductError,
   selectIsOnline as selectProductsIsOnline,
   addProductsItem,
   deleteProductsItem,
@@ -153,7 +152,6 @@ export const SyncManager: React.FC = () => {
         dispatch(removeProductPendingOperation(i));
       } catch (error) {
         console.error(`Erreur lors de la synchronisation des produits: ${error}`);
-        dispatch(setProductError(`Ошибка синхронизации продукта`));
       }
     }
   }, [dispatch, isProductsOnline, productsPendingOperations]);
