@@ -4,14 +4,14 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 import React from 'react';
 import { Amplify } from 'aws-amplify';
-import awsExports from './aws-exports';
+import awsConfig from './aws-config.js';
 import { Provider } from 'react-redux';
 import { store, persistor } from './store/userStore';
 import { PersistGate } from 'redux-persist/integration/react';
 import './index.css';
 import './i18n';
 
-Amplify.configure(awsExports);
+Amplify.configure(awsConfig);
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 

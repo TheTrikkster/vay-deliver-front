@@ -1,0 +1,26 @@
+const awsConfig = {
+  Auth: {
+    region: process.env.REACT_APP_AWS_REGION || 'eu-west-2',
+    identityPoolId: process.env.REACT_APP_AWS_COGNITO_IDENTITY_POOL_ID,
+    userPoolId: process.env.REACT_APP_AWS_USER_POOLS_ID,
+    userPoolWebClientId: process.env.REACT_APP_AWS_USER_POOLS_WEB_CLIENT_ID,
+  },
+  aws_project_region: process.env.REACT_APP_AWS_REGION || 'eu-west-2',
+  aws_cognito_identity_pool_id: process.env.REACT_APP_AWS_COGNITO_IDENTITY_POOL_ID,
+  aws_cognito_region: process.env.REACT_APP_AWS_REGION || 'eu-west-2',
+  aws_user_pools_id: process.env.REACT_APP_AWS_USER_POOLS_ID,
+  aws_user_pools_web_client_id: process.env.REACT_APP_AWS_USER_POOLS_WEB_CLIENT_ID,
+  oauth: {},
+  aws_cognito_username_attributes: ['EMAIL'],
+  aws_cognito_social_providers: [],
+  aws_cognito_signup_attributes: ['EMAIL'],
+  aws_cognito_mfa_configuration: 'OFF',
+  aws_cognito_mfa_types: ['SMS'],
+  aws_cognito_password_protection_settings: {
+    passwordPolicyMinLength: 8,
+    passwordPolicyCharacters: [],
+  },
+  aws_cognito_verification_mechanisms: ['EMAIL'],
+};
+
+export default awsConfig;
