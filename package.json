@@ -70,6 +70,7 @@
     ]
   },
   "devDependencies": {
+    "@aws-amplify/cli": "^13.0.1",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/react-hooks": "^8.0.1",
     "@types/i18next": "^13.0.0",
