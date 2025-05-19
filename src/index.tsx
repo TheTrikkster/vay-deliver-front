@@ -4,7 +4,7 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 import React from 'react';
 import { Amplify } from 'aws-amplify';
-import awsConfig from './aws-config.js';
+import awsConfig from './aws-config';
 import { Provider } from 'react-redux';
 import { store, persistor } from './store/userStore';
 import { PersistGate } from 'redux-persist/integration/react';
