@@ -44,6 +44,7 @@ const ProtectedRoutes = ({ children }: { children: ReactNode }) => {
 };
 
 // Enveloppez le composant avec withAuthenticator
+<<<<<<< HEAD
 const AuthProtectedRoutes = withAuthenticator(ProtectedRoutes, { hideSignUp: true });
 
 const protectedRoutes = [
@@ -55,6 +56,11 @@ const protectedRoutes = [
   { path: '/admin-order/:id', element: <Order /> },
   { path: '/admin-settings', element: <Settings /> },
 ];
+=======
+const AuthProtectedRoutes = withAuthenticator(ProtectedRoutes, {
+  hideSignUp: true,
+});
+>>>>>>> 5a3f630 (axios config updated)
 
 function App() {
   const router = createBrowserRouter([
