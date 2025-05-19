@@ -70,7 +70,7 @@ const OrderCard: React.FC<OrderCardProps> = ({
 
       {description && (
         <div className="mb-2 text-gray-500 text-sm">
-          <p>{description}</p>
+          <p className="line-clamp-1">{description}</p>
         </div>
       )}
 

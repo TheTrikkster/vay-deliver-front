@@ -1,10 +1,12 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ordersApi } from '../../api/services/ordersApi';
 import Loading from '../../components/Loading';
 import Menu from '../../components/Menu/Menu';
 import { useTranslation } from 'react-i18next';
+import AddTagModal from '../../components/AddTagModal/AddTagModal';
+import ConfirmModal from '../../components/ConfirmModal';
 
 interface OrderProps {
   _id: string;
@@ -29,8 +31,11 @@ const Order: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [orderDetails, setOrderDetails] = useState<OrderProps | null>(null);
+  const [isAddTagModalOpen, setIsAddTagModalOpen] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
+  const [tagToDelete, setTagToDelete] = useState<{ orderId: string; tagName: string } | null>(null);
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -109,6 +114,28 @@ const Order: React.FC = () => {
     }
   };
 
+  const handleTagSuccess = async () => {
+    try {
+      const response = await ordersApi.getById(id!);
+      setOrderDetails(response.data);
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour:', error);
+    }
+  };
+
+  const handleDeleteTagClick = (orderId: string, tagName: string) => {
+    setTagToDelete({ orderId, tagName });
+    setIsConfirmModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (tagToDelete) {
+      await removeTag(tagToDelete.orderId, tagToDelete.tagName);
+      setIsConfirmModalOpen(false);
+      setTagToDelete(null);
+    }
+  };
+
   if (loading) {
     return <Loading />;
   }
@@ -130,7 +157,7 @@ const Order: React.FC = () => {
           <path d="M15.41 7.41L14 6L8 12L14 18L15.41 16.59L10.83 12L15.41 7.41Z" fill="#666666" />
         </svg>
       </button>
-      <div className="flex-1 flex items-center justify-center">
+      <div className="flex justify-center mt-8">
         <div className="min-w-[343px] w-full md:w-5/12 bg-white rounded-2xl p-5 md:shadow-md max-w-[500px] md:mx-0 mx-4">
           {/* En-tête avec l'avatar et le statut */}
           <div className="flex flex-col mb-5 gap-5">
@@ -254,13 +281,21 @@ const Order: React.FC = () => {
 
           {/* Notes */}
           <div className="mb-5">
-            <h3 className="text-lg font-normal text-gray-800 mb-4">{t('notes')}</h3>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-normal text-gray-800">{t('notes')}</h3>
+              <button
+                className="text-lg font-normal text-gray-800"
+                onClick={() => setIsAddTagModalOpen(true)}
+              >
+                Добавить +
+              </button>
+            </div>
             <div className="flex flex-wrap gap-2 mb-3">
               {orderDetails.tagNames.map((tag: string, index: number) => (
                 <div key={index} className="font-light bg-gray-100 rounded-lg p-2 text-sm">
                   {tag}
                   <button
-                    onClick={() => removeTag(orderDetails._id, tag)}
+                    onClick={() => handleDeleteTagClick(orderDetails._id, tag)}
                     className="text-gray-500 ml-2"
                   >
                     ×
@@ -289,6 +324,22 @@ const Order: React.FC = () => {
           )}
         </div>
       </div>
+      <AddTagModal
+        isOpen={isAddTagModalOpen}
+        onClose={() => setIsAddTagModalOpen(false)}
+        orderId={orderDetails._id}
+        onSuccess={handleTagSuccess}
+      />
+      <ConfirmModal
+        isOpen={isConfirmModalOpen}
+        onClose={() => {
+          setIsConfirmModalOpen(false);
+          setTagToDelete(null);
+        }}
+        onConfirm={handleConfirmDelete}
+        title={t('deleteTag')}
+        message={t('deleteTagConfirmation')}
+      />
     </div>
   ) : (
     <div
