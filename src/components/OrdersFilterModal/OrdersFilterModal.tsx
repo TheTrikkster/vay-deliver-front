@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { selectFiltersObject, setFilters } from '../../store/slices/ordersSlice';
 import { buildFilterString } from '../../utils/filterUtils';
 import { debounce } from 'lodash';
+import PlacesAutocomplete, { geocodeByAddress, getLatLng } from 'react-places-autocomplete';
 
 interface FilterModalProps {
   isOpen: boolean;
@@ -34,6 +35,7 @@ const OrdersFilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onAppl
       if (JSON.stringify(position) !== JSON.stringify(filtersFromRedux.position)) {
         setPosition(filtersFromRedux.position);
       }
+      setSearchValue('');
     }
   }, [isOpen, filtersFromRedux]);
 
@@ -126,6 +128,21 @@ const OrdersFilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onAppl
     );
   };
 
+  const handleSelectAddress = async (address: string) => {
+    try {
+      const results = await geocodeByAddress(address);
+      const latLng = await getLatLng(results[0]);
+
+      setPosition({
+        lat: latLng.lat.toString(),
+        lng: latLng.lng.toString(),
+        address,
+      });
+    } catch (error) {
+      console.error('Error selecting address:', error);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -178,13 +195,72 @@ const OrdersFilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onAppl
         <div className="mb-6">
           <h3 className="text-lg font-medium mb-3">{t('addressSort')}</h3>
           <div className="relative">
-            <input
+            <PlacesAutocomplete
               value={position.address}
-              onChange={e => setPosition(prev => ({ ...prev, address: e.target.value }))}
-              type="text"
-              placeholder={t('enterAddress')}
-              className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent placeholder-gray-400 focus:placeholder-transparent transition-all pr-3 text-sm"
-            />
+              onChange={address => setPosition(prev => ({ ...prev, address }))}
+              onSelect={handleSelectAddress}
+              debounce={1000}
+              shouldFetchSuggestions={position.address.length >= 10}
+            >
+              {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
+                <div className="w-full">
+                  <input
+                    {...getInputProps({
+                      placeholder: t('enterAddress'),
+                      className:
+                        'w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent placeholder-gray-400 focus:placeholder-transparent transition-all pr-3 text-sm',
+                    })}
+                  />
+                  {(loading || suggestions.length > 0) && (
+                    <div className="absolute left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-sm z-10 max-h-48 overflow-y-auto mt-1">
+                      {loading && <div className="px-4 py-2.5 text-gray-500">{t('loading')}</div>}
+                      {suggestions.map(suggestion => {
+                        const style = {
+                          backgroundColor: suggestion.active ? '#f0f0f0' : '#fff',
+                          cursor: 'pointer',
+                        };
+                        return (
+                          <div
+                            {...getSuggestionItemProps(suggestion, {
+                              className:
+                                'px-4 py-2.5 hover:bg-gray-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0',
+                              style,
+                            })}
+                            key={suggestion.placeId}
+                          >
+                            <div className="flex items-center gap-2">
+                              <svg
+                                className="w-4 h-4 text-gray-400"
+                                xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                                <circle
+                                  cx="12"
+                                  cy="9"
+                                  r="2"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                />
+                              </svg>
+                              {suggestion.description}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
+            </PlacesAutocomplete>
             <div className="absolute right-0 inset-y-0 flex items-center border-l border-gray-200">
               <button
                 onClick={getCurrentLocation}

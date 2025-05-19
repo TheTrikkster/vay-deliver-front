@@ -114,7 +114,7 @@ describe('Composant ProductCard', () => {
 
     const cardContainer = container.firstChild as HTMLElement;
     expect(cardContainer).toHaveClass('w-11/12');
-    expect(cardContainer).toHaveClass('md:w-3/4');
+    expect(cardContainer).toHaveClass('md:w-2/4');
     expect(cardContainer).toHaveClass('bg-white');
     expect(cardContainer).toHaveClass('rounded-3xl');
   });

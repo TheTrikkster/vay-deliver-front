@@ -20,7 +20,7 @@ const OrderCard: React.FC<OrderCardProps> = ({
   isSelected = false,
 }) => {
   return (
-    <div className="bg-white rounded-xl p-4 shadow-md cursor-pointer relative hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-green-500">
+    <div className="min-w-[343px] w-11/12 md:w-2/4 bg-white rounded-xl p-4 shadow-md cursor-pointer relative hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-green-500">
       {/* Checkbox en mode sélection */}
       {isSelectionMode && (
         <div className="absolute top-4 right-4">

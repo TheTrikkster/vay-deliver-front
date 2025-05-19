@@ -147,7 +147,7 @@ function Orders() {
           <div className="flex flex-col gap-5">
             {orders.map(order => (
               <div
-                className="md:px-5 px-4"
+                className="flex justify-center md:px-5 px-4"
                 key={order._id}
                 onClick={() => handleCardClick(order._id)}
                 role="button"
@@ -161,7 +161,7 @@ function Orders() {
                 <OrderCard
                   firstName={order.firstName}
                   lastName={order.lastName}
-                  description={order.items.map((item: any) => item.product.name).join(', ')}
+                  description={order.items.map((item: any) => item.product?.name).join(', ')}
                   address={order.address}
                   tagNames={order.tagNames}
                   isSelectionMode={isSelectionMode}

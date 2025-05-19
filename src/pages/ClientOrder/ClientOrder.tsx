@@ -6,6 +6,7 @@ import { clearClientOrder } from '../../store/slices/clientSlice';
 import { toCents, fromCents } from '../../utils/orderCalcul';
 import { ordersApi } from '../../api/services/ordersApi';
 import { useTranslation } from 'react-i18next';
+import PlacesAutocomplete, { geocodeByAddress, getLatLng } from 'react-places-autocomplete';
 
 // Typage des données de formulaire
 interface FormData {
@@ -96,6 +97,29 @@ function ClientOrder() {
     return Object.keys(newErrors).length === 0;
   };
 
+  // Fonction pour gérer la sélection d'adresse
+  const handleSelectAddress = async (address: string) => {
+    try {
+      const results = await geocodeByAddress(address);
+      const latLng = await getLatLng(results[0]);
+
+      setFormData(prev => ({
+        ...prev,
+        address,
+      }));
+
+      // Effacer l'erreur
+      if (errors[FORM_FIELDS.ADDRESS]) {
+        setErrors(prev => ({
+          ...prev,
+          [FORM_FIELDS.ADDRESS]: undefined,
+        }));
+      }
+    } catch (error) {
+      console.error('Error selecting address:', error);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -160,7 +184,7 @@ function ClientOrder() {
           <div className="h-20 bg-[#4F46E5]"></div>
 
           {/* Contenu principal */}
-          <div className="max-w-lg mx-auto p-5 py-10">
+          <div className="max-w-lg mx-auto p-4 py-10">
             {/* Section Commande */}
             <div className="md:bg-white md:rounded-lg md:shadow-sm md:p-6 md:mb-6">
               <h1 className="text-xl font-semibold text-center mb-6">{t('yourOrder')}</h1>
@@ -209,7 +233,74 @@ function ClientOrder() {
               <h2 className="text-xl font-semibold text-center mb-6">{t('shippingInfo')}</h2>
 
               <div className="space-y-4">
-                {/* Premier champ */}
+                {/* Champ adresse avec autocomplete */}
+                <div>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 18 18"
+                        fill="none"
+                      >
+                        <path
+                          d="M9 1.5C6.0975 1.5 3.75 3.8475 3.75 6.75C3.75 10.6875 9 16.5 9 16.5C9 16.5 14.25 10.6875 14.25 6.75C14.25 3.8475 11.9025 1.5 9 1.5ZM9 8.625C8.50555 8.625 8.0222 8.4538 7.66092 8.14016C7.29965 7.82652 7.09865 7.39728 7.1018 6.9029C7.10496 6.40851 7.31207 5.98207 7.67799 5.67322C8.04392 5.36438 8.5291 5.19963 9.02353 5.20403C9.51796 5.20842 9.99932 5.38175 10.3595 5.69831C10.7196 6.01487 10.9186 6.44568 10.9131 6.90014C10.9076 7.35461 10.6983 7.78131 10.332 8.08984C9.96576 8.39837 9.48046 8.56174 8.9856 8.55634L9 8.625Z"
+                          fill={focusedField === 'address' ? '#4F46E5' : '#9DA0A5'}
+                        />
+                      </svg>
+                    </div>
+                    <PlacesAutocomplete
+                      value={formData.address}
+                      onChange={address => setFormData(prev => ({ ...prev, address }))}
+                      onSelect={handleSelectAddress}
+                      debounce={1000}
+                      shouldFetchSuggestions={formData.address.length >= 10}
+                    >
+                      {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
+                        <div className="w-full">
+                          <input
+                            {...getInputProps({
+                              placeholder: t('address'),
+                              className: `w-full pl-10 pr-4 py-3 border ${
+                                errors.address ? 'border-red-500' : 'border-gray-300'
+                              } ring-0 ring-offset-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent focus:placeholder-transparent`,
+                              onFocus: () => setFocusedField('address'),
+                              onBlur: () => setFocusedField(null),
+                              name: 'address',
+                            })}
+                          />
+                          <div className="absolute z-10 w-full bg-white rounded-lg shadow-lg">
+                            {loading && <div className="p-2 text-gray-500">{t('loading')}</div>}
+                            {suggestions.map(suggestion => {
+                              const style = {
+                                backgroundColor: suggestion.active ? '#f0f0f0' : '#fff',
+                                cursor: 'pointer',
+                                padding: '10px',
+                                fontSize: '14px',
+                                borderBottom: '1px solid #f0f0f0',
+                              };
+                              return (
+                                <div
+                                  {...getSuggestionItemProps(suggestion, { style })}
+                                  key={suggestion.placeId}
+                                >
+                                  {suggestion.description}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+                    </PlacesAutocomplete>
+                  </div>
+                  {errors.address && (
+                    <p data-testid="address-error" className="text-red-500 text-xs mt-1">
+                      {errors.address}
+                    </p>
+                  )}
+                </div>
+
                 <div>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
@@ -317,52 +408,19 @@ function ClientOrder() {
                     </p>
                   )}
                 </div>
-
-                <div>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-3 top-3 flex items-start pointer-events-none">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="18"
-                        height="18"
-                        viewBox="0 0 18 18"
-                        fill="none"
-                      >
-                        <path
-                          d="M9 1.5C6.0975 1.5 3.75 3.8475 3.75 6.75C3.75 10.6875 9 16.5 9 16.5C9 16.5 14.25 10.6875 14.25 6.75C14.25 3.8475 11.9025 1.5 9 1.5ZM9 8.625C8.50555 8.625 8.0222 8.4538 7.66092 8.14016C7.29965 7.82652 7.09865 7.39728 7.1018 6.9029C7.10496 6.40851 7.31207 5.98207 7.67799 5.67322C8.04392 5.36438 8.5291 5.19963 9.02353 5.20403C9.51796 5.20842 9.99932 5.38175 10.3595 5.69831C10.7196 6.01487 10.9186 6.44568 10.9131 6.90014C10.9076 7.35461 10.6983 7.78131 10.332 8.08984C9.96576 8.39837 9.48046 8.56174 8.9856 8.55634L9 8.625Z"
-                          fill={focusedField === 'address' ? '#4F46E5' : '#9DA0A5'}
-                        />
-                      </svg>
-                    </div>
-                    <textarea
-                      name="address"
-                      value={formData.address}
-                      onChange={handleChange}
-                      placeholder={t('address')}
-                      className={`w-full pl-10 pr-4 py-3 border ${errors.address ? 'border-red-500' : 'border-gray-300'} ring-0 ring-offset-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent focus:placeholder-transparent min-h-[100px]`}
-                      onFocus={() => setFocusedField('address')}
-                      onBlur={() => setFocusedField(null)}
-                    />
-                  </div>
-                  {errors.address && (
-                    <p data-testid="address-error" className="text-red-500 text-xs mt-1">
-                      {errors.address}
-                    </p>
-                  )}
-                </div>
               </div>
 
-              <div className="flex justify-center gap-4">
+              <div className="flex justify-center gap-4 mt-14 mb-4">
                 <button
                   onClick={handleCancel}
-                  className="w-full bg-[#4F46E5] text-white py-3 px-6 rounded-full text-lg font-medium hover:bg-[#4338CA] transition-colors mt-8"
+                  className="w-full bg-[#4F46E5] text-white py-3 px-6 rounded-full text-lg font-medium hover:bg-[#4338CA] transition-colors"
                 >
                   {t('cancel')}
                 </button>
                 <button
                   disabled={buttonDisabled}
                   type="submit"
-                  className={`${buttonDisabled ? 'bg-gray-300 text-gray-600 border-gray-300' : 'text-whiteborder-[#4355DA] hover:bg-[#4338CA]'} w-full bg-[#4F46E5] text-white py-3 px-6 rounded-full text-lg font-medium transition-colors mt-8`}
+                  className={`${buttonDisabled ? 'bg-gray-300 text-gray-600 border-gray-300' : 'text-whiteborder-[#4355DA] hover:bg-[#4338CA]'} w-full bg-[#4F46E5] text-white py-3 px-6 rounded-full text-lg font-medium transition-colors`}
                 >
                   {t('order')}
                 </button>

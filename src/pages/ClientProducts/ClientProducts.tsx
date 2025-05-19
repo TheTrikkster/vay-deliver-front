@@ -130,9 +130,9 @@ function ClientProducts() {
       <LanguageSwitcher />
 
       <section className="p-4">
-        <ul className="space-y-4 pb-5">
+        <ul className="flex flex-col justify-center items-center space-y-4 pb-5">
           {products.map(product => (
-            <li key={product._id}>
+            <li key={product._id} className="min-w-[343px] w-11/12 md:w-2/4">
               <ClientCard
                 product={product}
                 quantity={cart[product._id] || 0}

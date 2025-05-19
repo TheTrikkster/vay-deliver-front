@@ -6,7 +6,7 @@ import { withAuthenticator } from '@aws-amplify/ui-react';
 import '@aws-amplify/ui-react/styles.css';
 import { SyncManager } from './components/SyncManager/SyncManager';
 import GeoPosition from './components/GeoPosition';
-import LanguageSwitcher from './components/LanguageSwitcher';
+import Settings from './pages/Settings';
 
 const Home = lazy(() => import('./pages/Home'));
 const AdminProducts = lazy(() => import('./pages/AdminProducts/AdminProducts'));
@@ -36,15 +36,25 @@ const ProtectedRoutes = ({ children }: { children: ReactNode }) => {
   return (
     <div>
       <OfflineIndicator />
-      <InstallPrompt />
       <SyncManager />
+      {/* <Menu /> */}
       {children}
     </div>
   );
 };
 
 // Enveloppez le composant avec withAuthenticator
-const AuthProtectedRoutes = withAuthenticator(ProtectedRoutes);
+const AuthProtectedRoutes = withAuthenticator(ProtectedRoutes, { hideSignUp: true });
+
+const protectedRoutes = [
+  { path: '/home', element: <Home /> },
+  { path: '/admin-products', element: <AdminProducts /> },
+  { path: '/create-product', element: <CreateProduct /> },
+  { path: '/modify-product/:id', element: <ModifyProduct /> },
+  { path: '/admin-orders', element: <Orders /> },
+  { path: '/admin-order/:id', element: <Order /> },
+  { path: '/admin-settings', element: <Settings /> },
+];
 
 function App() {
   const router = createBrowserRouter([
@@ -75,66 +85,14 @@ function App() {
     },
 
     // Routes protégées (avec authentification)
-    {
-      path: '/home',
+    ...protectedRoutes.map(route => ({
+      ...route,
       element: (
         <Suspense fallback={<LoadingFallback />}>
-          <AuthProtectedRoutes>
-            <Home />
-          </AuthProtectedRoutes>
+          <AuthProtectedRoutes>{route.element}</AuthProtectedRoutes>
         </Suspense>
       ),
-    },
-    {
-      path: '/admin-products',
-      element: (
-        <Suspense fallback={<LoadingFallback />}>
-          <AuthProtectedRoutes>
-            <AdminProducts />
-          </AuthProtectedRoutes>
-        </Suspense>
-      ),
-    },
-    {
-      path: '/create-product',
-      element: (
-        <Suspense fallback={<LoadingFallback />}>
-          <AuthProtectedRoutes>
-            <CreateProduct />
-          </AuthProtectedRoutes>
-        </Suspense>
-      ),
-    },
-    {
-      path: '/modify-product/:id',
-      element: (
-        <Suspense fallback={<LoadingFallback />}>
-          <AuthProtectedRoutes>
-            <ModifyProduct />
-          </AuthProtectedRoutes>
-        </Suspense>
-      ),
-    },
-    {
-      path: '/admin-orders',
-      element: (
-        <Suspense fallback={<LoadingFallback />}>
-          <AuthProtectedRoutes>
-            <Orders />
-          </AuthProtectedRoutes>
-        </Suspense>
-      ),
-    },
-    {
-      path: '/admin-order/:id',
-      element: (
-        <Suspense fallback={<LoadingFallback />}>
-          <AuthProtectedRoutes>
-            <Order />
-          </AuthProtectedRoutes>
-        </Suspense>
-      ),
-    },
+    })),
     {
       path: '*',
       element: (
