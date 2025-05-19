@@ -6,6 +6,10 @@ import configureStore from 'redux-mock-store';
 import ClientOrder from './ClientOrder';
 import { clearClientOrder } from '../../store/slices/clientSlice';
 import { ordersApi } from '../../api/services/ordersApi';
+import PlacesAutocomplete, {
+  geocodeByAddress as actualGeocodeByAddress,
+  getLatLng as actualGetLatLng,
+} from 'react-places-autocomplete';
 
 // Mock des dépendances
 jest.mock('../../api/services/ordersApi');
@@ -44,6 +48,54 @@ jest.mock('react-i18next', () => ({
     },
   }),
 }));
+
+// Mock react-places-autocomplete
+type PlacesAutocompleteProps = React.ComponentProps<typeof PlacesAutocomplete>;
+
+jest.mock('react-places-autocomplete', () => {
+  // On importe le module original pour extraire ses types
+  const originalModule = jest.requireActual(
+    'react-places-autocomplete'
+  ) as typeof import('react-places-autocomplete');
+
+  return {
+    __esModule: true,
+    // 2. On ré-exporte tout, pour ne pas casser d'autres imports
+    ...originalModule,
+    // 3. On mocke le composant par défaut en typant ses params
+    default: ({ children, onChange, value, onSelect }: PlacesAutocompleteProps) => {
+      return children({
+        getInputProps: ({ placeholder, className }) => ({
+          placeholder,
+          className,
+          value,
+          // onChange du DOM → onChange fourni par tes composants
+          onChange: (e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value),
+        }),
+        suggestions: [], // aucun résultat
+        getSuggestionItemProps: () => ({}), // mock basique
+        loading: false,
+      });
+    },
+    // 4. On mocke geocodeByAddress avec le type exact de la fn originale
+    geocodeByAddress: jest
+      .fn() // crée une MockedFunction
+      .mockResolvedValue([
+        {
+          geometry: {
+            location: {
+              lat: () => 48.8566,
+              lng: () => 2.3522,
+            },
+          },
+        },
+      ]) as jest.MockedFunction<typeof actualGeocodeByAddress>,
+    // 5. même principe pour getLatLng
+    getLatLng: jest.fn().mockResolvedValue({ lat: 48.8566, lng: 2.3522 }) as jest.MockedFunction<
+      typeof actualGetLatLng
+    >,
+  };
+});
 
 const mockStore = configureStore([]);
 

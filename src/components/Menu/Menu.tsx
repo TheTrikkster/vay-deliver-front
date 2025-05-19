@@ -16,7 +16,7 @@ function Menu({ showAddProd = false }: MenuProps) {
   const MENU_LINKS = [
     { path: '/admin-products', label: t('links.products') },
     { path: '/admin-orders', label: t('links.orders') },
-    { path: '/settings', label: t('links.settings') },
+    { path: '/admin-settings', label: t('links.settings') },
     { path: '/logout', label: t('links.logout') },
   ];
 
@@ -123,7 +123,6 @@ function Menu({ showAddProd = false }: MenuProps) {
           ))}
         </nav>
       </div>
-      <LanguageSwitcher />
     </>
   );
 }

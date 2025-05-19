@@ -23,6 +23,7 @@ export const InstallPrompt = () => {
     };
 
     window.addEventListener('beforeinstallprompt', handler as EventListener);
+    console.log('hello');
 
     return () => window.removeEventListener('beforeinstallprompt', handler as EventListener);
   }, []);
