@@ -81,24 +81,6 @@ const OrdersFilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onAppl
     setSearchValue('');
   };
 
-  const handleAddTag = () => {
-    const trimmedValue = searchValue.trim();
-    if (!trimmedValue) return;
-
-    if (!selectedTags.includes(trimmedValue)) {
-      setSelectedTags(prev => [...prev, trimmedValue]);
-    }
-    setSearchValue('');
-    setSuggestedTags([]);
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      handleAddTag();
-    }
-  };
-
   const handleSuggestedTagClick = useCallback(
     (tag: Tag) => {
       if (!selectedTags.includes(tag.name)) {
@@ -307,7 +289,6 @@ const OrdersFilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onAppl
           <h3 className="text-lg font-medium mb-3">{t('notesSort')}</h3>
           <div className="relative">
             <div className="relative border border-gray-200 rounded-lg">
-              <div className="absolute inset-y-0 left-3 flex items-center"></div>
               <input
                 type="text"
                 value={searchValue}
@@ -317,29 +298,12 @@ const OrdersFilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onAppl
                   setSearchValue(e.target.value);
                   debouncedSearchTag(e.target.value);
                 }}
-                onKeyPress={handleKeyPress}
               />
-              <button
-                onClick={handleAddTag}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-gray-600"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 20 20"
-                  fill="none"
-                  stroke="currentColor"
-                >
-                  <path d="M10 4V16M4 10H16" strokeWidth="2" strokeLinecap="round" />
-                </svg>
-              </button>
             </div>
 
             {/* Suggestions dropdown */}
             {suggestedTags.length > 0 && searchValue && searchValue.trim() !== '' && (
               <div className="absolute left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-sm z-10 max-h-48 overflow-y-auto mt-1">
-                {' '}
                 {suggestedTags.map(tag => (
                   <div
                     key={tag._id}

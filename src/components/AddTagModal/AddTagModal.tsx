@@ -1,28 +1,51 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { addTagToOrders } from '../../store/slices/ordersSlice';
+import { useAppDispatch } from '../../store/hooks';
 
 interface AddTagModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (note: string) => void;
+  orderId?: string;
+  selectedOrderIds?: string[];
+  onSuccess?: (tagName: string) => void;
 }
 
-const AddTagModal: React.FC<AddTagModalProps> = ({ isOpen, onClose, onConfirm }) => {
-  const [noteText, setNoteText] = useState<string>('');
+const AddTagModal: React.FC<AddTagModalProps> = ({
+  isOpen,
+  onClose,
+  orderId,
+  selectedOrderIds,
+  onSuccess,
+}) => {
+  const [tagName, setTagName] = useState<string>('');
   const { t } = useTranslation('addTagModal');
+  const dispatch = useAppDispatch();
+
+  const handleAddTag = useCallback(async () => {
+    if (!tagName.trim()) return;
+
+    try {
+      const orderIds = orderId ? [orderId] : selectedOrderIds || [];
+      await dispatch(addTagToOrders({ tagName, orderIds })).unwrap();
+      onSuccess?.(tagName);
+      setTagName('');
+      onClose();
+    } catch (error) {
+      console.error("Erreur lors de l'ajout du tag:", error);
+    }
+  }, [dispatch, tagName, orderId, selectedOrderIds, onClose, onSuccess]);
+
+  const handleConfirm = useCallback(() => {
+    handleAddTag();
+  }, [handleAddTag]);
+
+  const handleClose = useCallback(() => {
+    setTagName('');
+    onClose();
+  }, [onClose]);
 
   if (!isOpen) return null;
-
-  const handleConfirm = () => {
-    onConfirm(noteText);
-    setNoteText('');
-    onClose();
-  };
-
-  const handleClose = () => {
-    setNoteText('');
-    onClose();
-  };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -32,8 +55,8 @@ const AddTagModal: React.FC<AddTagModalProps> = ({ isOpen, onClose, onConfirm })
         <textarea
           className="w-full border rounded-lg p-3 min-h-[100px] mb-4"
           placeholder={t('placeholder')}
-          value={noteText}
-          onChange={e => setNoteText(e.target.value)}
+          value={tagName}
+          onChange={e => setTagName(e.target.value)}
         />
 
         <div className="flex gap-4">
@@ -45,7 +68,7 @@ const AddTagModal: React.FC<AddTagModalProps> = ({ isOpen, onClose, onConfirm })
           </button>
           <button
             onClick={handleConfirm}
-            disabled={noteText.trim().length < 2}
+            disabled={tagName.trim().length < 2}
             className="flex-1 py-3 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors disabled:opacity-50 disabled:bg-green-300 disabled:hover:bg-green-300 disabled:cursor-not-allowed"
           >
             {t('confirm')}

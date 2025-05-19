@@ -1,9 +1,14 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import { configureStore } from '@reduxjs/toolkit';
 import Order from './Order';
 import { ordersApi } from '../../api/services/ordersApi';
 import { AxiosResponse } from 'axios';
+import productsReducer from '../../store/slices/productsSlice';
+import ordersReducer from '../../store/slices/ordersSlice';
+import clientReducer from '../../store/slices/clientSlice';
 
 // Mocks
 jest.mock('../../api/services/ordersApi');
@@ -51,6 +56,26 @@ const mockedUseParams = useParams as jest.Mock;
 const mockedUseNavigate = useNavigate as jest.Mock;
 const mockedUseLocation = useLocation as jest.Mock;
 
+// Créer un store de test
+const createTestStore = () => {
+  return configureStore({
+    reducer: {
+      products: productsReducer,
+      orders: ordersReducer,
+      client: clientReducer,
+    },
+  });
+};
+
+// Wrapper pour les tests
+const renderWithRedux = (component: React.ReactElement) => {
+  const store = createTestStore();
+  return {
+    ...render(<Provider store={store}>{component}</Provider>),
+    store,
+  };
+};
+
 describe('Order', () => {
   const mockNavigate = jest.fn();
   const mockOrderId = '123';
@@ -93,15 +118,15 @@ describe('Order', () => {
   });
 
   test('devrait afficher un indicateur de chargement', () => {
-    mockedOrdersApi.getById.mockImplementationOnce(() => new Promise(() => {})); // Ne résout jamais
-    render(<Order />);
+    mockedOrdersApi.getById.mockImplementationOnce(() => new Promise(() => {}));
+    renderWithRedux(<Order />);
     const spinner = screen.getByTestId('spinner');
     expect(spinner).toHaveClass('animate-spin');
     expect(spinner).toHaveClass('rounded-full');
   });
 
   test('devrait récupérer et afficher les détails de la commande', async () => {
-    render(<Order />);
+    renderWithRedux(<Order />);
 
     await waitFor(() => {
       expect(mockedOrdersApi.getById).toHaveBeenCalledWith(mockOrderId);
@@ -110,12 +135,12 @@ describe('Order', () => {
     await waitFor(() => {
       expect(screen.getByText('Jean Dupont')).toBeInTheDocument();
       expect(screen.getByText('123 Rue de Paris')).toBeInTheDocument();
-      expect(screen.getByText('Active')).toBeInTheDocument(); // Statut actif
+      expect(screen.getByText('Active')).toBeInTheDocument();
     });
   });
 
   test('devrait afficher correctement le statut ACTIVE', async () => {
-    render(<Order />);
+    renderWithRedux(<Order />);
 
     await waitFor(() => {
       const statusElement = screen.getByText('Active');
@@ -129,8 +154,7 @@ describe('Order', () => {
     mockedOrdersApi.getById.mockResolvedValueOnce(
       createAxiosResponse({ ...mockOrderData, status: 'COMPLETED' })
     );
-
-    render(<Order />);
+    renderWithRedux(<Order />);
 
     await waitFor(() => {
       const statusElement = screen.getByText('Terminée');
@@ -144,8 +168,7 @@ describe('Order', () => {
     mockedOrdersApi.getById.mockResolvedValueOnce(
       createAxiosResponse({ ...mockOrderData, status: 'CANCELED' })
     );
-
-    render(<Order />);
+    renderWithRedux(<Order />);
 
     await waitFor(() => {
       const statusElement = screen.getByText('Annulée');
@@ -156,7 +179,7 @@ describe('Order', () => {
   });
 
   test('devrait calculer correctement le prix total', async () => {
-    render(<Order />);
+    renderWithRedux(<Order />);
 
     await waitFor(() => {
       // 2*10 + 1*15 = 35
@@ -165,7 +188,7 @@ describe('Order', () => {
   });
 
   test('devrait afficher tous les articles de la commande', async () => {
-    render(<Order />);
+    renderWithRedux(<Order />);
 
     await waitFor(() => {
       expect(screen.getByText('Produit 1')).toBeInTheDocument();
@@ -179,7 +202,7 @@ describe('Order', () => {
   });
 
   test('devrait afficher tous les tags', async () => {
-    render(<Order />);
+    renderWithRedux(<Order />);
 
     await waitFor(() => {
       expect(screen.getByText('Urgent')).toBeInTheDocument();
@@ -188,7 +211,7 @@ describe('Order', () => {
   });
 
   test('devrait naviguer vers la page précédente quand le bouton retour est cliqué', async () => {
-    render(<Order />);
+    renderWithRedux(<Order />);
 
     await waitFor(() => {
       const backButton = screen.getByRole('button', { name: '' }); // Le bouton retour n'a pas de texte
@@ -200,8 +223,7 @@ describe('Order', () => {
 
   test('devrait marquer la commande comme complétée', async () => {
     mockedOrdersApi.updateStatus.mockResolvedValueOnce(createAxiosResponse({}));
-
-    render(<Order />);
+    renderWithRedux(<Order />);
 
     await waitFor(() => {
       const completeButton = screen.getByText('Terminer');
@@ -218,8 +240,7 @@ describe('Order', () => {
 
   test('devrait marquer la commande comme annulée', async () => {
     mockedOrdersApi.updateStatus.mockResolvedValueOnce(createAxiosResponse({}));
-
-    render(<Order />);
+    renderWithRedux(<Order />);
 
     await waitFor(() => {
       const cancelButton = screen.getByText('Annuler');
@@ -238,8 +259,7 @@ describe('Order', () => {
     mockedOrdersApi.getById.mockResolvedValueOnce(
       createAxiosResponse({ ...mockOrderData, status: 'COMPLETED' })
     );
-
-    render(<Order />);
+    renderWithRedux(<Order />);
 
     await waitFor(() => {
       expect(screen.queryByText('Terminer')).not.toBeInTheDocument();

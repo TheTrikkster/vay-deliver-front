@@ -77,20 +77,6 @@ function Orders() {
     [dispatch]
   );
 
-  const handleAddNote = useCallback(
-    (note: string) => {
-      return dispatch(addTagToOrders({ tagName: note, orderIds: selectedOrderIds }))
-        .unwrap()
-        .then(() => {
-          setIsAddTagModalOpen(false);
-        })
-        .catch(error => {
-          console.error('Erreur:', error);
-        });
-    },
-    [dispatch, selectedOrderIds]
-  );
-
   const renderHeader = () => {
     if (isSelectionMode) {
       return (
@@ -145,30 +131,34 @@ function Orders() {
             <div className="px-4 py-4 flex justify-between items-center">{renderHeader()}</div>
           </header>
           <div className="flex flex-col gap-5">
-            {orders.map(order => (
-              <div
-                className="flex justify-center md:px-5 px-4"
-                key={order._id}
-                onClick={() => handleCardClick(order._id)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={e => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    handleCardClick(order._id);
-                  }
-                }}
-              >
-                <OrderCard
-                  firstName={order.firstName}
-                  lastName={order.lastName}
-                  description={order.items.map((item: any) => item.product?.name).join(', ')}
-                  address={order.address}
-                  tagNames={order.tagNames}
-                  isSelectionMode={isSelectionMode}
-                  isSelected={selectedOrderIds.includes(order._id)}
-                />
-              </div>
-            ))}
+            {orders.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">{t('noOrders')}</div>
+            ) : (
+              orders.map(order => (
+                <div
+                  className="flex justify-center md:px-5 px-4"
+                  key={order._id}
+                  onClick={() => handleCardClick(order._id)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      handleCardClick(order._id);
+                    }
+                  }}
+                >
+                  <OrderCard
+                    firstName={order.firstName}
+                    lastName={order.lastName}
+                    description={order.items.map((item: any) => item.product?.name).join(', ')}
+                    address={order.address}
+                    tagNames={order.tagNames}
+                    isSelectionMode={isSelectionMode}
+                    isSelected={selectedOrderIds.includes(order._id)}
+                  />
+                </div>
+              ))
+            )}
             <Pagination
               currentPage={currentPage}
               totalPages={totalPages}
@@ -193,7 +183,7 @@ function Orders() {
             <AddTagModal
               isOpen={isAddTagModalOpen}
               onClose={() => setIsAddTagModalOpen(false)}
-              onConfirm={handleAddNote}
+              selectedOrderIds={selectedOrderIds}
             />
           </div>
         </>

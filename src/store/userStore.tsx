@@ -25,7 +25,7 @@ const ordersPersistConfig = {
 const productsPersistConfig = {
   key: 'products',
   storage,
-  // Si vous voulez tout persister, pas besoin de whitelist
+  whitelist: ['items', 'pendingOperations', 'lastFetched'],
 };
 
 const clientPersistConfig = {

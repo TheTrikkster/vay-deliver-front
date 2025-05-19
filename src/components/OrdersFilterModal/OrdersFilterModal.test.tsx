@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import OrdersFilterModal from './OrdersFilterModal';
 import { tagsApi } from '../../api/services/tagsApi';
 import * as filterUtils from '../../utils/filterUtils';
@@ -218,55 +218,6 @@ describe('OrdersFilterModal', () => {
     expect(mockOnApply).toHaveBeenCalledWith('status=ACTIVE&address=Paris');
   });
 
-  test('devrait ajouter un tag quand Entrée est pressé', async () => {
-    render(<OrdersFilterModal isOpen={true} onClose={mockOnClose} onApply={mockOnApply} />);
-
-    const tagInput = screen.getByPlaceholderText('Введите название заметки');
-
-    // Ajouter un tag
-    fireEvent.change(tagInput, { target: { value: 'important' } });
-    fireEvent.keyPress(tagInput, { key: 'Enter', code: 13, charCode: 13 });
-
-    // Vérifier que le tag est ajouté
-    expect(screen.getByText('important')).toBeInTheDocument();
-    expect(tagInput).toHaveValue('');
-
-    // Appliquer les filtres
-    fireEvent.click(screen.getByText('Подтвердить'));
-    expect(mockOnApply).toHaveBeenCalledWith('status=ACTIVE&tagNames=important');
-  });
-
-  test('devrait ajouter un tag quand le bouton + est cliqué', () => {
-    render(<OrdersFilterModal isOpen={true} onClose={mockOnClose} onApply={mockOnApply} />);
-
-    const tagInput = screen.getByPlaceholderText('Введите название заметки');
-
-    // Ajouter un tag
-    fireEvent.change(tagInput, { target: { value: 'important' } });
-    fireEvent.click(tagInput.nextElementSibling as Element); // Cliquer sur le bouton +
-
-    // Vérifier que le tag est ajouté
-    expect(screen.getByText('important')).toBeInTheDocument();
-  });
-
-  test('devrait supprimer un tag quand le bouton × est cliqué', async () => {
-    render(<OrdersFilterModal isOpen={true} onClose={mockOnClose} onApply={mockOnApply} />);
-
-    // Ajouter un tag
-    const tagInput = screen.getByPlaceholderText('Введите название заметки');
-    fireEvent.change(tagInput, { target: { value: 'important' } });
-    fireEvent.keyPress(tagInput, { key: 'Enter', code: 13, charCode: 13 });
-
-    // Vérifier que le tag est ajouté
-    expect(screen.getByText('important')).toBeInTheDocument();
-
-    // Supprimer le tag
-    fireEvent.click(screen.getByText('×'));
-
-    // Vérifier que le tag est supprimé
-    expect(screen.queryByText('important')).not.toBeInTheDocument();
-  });
-
   test('devrait afficher et permettre de sélectionner des suggestions de tags', async () => {
     render(<OrdersFilterModal isOpen={true} onClose={mockOnClose} onApply={mockOnApply} />);
 
@@ -282,14 +233,17 @@ describe('OrdersFilterModal', () => {
 
     // Attendre que les suggestions soient affichées
     await waitFor(() => {
-      expect(screen.getByText('urgent')).toBeInTheDocument();
+      const suggestionElement = screen.getByText('urgent');
+      expect(suggestionElement).toBeInTheDocument();
     });
 
     // Cliquer sur une suggestion
     fireEvent.click(screen.getByText('urgent'));
 
     // Vérifier que le tag suggéré est ajouté
-    expect(screen.getByText('urgent')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('urgent')).toBeInTheDocument();
+    });
     expect(tagInput).toHaveValue('');
   });
 
@@ -338,33 +292,7 @@ describe('OrdersFilterModal', () => {
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
   });
 
-  test('ne devrait pas ajouter de tags vides ou doublons', () => {
-    render(<OrdersFilterModal isOpen={true} onClose={mockOnClose} onApply={mockOnApply} />);
-
-    const tagInput = screen.getByPlaceholderText('Введите название заметки');
-
-    // Essayer d'ajouter un tag vide
-    fireEvent.change(tagInput, { target: { value: '   ' } });
-    fireEvent.keyPress(tagInput, { key: 'Enter', code: 13, charCode: 13 });
-    expect(screen.queryByText('   ')).not.toBeInTheDocument();
-
-    // Ajouter un tag valide
-    fireEvent.change(tagInput, { target: { value: 'important' } });
-    fireEvent.keyPress(tagInput, { key: 'Enter', code: 13, charCode: 13 });
-    expect(screen.getByText('important')).toBeInTheDocument();
-
-    // Essayer d'ajouter le même tag
-    fireEvent.change(tagInput, { target: { value: 'important' } });
-    fireEvent.keyPress(tagInput, { key: 'Enter', code: 13, charCode: 13 });
-    // Vérifier qu'il n'y a qu'un seul tag 'important' (pas de doublons)
-    const importantTags = screen.getAllByText('important');
-    expect(importantTags).toHaveLength(1);
-
-    // Vérifier que le champ de saisie est vidé après l'ajout
-    expect(tagInput).toHaveValue('');
-  });
-
-  test('devrait construire correctement la chaîne de filtres avec plusieurs paramètres', () => {
+  test('devrait construire correctement la chaîne de filtres avec plusieurs paramètres', async () => {
     render(<OrdersFilterModal isOpen={true} onClose={mockOnClose} onApply={mockOnApply} />);
 
     // Configurer plusieurs filtres
@@ -374,9 +302,19 @@ describe('OrdersFilterModal', () => {
     const addressInput = screen.getByPlaceholderText('Введите адрес или название города');
     fireEvent.change(addressInput, { target: { value: 'Paris' } });
 
+    // Simuler des suggestions de l'API
+    (tagsApi.suggest as jest.Mock).mockResolvedValueOnce({
+      data: [{ _id: '1', name: 'urgent' }],
+    });
+
     const tagInput = screen.getByPlaceholderText('Введите название заметки');
-    fireEvent.change(tagInput, { target: { value: 'urgent' } });
-    fireEvent.keyPress(tagInput, { key: 'Enter', code: 13, charCode: 13 });
+    fireEvent.change(tagInput, { target: { value: 'urg' } });
+
+    // Attendre et cliquer sur la suggestion
+    await waitFor(() => {
+      const suggestion = screen.getByText('urgent');
+      fireEvent.click(suggestion);
+    });
 
     // Appliquer les filtres
     fireEvent.click(screen.getByText('Подтвердить'));
@@ -412,9 +350,11 @@ describe('OrdersFilterModal', () => {
     // Vider le champ
     fireEvent.change(tagInput, { target: { value: '' } });
 
-    // Vérifier que les suggestions sont nettoyées
-    expect(screen.queryByText('urgent')).not.toBeInTheDocument();
-    expect(screen.queryByText('important')).not.toBeInTheDocument();
+    // Attendre que les suggestions disparaissent
+    await waitFor(() => {
+      expect(screen.queryByText('urgent')).not.toBeInTheDocument();
+      expect(screen.queryByText('important')).not.toBeInTheDocument();
+    });
   });
 
   test('devrait utiliser buildFilterString pour générer la chaîne de filtres', () => {
@@ -470,19 +410,6 @@ describe('OrdersFilterModal', () => {
         }),
       })
     );
-  });
-
-  test('ne devrait pas ajouter de tag si la valeur est vide après trim', () => {
-    render(<OrdersFilterModal isOpen={true} onClose={mockOnClose} onApply={mockOnApply} />);
-
-    const tagInput = screen.getByPlaceholderText('Введите название заметки');
-
-    // Essayer d'ajouter un tag avec uniquement des espaces
-    fireEvent.change(tagInput, { target: { value: '   ' } });
-    fireEvent.click(tagInput.nextElementSibling as Element); // Cliquer sur le bouton +
-
-    // Vérifier qu'aucun tag n'est ajouté
-    expect(screen.queryByRole('button', { name: /×/i })).not.toBeInTheDocument();
   });
 
   test('devrait gérer le debounce pour la recherche de tags', async () => {
