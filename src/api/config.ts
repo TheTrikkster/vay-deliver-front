@@ -5,7 +5,7 @@ import { fetchAuthSession } from 'aws-amplify/auth';
 export const API_BASE_URL_DEV = 'http://localhost:3300';
 export const API_BASE_URL_PROD = 'https://7hogl4xayc.execute-api.us-east-1.amazonaws.com/dev';
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_BASE_URL_PROD,
+  baseURL: API_BASE_URL_PROD,
   headers: {
     'Content-Type': 'application/json',
   },
