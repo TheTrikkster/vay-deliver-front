@@ -1,26 +1,34 @@
-const awsConfig = {
+import { ResourcesConfig } from 'aws-amplify';
+
+// Configuration pour Amplify v6
+const awsConfig: ResourcesConfig = {
   Auth: {
-    region: process.env.REACT_APP_AWS_REGION || 'eu-west-2',
-    identityPoolId: process.env.REACT_APP_AWS_COGNITO_IDENTITY_POOL_ID,
-    userPoolId: process.env.REACT_APP_AWS_USER_POOLS_ID,
-    userPoolWebClientId: process.env.REACT_APP_AWS_USER_POOLS_WEB_CLIENT_ID,
+    Cognito: {
+      userPoolId: process.env.REACT_APP_AWS_USER_POOLS_ID || '',
+      userPoolClientId: process.env.REACT_APP_AWS_USER_POOLS_WEB_CLIENT_ID || '',
+      identityPoolId: process.env.REACT_APP_AWS_COGNITO_IDENTITY_POOL_ID || '',
+      loginWith: {
+        email: true,
+        phone: false,
+        username: false,
+      },
+    },
   },
-  aws_project_region: process.env.REACT_APP_AWS_REGION || 'eu-west-2',
-  aws_cognito_identity_pool_id: process.env.REACT_APP_AWS_COGNITO_IDENTITY_POOL_ID,
-  aws_cognito_region: process.env.REACT_APP_AWS_REGION || 'eu-west-2',
-  aws_user_pools_id: process.env.REACT_APP_AWS_USER_POOLS_ID,
-  aws_user_pools_web_client_id: process.env.REACT_APP_AWS_USER_POOLS_WEB_CLIENT_ID,
-  oauth: {},
-  aws_cognito_username_attributes: ['EMAIL'],
-  aws_cognito_social_providers: [],
-  aws_cognito_signup_attributes: ['EMAIL'],
-  aws_cognito_mfa_configuration: 'OFF',
-  aws_cognito_mfa_types: ['SMS'],
-  aws_cognito_password_protection_settings: {
-    passwordPolicyMinLength: 8,
-    passwordPolicyCharacters: [],
-  },
-  aws_cognito_verification_mechanisms: ['EMAIL'],
 };
+
+// Vérification pour s'assurer que les variables d'environnement sont bien chargées
+// et alerter en développement si ce n'est pas le cas
+if (process.env.NODE_ENV === 'development') {
+  const missingVars = [
+    'REACT_APP_AWS_USER_POOLS_ID',
+    'REACT_APP_AWS_USER_POOLS_WEB_CLIENT_ID',
+    'REACT_APP_AWS_COGNITO_IDENTITY_POOL_ID',
+  ].filter(varName => !process.env[varName]);
+
+  if (missingVars.length > 0) {
+    console.error("⚠️ Variables d'environnement manquantes:", missingVars);
+    console.error('Vérifiez votre fichier .env et le chargement des variables');
+  }
+}
 
 export default awsConfig;
