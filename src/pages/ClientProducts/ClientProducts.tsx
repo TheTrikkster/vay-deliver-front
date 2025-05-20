@@ -69,7 +69,7 @@ function ClientProducts() {
       try {
         const response = await productsApi.getClientProducts(currentPage);
         setTotalPages(response.data.totalPages);
-        setProducts(response.data.products);
+        setProducts(response.data.products || []);
         setError(null);
       } catch (error) {
         console.log('Error fetching products:', error);
@@ -82,7 +82,7 @@ function ClientProducts() {
     fetchProducts();
   }, [currentPage]);
 
-  const total = products.reduce((sum, product) => {
+  const total = (Array.isArray(products) ? products : []).reduce((sum, product) => {
     const quantity = cart[product._id] || 0;
     return sum + calculatePrice(product.price, quantity);
   }, 0);
@@ -131,7 +131,7 @@ function ClientProducts() {
 
       <section className="p-4">
         <ul className="flex flex-col justify-center items-center space-y-4 pb-5">
-          {products.map(product => (
+          {(Array.isArray(products) ? products : []).map(product => (
             <li key={product._id} className="min-w-[343px] w-11/12 md:w-2/4">
               <ClientCard
                 product={product}
@@ -144,7 +144,7 @@ function ClientProducts() {
         </ul>
       </section>
 
-      {products.length > 0 && (
+      {Array.isArray(products) && products.length > 0 && (
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
