@@ -1,0 +1,9 @@
+{
+  "title": "Paramètres",
+  "logout": "Déconnexion",
+  "siteEnabled": "Site activé",
+  "siteDisabled": "Le projet est inactif",
+  "visitorMessage": "Message pour les visiteurs",
+  "placeholder": "Par exemple : Les commandes sont temporairement fermées. Les ventes reprendront dès que les produits seront à nouveau disponibles.",
+  "confirm": "Confirmer"
+}

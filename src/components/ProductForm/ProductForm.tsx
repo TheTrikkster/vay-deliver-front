@@ -80,7 +80,7 @@ function ProductForm({ initialValues, onSubmit, isEditing, isLoading = false }: 
   }
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-50">
+    <div className="flex justify-center min-h-screen bg-gray-50 pt-10">
       <div className="md:bg-white md:rounded-xl md:shadow-sm max-w-lg p-6">
         <h1 className="text-center text-xl font-bold mb-5">
           {isEditing ? t('editProduct') : t('addNewProduct')}

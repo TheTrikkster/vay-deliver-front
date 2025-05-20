@@ -3,5 +3,6 @@
   "selectAll": "Выделить все",
   "deselectAll": "Убрать все",
   "filters": "Фильтры",
-  "addNote": "Заметка +"
+  "addNote": "Заметка +",
+  "noOrders": "Заказов не найдено"
 }

@@ -1,0 +1,9 @@
+{
+  "title": "Settings",
+  "logout": "Sign out",
+  "siteEnabled": "Site enabled",
+  "siteDisabled": "Project is inactive",
+  "visitorMessage": "Message for visitors",
+  "placeholder": "For example: Orders are temporarily closed. Sales will resume as soon as products are available.",
+  "confirm": "Confirm"
+}

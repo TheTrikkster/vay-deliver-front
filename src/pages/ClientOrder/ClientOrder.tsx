@@ -181,10 +181,10 @@ function ClientOrder() {
       ) : (
         <>
           {/* En-tête violet */}
-          <div className="h-20 bg-[#4F46E5]"></div>
+          <div className="h-16 bg-[#4F46E5]"></div>
 
           {/* Contenu principal */}
-          <div className="max-w-lg mx-auto p-4 py-10">
+          <div className="max-w-lg mx-auto px-4 pt-10 pb-4">
             {/* Section Commande */}
             <div className="md:bg-white md:rounded-lg md:shadow-sm md:p-6 md:mb-6">
               <h1 className="text-xl font-semibold text-center mb-6">{t('yourOrder')}</h1>

@@ -8,7 +8,6 @@ import { useTranslation } from 'react-i18next';
 
 import {
   fetchOrders,
-  addTagToOrders,
   setCurrentPage,
   toggleSelectionMode,
   toggleOrderSelection,
