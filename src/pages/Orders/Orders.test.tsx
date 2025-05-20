@@ -23,6 +23,8 @@ jest.mock('react-i18next', () => ({
         deselectAll: 'Désélectionner tout',
         filters: 'Filtres',
         addNote: 'Ajouter une note',
+        getOrdersError: 'Impossible de charger les commandes',
+        addTagError: 'Erreur lors de l’ajout du tag',
       };
       return translations[key] || key;
     },
@@ -158,7 +160,7 @@ describe('Orders', () => {
 
   test("devrait afficher un message d'erreur en cas d'échec", async () => {
     // Le message d'erreur affiché est en russe car il provient du store Redux et non du composant
-    const errorMessage = 'Невозможно загрузить заказы';
+    const errorMessage = 'Impossible de charger les commandes';
     (ordersApi.getAll as jest.Mock).mockRejectedValue(new Error(errorMessage));
 
     renderComponent();

@@ -63,14 +63,15 @@ export const fetchOrders = createAsyncThunk(
   'orders/fetchOrders',
   async (
     { page, filters, limit = 30 }: { page: number; filters?: string; limit?: number },
-    { rejectWithValue }
+    { rejectWithValue, dispatch }
   ) => {
     try {
       const response = await ordersApi.getAll(page, filters, limit);
       return response.data;
     } catch (error) {
+      dispatch(setCurrentFilters('status=ACTIVE'));
       console.error('Erreur lors de la récupération des commandes:', error);
-      return rejectWithValue('Невозможно загрузить заказы');
+      return rejectWithValue('fetchOrdersError');
     }
   }
 );
@@ -107,7 +108,7 @@ export const addTagToOrders = createAsyncThunk(
       }
     } catch (error) {
       console.error("Erreur lors de l'ajout du tag:", error);
-      return rejectWithValue('Ошибка добавления тега');
+      return rejectWithValue('addTagToOrdersError');
     }
   }
 );
@@ -190,7 +191,7 @@ const ordersSlice = createSlice({
         if (action.payload) {
           state.error = action.payload as string;
         } else {
-          state.error = action.error.message || 'Произошла неизвестная ошибка';
+          state.error = action.error.message as string;
         }
       })
       // Gérer addTagToOrders (mise à jour optimiste)

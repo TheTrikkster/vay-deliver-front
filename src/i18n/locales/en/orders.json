@@ -4,5 +4,7 @@
   "deselectAll": "Deselect all",
   "filters": "Filters",
   "addNote": "Add note",
-  "noOrders": "No orders found"
+  "noOrders": "No orders found",
+  "getOrdersError": "Unable to load orders",
+  "addTagError": "Error adding tag"
 }
