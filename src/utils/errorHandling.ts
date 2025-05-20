@@ -14,6 +14,7 @@ export const handleApiError = (
   error: unknown,
   fallbackMessage = "Une erreur s'est produite"
 ): string => {
+  console.log(error);
   if (axios.isCancel(error)) {
     console.log('Requête annulée');
     return 'Opération annulée';

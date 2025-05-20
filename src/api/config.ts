@@ -3,7 +3,7 @@ import { handleApiError } from '../utils/errorHandling';
 import { fetchAuthSession } from 'aws-amplify/auth';
 
 export const API_BASE_URL_DEV = 'http://localhost:3300';
-export const API_BASE_URL_PROD = 'https://bvgxoado1l.execute-api.us-east-1.amazonaws.com';
+export const API_BASE_URL_PROD = 'https://7hogl4xayc.execute-api.us-east-1.amazonaws.com/dev';
 const api = axios.create({
   baseURL: API_BASE_URL_PROD,
   headers: {
@@ -11,13 +11,12 @@ const api = axios.create({
   },
 });
 
-// Intercepteur pour injecter dynamiquement le token JWT d'Amplify v6 dans chaque requête
+// // Intercepteur pour injecter dynamiquement le token JWT d'Amplify v6 dans chaque requête
 api.interceptors.request.use(
   async config => {
     try {
       const session = await fetchAuthSession();
-      const accessToken = session.tokens?.accessToken?.toString();
-      console.log('AccessToken:', accessToken);
+      const accessToken = session.tokens?.idToken?.toString();
       if (accessToken) {
         if (!config.headers) config.headers = {} as AxiosRequestHeaders;
         (config.headers as any)['Authorization'] = `Bearer ${accessToken}`;
