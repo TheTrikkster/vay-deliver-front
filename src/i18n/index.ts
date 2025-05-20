@@ -70,6 +70,18 @@ import orders_fr from './locales/fr/orders.json';
 import orders_en from './locales/en/orders.json';
 import orders_ru from './locales/ru/orders.json';
 import orders_de from './locales/de/orders.json';
+import confirmModalFR from './locales/fr/confirmModal.json';
+import confirmModalEN from './locales/en/confirmModal.json';
+import confirmModalRU from './locales/ru/confirmModal.json';
+import confirmModalDE from './locales/de/confirmModal.json';
+import notFoundFR from './locales/fr/notFound.json';
+import notFoundEN from './locales/en/notFound.json';
+import notFoundRU from './locales/ru/notFound.json';
+import notFoundDE from './locales/de/notFound.json';
+import settingsFR from './locales/fr/settings.json';
+import settingsEN from './locales/en/settings.json';
+import settingsRU from './locales/ru/settings.json';
+import settingsDE from './locales/de/settings.json';
 
 // Les ressources contiennent les traductions par langue et par namespace
 const resources = {
@@ -91,6 +103,9 @@ const resources = {
     modifyProduct: modifyProduct_fr,
     order: order_fr,
     orders: orders_fr,
+    confirmModal: confirmModalFR,
+    notFound: notFoundFR,
+    settings: settingsFR,
   },
   en: {
     common: commonEN,
@@ -110,6 +125,9 @@ const resources = {
     modifyProduct: modifyProduct_en,
     order: order_en,
     orders: orders_en,
+    confirmModal: confirmModalEN,
+    notFound: notFoundEN,
+    settings: settingsEN,
   },
   ru: {
     menu: menuRU,
@@ -128,6 +146,9 @@ const resources = {
     modifyProduct: modifyProduct_ru,
     order: order_ru,
     orders: orders_ru,
+    confirmModal: confirmModalRU,
+    notFound: notFoundRU,
+    settings: settingsRU,
   },
   de: {
     menu: menuDE,
@@ -146,6 +167,9 @@ const resources = {
     modifyProduct: modifyProduct_de,
     order: order_de,
     orders: orders_de,
+    confirmModal: confirmModalDE,
+    notFound: notFoundDE,
+    settings: settingsDE,
   },
 };
 
@@ -181,6 +205,9 @@ i18n
       'modifyProduct',
       'order',
       'orders',
+      'confirmModal',
+      'notFound',
+      'settings',
     ],
     defaultNS: 'common',
 

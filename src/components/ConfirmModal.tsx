@@ -16,7 +16,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
   title,
   message,
 }) => {
-  const { t } = useTranslation('common');
+  const { t } = useTranslation('confirmModal');
 
   if (!isOpen) return null;
 

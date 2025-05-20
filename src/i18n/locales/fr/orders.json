@@ -3,5 +3,6 @@
   "selectAll": "Sélectionner tout",
   "deselectAll": "Désélectionner tout",
   "filters": "Filtres",
-  "addNote": "Ajouter une note"
+  "addNote": "Ajouter une note",
+  "noOrders": "Aucune commande trouvée"
 }

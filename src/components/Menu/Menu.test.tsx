@@ -36,6 +36,14 @@ jest.mock('react-router-dom', () => ({
   }),
 }));
 
+// Mock useAuthenticator d'AWS Amplify
+jest.mock('@aws-amplify/ui-react', () => ({
+  useAuthenticator: () => ({
+    signOut: jest.fn(),
+    user: { username: 'test' },
+  }),
+}));
+
 // Wrapper pour fournir le contexte du router
 const renderWithRouter = (component: React.ReactElement) => {
   return render(<BrowserRouter>{component}</BrowserRouter>);

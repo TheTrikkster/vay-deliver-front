@@ -2,12 +2,14 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../LanguageSwitcher';
+import { useAuthenticator } from '@aws-amplify/ui-react';
 
 interface MenuProps {
   showAddProd?: boolean;
 }
 
 function Menu({ showAddProd = false }: MenuProps) {
+  const { signOut } = useAuthenticator();
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
   const menuRef = useRef<HTMLDivElement>(null);
@@ -110,17 +112,28 @@ function Menu({ showAddProd = false }: MenuProps) {
         </button>
 
         <nav className="flex flex-col items-center justify-center h-full space-y-8 text-2xl">
-          {MENU_LINKS.map(({ path, label }) => (
-            <Link
-              key={path}
-              to={path}
-              className={`hover:text-gray-600 transition-colors ${
-                isActivePage(path) ? 'text-[#4F46E5] font-medium' : ''
-              }`}
-            >
-              {label}
-            </Link>
-          ))}
+          {MENU_LINKS.map(({ path, label }) =>
+            path === '/logout' ? (
+              <button
+                key={path}
+                onClick={signOut}
+                className="hover:text-gray-600 rounded transition-colors"
+                type="button"
+              >
+                {label}
+              </button>
+            ) : (
+              <Link
+                key={path}
+                to={path}
+                className={`hover:text-gray-600 transition-colors ${
+                  isActivePage(path) ? 'text-[#4F46E5] font-medium' : ''
+                }`}
+              >
+                {label}
+              </Link>
+            )
+          )}
         </nav>
       </div>
     </>

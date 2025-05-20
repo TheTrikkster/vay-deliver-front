@@ -1,0 +1,9 @@
+{
+  "title": "Einstellungen",
+  "logout": "Abmelden",
+  "siteEnabled": "Seite aktiviert",
+  "siteDisabled": "Projekt ist inaktiv",
+  "visitorMessage": "Nachricht für Besucher",
+  "placeholder": "Zum Beispiel: Bestellungen sind vorübergehend geschlossen. Der Verkauf wird fortgesetzt, sobald die Produkte verfügbar sind.",
+  "confirm": "Bestätigen"
+}

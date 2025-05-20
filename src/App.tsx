@@ -5,10 +5,9 @@ import { InstallPrompt } from './components/InstallPrompt';
 import { withAuthenticator } from '@aws-amplify/ui-react';
 import '@aws-amplify/ui-react/styles.css';
 import { SyncManager } from './components/SyncManager/SyncManager';
-import GeoPosition from './components/GeoPosition';
-import Settings from './pages/Settings';
+import Settings from './pages/Settings/Settings';
+import { useTranslation } from 'react-i18next';
 
-const Home = lazy(() => import('./pages/Home'));
 const AdminProducts = lazy(() => import('./pages/AdminProducts/AdminProducts'));
 const CreateProduct = lazy(() => import('./pages/CreateProduct/CreateProduct'));
 const ModifyProduct = lazy(() => import('./pages/ModifyProduct/ModifyProduct'));
@@ -23,10 +22,11 @@ const LoadingFallback = () => (
 );
 
 const NotFound = () => {
+  const { t } = useTranslation('notFound');
   return (
-    <div className="flex min-h-screen items-center justify-center flex-col">
-      <h1 className="text-3xl font-bold mb-4">Страница не найдена</h1>
-      <p className="text-lg">Страница, которую вы ищете, не существует.</p>
+    <div className="flex flex-col justify-center text-center min-h-screen">
+      <h1 className="text-3xl font-bold mb-4">{t('title')}</h1>
+      <p className="text-lg">{t('description')}</p>
     </div>
   );
 };
@@ -47,7 +47,6 @@ const ProtectedRoutes = ({ children }: { children: ReactNode }) => {
 const AuthProtectedRoutes = withAuthenticator(ProtectedRoutes, { hideSignUp: true });
 
 const protectedRoutes = [
-  { path: '/home', element: <Home /> },
   { path: '/admin-products', element: <AdminProducts /> },
   { path: '/create-product', element: <CreateProduct /> },
   { path: '/modify-product/:id', element: <ModifyProduct /> },
@@ -75,15 +74,6 @@ function App() {
         </Suspense>
       ),
     },
-    {
-      path: '/geo',
-      element: (
-        <Suspense fallback={<LoadingFallback />}>
-          <GeoPosition />
-        </Suspense>
-      ),
-    },
-
     // Routes protégées (avec authentification)
     ...protectedRoutes.map(route => ({
       ...route,

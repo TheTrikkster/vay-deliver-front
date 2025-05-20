@@ -34,6 +34,13 @@ jest.mock('react-i18next', () => ({
   }),
 }));
 
+jest.mock('@aws-amplify/ui-react', () => ({
+  useAuthenticator: () => ({
+    signOut: jest.fn(),
+    user: { username: 'test' },
+  }),
+}));
+
 const mockInventoryItems = [
   {
     id: '1',

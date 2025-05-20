@@ -3,5 +3,6 @@
   "selectAll": "Select all",
   "deselectAll": "Deselect all",
   "filters": "Filters",
-  "addNote": "Add note"
+  "addNote": "Add note",
+  "noOrders": "No orders found"
 }

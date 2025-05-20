@@ -3,5 +3,6 @@
   "selectAll": "Alle auswählen",
   "deselectAll": "Alle abwählen",
   "filters": "Filter",
-  "addNote": "Notiz hinzufügen"
+  "addNote": "Notiz hinzufügen",
+  "noOrders": "Keine Bestellungen gefunden"
 }

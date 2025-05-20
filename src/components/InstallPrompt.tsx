@@ -45,7 +45,7 @@ export const InstallPrompt = () => {
   if (!showPrompt) return null;
 
   return (
-    <div className="fixed z-10 bottom-4 left-1/2 transform -translate-x-1/2 md:left-auto md:transform-none md:bottom-4 md:right-4 bg-white p-4 rounded-lg shadow-lg">
+    <div className="fixed z-10 bottom-4 left-1/2 transform -translate-x-1/2 md:left-auto md:transform-none md:bottom-4 md:right-4 bg-white p-4 rounded-lg shadow-lg w-[60%] md:w-auto">
       {' '}
       <p className="mb-2">{t('installQuestion')}</p>
       <div className="flex justify-center space-x-2">
