@@ -4,5 +4,7 @@
   "deselectAll": "Désélectionner tout",
   "filters": "Filtres",
   "addNote": "Ajouter une note",
-  "noOrders": "Aucune commande trouvée"
+  "noOrders": "Aucune commande trouvée",
+  "getOrdersError": "Impossible de charger les commandes",
+  "addTagError": "Erreur lors de l’ajout du tag"
 }

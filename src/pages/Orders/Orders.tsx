@@ -96,14 +96,61 @@ function Orders() {
 
     return (
       <>
-        <button className="text-base font-medium" onClick={() => setIsFilterModalOpen(true)}>
+        <button
+          className="flex items-center gap-2 text-base font-medium"
+          onClick={() => setIsFilterModalOpen(true)}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="13"
+            height="13"
+            viewBox="0 0 13 13"
+            fill="none"
+          >
+            <g clipPath="url(#clip0_603_1203)">
+              <path
+                d="M6.06672 1.95L11.2667 1.95M0.866724 11.05L2.81672 11.05M0.866724 1.95L3.46672 1.95M5.41672 11.05L11.2667 11.05M9.31672 6.5L11.2667 6.5M0.866724 6.5L6.71672 6.5"
+                stroke="#333333"
+                strokeWidth="0.75"
+                strokeLinecap="round"
+              />
+              <path
+                d="M3.46671 1.95C3.46671 2.66797 4.04874 3.25 4.76671 3.25C5.48468 3.25 6.06671 2.66797 6.06671 1.95C6.06671 1.23203 5.48468 0.650002 4.76671 0.650001C4.04874 0.650001 3.46671 1.23203 3.46671 1.95Z"
+                stroke="#333333"
+                strokeWidth="0.75"
+                strokeLinecap="round"
+              />
+              <path
+                d="M6.71671 6.5C6.71671 7.21797 7.29874 7.8 8.01671 7.8C8.73468 7.8 9.31671 7.21797 9.31671 6.5C9.31671 5.78203 8.73468 5.2 8.01671 5.2C7.29874 5.2 6.71671 5.78203 6.71671 6.5Z"
+                stroke="#333333"
+                strokeWidth="0.75"
+                strokeLinecap="round"
+              />
+              <path
+                d="M2.81672 11.05C2.81672 11.768 3.39875 12.35 4.11672 12.35C4.83469 12.35 5.41672 11.768 5.41672 11.05C5.41672 10.332 4.83469 9.75 4.11672 9.75C3.39875 9.75 2.81672 10.332 2.81672 11.05Z"
+                stroke="#333333"
+                strokeWidth="0.75"
+                strokeLinecap="round"
+              />
+            </g>
+            <defs>
+              <clipPath id="clip0_603_1203">
+                <rect
+                  width="13"
+                  height="12.1333"
+                  fill="white"
+                  transform="translate(12.1334) rotate(90)"
+                />
+              </clipPath>
+            </defs>
+          </svg>
           {t('filters')}
         </button>
         <button
           className="text-base font-medium"
           onClick={() => dispatch(toggleSelectionMode(true))}
         >
-          {t('addNote')}
+          {t('addNote')} +
         </button>
       </>
     );
@@ -121,7 +168,9 @@ function Orders() {
           data-testid="error-message"
           className="absolute top-60 left-1/2 transform -translate-x-1/2 bg-red-100 px-6 py-3 rounded-lg shadow-md"
         >
-          <p className="text-red-500">{error}</p>
+          <p className="text-red-500">
+            {error === 'fetchOrdersError' ? t('getOrdersError') : t('addTagError')}
+          </p>
         </div>
       ) : (
         <>

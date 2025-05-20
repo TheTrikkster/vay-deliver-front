@@ -410,11 +410,17 @@ describe('orders reducer', () => {
     await thunk(dispatch, () => ({}), undefined);
 
     const { calls } = dispatch.mock;
-    const [start, end] = calls;
 
-    expect(start[0].type).toBe(fetchOrders.pending.type);
-    expect(end[0].type).toBe(fetchOrders.rejected.type);
-    expect(end[0].payload).toBe('Невозможно загрузить заказы');
+    // Vérifier l'appel pending
+    expect(calls[0][0].type).toBe(fetchOrders.pending.type);
+
+    // Vérifier l'appel à setCurrentFilters
+    expect(calls[1][0].type).toBe('orders/setCurrentFilters');
+    expect(calls[1][0].payload).toBe('status=ACTIVE');
+
+    // Vérifier l'appel rejected
+    expect(calls[2][0].type).toBe(fetchOrders.rejected.type);
+    expect(calls[2][0].payload).toBe('fetchOrdersError');
   });
 
   // Nouveaux tests pour les fonctionnalités hors ligne

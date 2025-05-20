@@ -4,5 +4,7 @@
   "deselectAll": "Alle abwählen",
   "filters": "Filter",
   "addNote": "Notiz hinzufügen",
-  "noOrders": "Keine Bestellungen gefunden"
+  "noOrders": "Keine Bestellungen gefunden",
+  "getOrdersError": "Bestellungen konnten nicht geladen werden",
+  "addTagError": "Fehler beim Hinzufügen des Tags"
 }
