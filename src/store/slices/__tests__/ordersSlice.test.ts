@@ -418,9 +418,17 @@ describe('orders reducer', () => {
     expect(calls[1][0].type).toBe('orders/setCurrentFilters');
     expect(calls[1][0].payload).toBe('status=ACTIVE');
 
+    // Vérifier l'appel à setFilters
+    expect(calls[2][0].type).toBe('orders/setFilters');
+    expect(calls[2][0].payload).toEqual({
+      status: 'ACTIVE',
+      tagNames: [],
+      position: { lat: '', lng: '', address: '' },
+    });
+
     // Vérifier l'appel rejected
-    expect(calls[2][0].type).toBe(fetchOrders.rejected.type);
-    expect(calls[2][0].payload).toBe('fetchOrdersError');
+    expect(calls[3][0].type).toBe(fetchOrders.rejected.type);
+    expect(calls[3][0].payload).toBe('fetchOrdersError');
   });
 
   // Nouveaux tests pour les fonctionnalités hors ligne

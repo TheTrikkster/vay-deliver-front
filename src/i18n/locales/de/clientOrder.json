@@ -14,5 +14,6 @@
   "requiredField": "Pflichtfeld",
   "invalidPhoneFormat": "Ungültiges Telefonformat",
   "cancel": "Stornieren",
-  "order": "Bestellen"
+  "order": "Bestellen",
+  "requestError": "Bitte überprüfen Sie Ihre Angaben und versuchen Sie es erneut."
 }

@@ -70,6 +70,13 @@ export const fetchOrders = createAsyncThunk(
       return response.data;
     } catch (error) {
       dispatch(setCurrentFilters('status=ACTIVE'));
+      dispatch(
+        setFilters({
+          status: 'ACTIVE',
+          tagNames: [],
+          position: { lat: '', lng: '', address: '' },
+        })
+      );
       console.error('Erreur lors de la récupération des commandes:', error);
       return rejectWithValue('fetchOrdersError');
     }

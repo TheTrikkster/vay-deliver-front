@@ -13,7 +13,6 @@ import productsReducer, {
   selectProductsLoading,
   selectProductsItems,
   selectProductsError,
-  selectProductsLastFetched,
   selectIsOnline,
   selectPendingOperations,
 } from '../productsSlice';
@@ -25,7 +24,6 @@ describe('products reducer', () => {
     items: [],
     isLoading: false,
     error: null,
-    lastFetched: null,
     isOnline: true,
     pendingOperations: [],
   };
@@ -49,7 +47,6 @@ describe('products reducer', () => {
     const actualState = productsReducer(initialState, setProductsItems(items));
 
     expect(actualState.items).toEqual(items);
-    expect(actualState.lastFetched).not.toBeNull();
   });
 
   test('devrait gérer updateProductsItem', () => {
@@ -112,7 +109,6 @@ describe('products reducer', () => {
 
     expect(actualState.items).toHaveLength(1);
     expect(actualState.items[0]).toEqual(newItem);
-    expect(actualState.lastFetched).not.toBeNull();
   });
 
   test('devrait gérer clearPendingOperations', () => {
@@ -161,61 +157,11 @@ describe('products reducer', () => {
     expect(state.pendingOperations[0]).toEqual(operation2);
   });
 
-  test('devrait mettre à jour lastFetched quand les items sont modifiés', () => {
-    const startTime = Date.now();
-    jest.spyOn(Date, 'now').mockImplementation(() => startTime);
-
-    const sampleItem: InventoryProduct = {
-      id: 1,
-      name: 'Pomme',
-      price: 5,
-      availableQuantity: 10,
-      unitExpression: 'kg',
-      description: 'Pommes rouges',
-      minOrder: 1,
-      status: ProductStatus.ACTIVE,
-    };
-
-    // Vérifier setProductsItems
-    let state = productsReducer(initialState, setProductsItems([sampleItem]));
-    expect(state.lastFetched).toBe(startTime);
-
-    // Avancer le temps
-    const newTime = startTime + 1000;
-    jest.spyOn(Date, 'now').mockImplementation(() => newTime);
-
-    // Vérifier addProductsItem
-    const newItem = { ...sampleItem, id: 2, name: 'Orange' };
-    state = productsReducer(state, addProductsItem(newItem));
-    expect(state.lastFetched).toBe(newTime);
-
-    // Avancer le temps encore
-    const newerTime = newTime + 1000;
-    jest.spyOn(Date, 'now').mockImplementation(() => newerTime);
-
-    // Vérifier updateProductsItem
-    const updatedItem = { ...sampleItem, quantity: '15' };
-    state = productsReducer(state, updateProductsItem(updatedItem));
-    expect(state.lastFetched).toBe(newerTime);
-
-    // Avancer le temps une dernière fois
-    const latestTime = newerTime + 1000;
-    jest.spyOn(Date, 'now').mockImplementation(() => latestTime);
-
-    // Vérifier deleteProductsItem
-    state = productsReducer(state, deleteProductsItem(1));
-    expect(state.lastFetched).toBe(latestTime);
-
-    // Nettoyer le mock
-    jest.restoreAllMocks();
-  });
-
   test("devrait correctement initialiser l'état", () => {
     // Vérifier que l'état initial est conforme à ce qui est défini
     const state = productsReducer(undefined, { type: 'unknown' });
     expect(state).toEqual({
       items: [],
-      lastFetched: null,
       isLoading: false,
       error: null,
       isOnline: navigator.onLine,
@@ -263,7 +209,6 @@ describe('products reducer', () => {
     // Tenter de mettre à jour un item qui n'existe pas
     const newState = productsReducer(initialItemState, updateProductsItem(nonExistentItem));
 
-    // Vérifier que l'état n'a pas changé (à part lastFetched qui est mis à jour)
     expect(newState.items).toEqual(initialItemState.items);
     expect(newState.items.length).toBe(1);
     expect(newState.items[0].id).toBe(1);
@@ -384,7 +329,6 @@ describe('Inventory selectors', () => {
       items: [sampleItem, sampleItem2],
       isLoading: true,
       error: 'Test error',
-      lastFetched: 12345,
       isOnline: false,
       pendingOperations: [operation],
     },
@@ -407,10 +351,6 @@ describe('Inventory selectors', () => {
     expect(selectProductsError(mockState)).toBe('Test error');
   });
 
-  test('selectProductsLastFetched devrait retourner lastFetched', () => {
-    expect(selectProductsLastFetched(mockState)).toBe(12345);
-  });
-
   test("selectIsOnline devrait retourner l'état de connexion", () => {
     expect(selectIsOnline(mockState)).toBe(false);
   });
@@ -425,7 +365,6 @@ describe('Inventory selectors', () => {
         items: [],
         isLoading: false,
         error: null,
-        lastFetched: null,
         isOnline: true,
         pendingOperations: [],
       },

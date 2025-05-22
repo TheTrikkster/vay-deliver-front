@@ -26,7 +26,6 @@ describe('Store Configuration', () => {
         isLoading: false,
         isOnline: true,
         items: [],
-        lastFetched: null,
         pendingOperations: [],
       })
     );

@@ -14,5 +14,6 @@
   "requiredField": "Champ obligatoire",
   "invalidPhoneFormat": "Format de numéro invalide",
   "cancel": "Annuler",
-  "order": "Commander"
+  "order": "Commander",
+  "requestError": "Veuillez vérifier vos informations et réessayer."
 }

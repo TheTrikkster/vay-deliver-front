@@ -11,7 +11,7 @@ export const ordersApi = {
   createOrder: (orderDetails: OrderDetails) => api.post(`${ENDPOINTS.ORDERS.BASE}`, orderDetails),
 
   updateStatus: (id: string, status: string) =>
-    api.patch(`${ENDPOINTS.ORDERS.BASE}/${id}`, { status }),
+    api.patch(`${ENDPOINTS.ORDERS.BASE}/${id}/status`, { status }),
 
   addTagToOrders: (tagNames: string[], orderIds: string[]) =>
     api.post(`${ENDPOINTS.ORDERS.BASE}/tags`, { tagNames, orderIds }),

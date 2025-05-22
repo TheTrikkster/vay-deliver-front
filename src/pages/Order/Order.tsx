@@ -260,8 +260,8 @@ const Order: React.FC = () => {
           </div>
 
           {/* Liste des articles */}
-          <div className="mb-5">
-            <h3 className="text-lg font-normal text-gray-800 mb-4">{t('products')}</h3>
+          <div className="mb-5 py-3 border-t border-dashed border-gray-300">
+            <h3 className="text-lg font-semibold mb-4">{t('products')}</h3>
             <div className="flex flex-col gap-3">
               {orderDetails.items.map((item: any, index: number) => {
                 return (
@@ -273,9 +273,9 @@ const Order: React.FC = () => {
                 );
               })}
             </div>
-            <div className="flex justify-between mt-5 pt-5 border-t border-dashed border-gray-300">
-              <span className="text-lg font-bold">{t('total')}</span>
-              <span className="text-lg font-bold">{finalPrice} €</span>
+            <div className="flex justify-between mt-5 py-3 border-y border-dashed border-gray-300">
+              <span className="text-lg font-semibold">{t('total')}</span>
+              <span className="text-lg font-semibold">{finalPrice} €</span>
             </div>
           </div>
 
@@ -287,7 +287,7 @@ const Order: React.FC = () => {
                 className="text-lg font-normal text-gray-800"
                 onClick={() => setIsAddTagModalOpen(true)}
               >
-                Добавить +
+                {t('addTag')} +
               </button>
             </div>
             <div className="flex flex-wrap gap-2 mb-3">

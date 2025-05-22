@@ -25,6 +25,7 @@ import {
 import Pagination from '../../components/PaginationComp/PaginationComp';
 import Loading from '../../components/Loading';
 import Menu from '../../components/Menu/Menu';
+import { OrderStatus, Position } from '../../types/order';
 
 function Orders() {
   const { t } = useTranslation('orders');
@@ -44,6 +45,7 @@ function Orders() {
   // États locaux pour les modals
   const [isFilterModalOpen, setIsFilterModalOpen] = useState<boolean>(false);
   const [isAddTagModalOpen, setIsAddTagModalOpen] = useState<boolean>(false);
+  const [position, setPosition] = useState<Position>({ lat: '', lng: '', address: '' });
 
   // Chargement initial des données
   useEffect(() => {
@@ -160,6 +162,8 @@ function Orders() {
     return <Loading />;
   }
 
+  console.log({ position });
+
   return (
     <div className="min-h-screen bg-gray-100 relative pb-6">
       <Menu />
@@ -178,22 +182,15 @@ function Orders() {
             <hr className="border-gray-200" />
             <div className="px-4 py-4 flex justify-between items-center">{renderHeader()}</div>
           </header>
-          <div className="flex flex-col gap-5">
+          <div className="flex flex-col gap-4">
             {orders.length === 0 ? (
               <div className="text-center py-8 text-gray-500">{t('noOrders')}</div>
             ) : (
               orders.map(order => (
                 <div
-                  className="flex justify-center md:px-5 px-4"
+                  className="flex justify-center"
                   key={order._id}
                   onClick={() => handleCardClick(order._id)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={e => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      handleCardClick(order._id);
-                    }
-                  }}
                 >
                   <OrderCard
                     firstName={order.firstName}
@@ -201,6 +198,7 @@ function Orders() {
                     description={order.items.map((item: any) => item.product?.name).join(', ')}
                     address={order.address}
                     tagNames={order.tagNames}
+                    status={order.status as OrderStatus}
                     isSelectionMode={isSelectionMode}
                     isSelected={selectedOrderIds.includes(order._id)}
                   />

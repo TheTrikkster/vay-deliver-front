@@ -10,6 +10,7 @@ import Menu from '../../components/Menu/Menu';
 import { useDispatch } from 'react-redux';
 import { setError } from '../../store/slices/productsSlice';
 import Loading from '../../components/Loading';
+import DeleteProductModal from '../../components/DeleteProductModal';
 
 function AdminProducts() {
   const { t } = useTranslation('adminProducts');
@@ -21,11 +22,13 @@ function AdminProducts() {
   const [openCardMenuId, setOpenCardMenuId] = useState<number | null>(null);
   const [isDeletePopupOpen, setIsDeletePopupOpen] = useState<boolean>(false);
   const [itemToDelete, setItemToDelete] = useState<number | null>(null);
+  const [forceOpen, setForceOpen] = useState<boolean>(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const {
     loading,
     error,
     deleteItem,
+    forceDeleteItem,
     updateItemQuantity,
     updateItemStatus,
     currentItems,
@@ -50,11 +53,32 @@ function AdminProducts() {
     setOpenCardMenuId(null);
   }, []);
 
-  const confirmDelete = useCallback(() => {
+  const confirmDelete = useCallback(async () => {
     if (itemToDelete !== null) {
-      deleteItem(itemToDelete);
-      setIsDeletePopupOpen(false);
-      setItemToDelete(null);
+      try {
+        await deleteItem(itemToDelete);
+        setItemToDelete(null);
+      } catch (error: any) {
+        if (error.message === 'activeOrder') {
+          setForceOpen(true);
+        }
+        console.error('Error deleting product:', error);
+      } finally {
+        setIsDeletePopupOpen(false);
+      }
+    }
+  }, [deleteItem, itemToDelete]);
+
+  const forceDelete = useCallback(async () => {
+    if (itemToDelete !== null) {
+      try {
+        await forceDeleteItem(itemToDelete);
+        setItemToDelete(null);
+        setForceOpen(false);
+        dispatch(setError(null));
+      } catch (error) {
+        console.error('Error deleting product:', error);
+      }
     }
   }, [deleteItem, itemToDelete]);
 
@@ -98,23 +122,29 @@ function AdminProducts() {
 
   const currentProduct = currentItems.find(item => item.id === quantityToEdit.id);
 
+  console.log({ error });
+
+  if (error && error !== 'activeOrder') {
+    return (
+      <div className="w-full min-h-screen bg-gray-100 pb-6">
+        <Menu showAddProd={true} />
+        <div className="absolute top-60 left-1/2 transform -translate-x-1/2 bg-red-100 px-6 py-3 rounded-lg shadow-md">
+          <p className="text-red-500">{error}</p>
+        </div>
+      </div>
+    );
+  }
+
   if (loading) {
     return <Loading />;
   }
 
-  console.log({ currentItems });
-
   return (
     <div className="w-full min-h-screen bg-gray-100 pb-6">
       <Menu showAddProd={true} />
-      {error && (
-        <div className="absolute top-60 left-1/2 transform -translate-x-1/2 bg-red-100 px-6 py-3 rounded-lg shadow-md">
-          <p className="text-red-500">{error}</p>
-        </div>
-      )}
 
-      {!loading && !error && (
-        <div className="flex flex-col items-center gap-3 mt-14">
+      {!loading && (
+        <div className="flex flex-col items-center gap-4 mt-5">
           {currentItems.length === 0 ? (
             <div className="flex flex-col items-center justify-center min-h-[calc(100vh-200px)] w-full">
               <p className="text-xl text-gray-600 mb-4">{t('mustAddProduct')}</p>
@@ -142,7 +172,7 @@ function AdminProducts() {
         </div>
       )}
 
-      {!error && currentItems.length > 0 && (
+      {currentItems.length > 0 && (
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}
@@ -182,26 +212,26 @@ function AdminProducts() {
       )}
 
       {isDeletePopupOpen && (
-        <div className="px-4 md:px-0 fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full">
-            <h3 className="text-lg font-bold mb-4">{t('deleteConfirmation')}</h3>
-            <p className="mb-4">{t('deleteConfirmationText')}</p>
-            <div className="flex justify-center gap-2">
-              <button
-                className="flex-1 px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300"
-                onClick={() => setIsDeletePopupOpen(false)}
-              >
-                {t('cancel')}
-              </button>
-              <button
-                className="flex-1 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
-                onClick={confirmDelete}
-              >
-                {t('delete')}
-              </button>
-            </div>
-          </div>
-        </div>
+        <DeleteProductModal
+          title={t('deleteConfirmation')}
+          message={t('deleteConfirmationText')}
+          cancelText={t('cancel')}
+          confirmText={t('delete')}
+          onClose={() => setIsDeletePopupOpen(false)}
+          onConfirm={confirmDelete}
+          variant="normal"
+        />
+      )}
+      {forceOpen && (
+        <DeleteProductModal
+          title={t('deleteConfirmation')}
+          message={t('deleteConfirmationText')}
+          cancelText={t('cancel')}
+          confirmText={t('delete')}
+          onClose={() => setForceOpen(false)}
+          onConfirm={forceDelete}
+          variant="danger"
+        />
       )}
     </div>
   );

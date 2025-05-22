@@ -1,11 +1,13 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import OrderCard from './OrderCard';
+import { OrderStatus } from '../../types/order';
 
 describe('OrderCard', () => {
   const defaultProps = {
     firstName: 'Jean',
     lastName: 'Dupont',
+    status: 'ACTIVE' as OrderStatus,
     address: '123 Rue de Paris',
     distance: '5 km',
     tagNames: ['Urgent', 'Livraison'],

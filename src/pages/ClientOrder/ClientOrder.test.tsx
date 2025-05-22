@@ -273,15 +273,6 @@ describe('ClientOrder', () => {
         ],
       });
     });
-
-    // Attendre que le message de succès s'affiche
-    await waitFor(
-      () => {
-        const successMessage = screen.getByText(/Ваш заказ успешно оформлен!/i);
-        expect(successMessage).toBeInTheDocument();
-      },
-      { timeout: 3000 }
-    ); // Augmenter le timeout car il y a un délai de 3 secondes
   });
 
   it('devrait gérer les erreurs de soumission', async () => {

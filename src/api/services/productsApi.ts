@@ -21,6 +21,8 @@ export const productsApi = {
 
   delete: (id: number) => api.delete(`${ENDPOINTS.PRODUCTS.BASE}/${id}`),
 
+  forceDelete: (id: number) => api.delete(`${ENDPOINTS.PRODUCTS.BASE}/${id}?force=true`),
+
   update: (id: string | number, productData: ProductApiData) =>
     api.put(`${ENDPOINTS.PRODUCTS.BASE}/${id}`, productData),
 };

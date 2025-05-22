@@ -13,7 +13,6 @@ import {
   selectProductsItems,
   selectProductsLoading,
   selectProductsError,
-  selectProductsLastFetched,
   selectIsOnline,
 } from '../store/slices/productsSlice';
 import { productsApi } from '../api/services/productsApi';
@@ -37,21 +36,11 @@ export function useProductsInventory(itemsPerPage = 30) {
   const inventoryItems = useSelector(selectProductsItems);
   const loading = useSelector(selectProductsLoading);
   const error = useSelector(selectProductsError);
-  const lastFetched = useSelector(selectProductsLastFetched);
   const isOnline = useSelector(selectIsOnline);
 
   // États locaux pour la pagination
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
-
-  // Déterminer si les données ont besoin d'être rafraîchies
-  const shouldRefresh = useCallback(() => {
-    if (!lastFetched) return true;
-
-    // Rafraîchir si les données datent de plus de 5 minutes
-    const REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minutes
-    return Date.now() - lastFetched > REFRESH_INTERVAL;
-  }, [lastFetched]);
 
   // Fonction modifiée pour charger l'inventaire avec pagination
   const fetchInventory = useCallback(
@@ -89,21 +78,21 @@ export function useProductsInventory(itemsPerPage = 30) {
 
   // Chargement initial
   useEffect(() => {
-    if (shouldRefresh()) {
+    if (isOnline) {
       fetchInventory(currentPage);
     }
-  }, [shouldRefresh, currentPage, fetchInventory]);
+  }, [isOnline, currentPage, fetchInventory]);
 
   // Fonction pour supprimer un élément avec optimistic update
   const deleteItem = useCallback(
     async (id: number) => {
-      // Optimistic update via Redux
-      dispatch(deleteProductsItem(id));
-
       try {
         if (isOnline) {
           // Appel API pour persistance si en ligne
           await productsApi.delete(id);
+
+          // Optimistic update via Redux
+          dispatch(deleteProductsItem(id));
         } else {
           // Stocker l'opération pour exécution ultérieure si hors ligne
           dispatch(
@@ -116,15 +105,38 @@ export function useProductsInventory(itemsPerPage = 30) {
             })
           );
         }
-      } catch (err) {
+      } catch (err: any) {
         console.log('Error deleting item:', err);
-        dispatch(setError(t('deleteError')));
+        console.log('israil', err.response.data.message);
+        if (err.response.data.message === 'Product is currently in an active order') {
+          dispatch(setError(t('activeOrder')));
 
-        // Recharger les données depuis l'API en cas d'échec
-        fetchInventory(currentPage);
+          throw new Error(t('activeOrder'));
+        } else {
+          dispatch(setError(t('deleteError')));
+
+          // Recharger les données depuis l'API en cas d'échec
+          fetchInventory(currentPage);
+        }
       }
     },
     [dispatch, isOnline, currentPage, fetchInventory]
+  );
+
+  const forceDeleteItem = useCallback(
+    async (id: number) => {
+      // Optimistic update via Redux
+      dispatch(deleteProductsItem(id));
+
+      try {
+        await productsApi.forceDelete(id);
+      } catch (err: any) {
+        console.log('Error deleting item:', err);
+        dispatch(setError(t('deleteError')));
+        fetchInventory(currentPage);
+      }
+    },
+    [dispatch, currentPage, fetchInventory, t]
   );
 
   const performOptimisticUpdate = useCallback(
@@ -225,6 +237,7 @@ export function useProductsInventory(itemsPerPage = 30) {
     loading,
     error,
     deleteItem,
+    forceDeleteItem,
     updateItemQuantity,
     updateItemStatus,
     currentItems: inventoryItems,

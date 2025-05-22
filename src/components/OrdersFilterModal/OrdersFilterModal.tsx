@@ -7,6 +7,7 @@ import { selectFiltersObject, setFilters } from '../../store/slices/ordersSlice'
 import { buildFilterString } from '../../utils/filterUtils';
 import { debounce } from 'lodash';
 import PlacesAutocomplete, { geocodeByAddress, getLatLng } from 'react-places-autocomplete';
+import { AddressInput } from '../AddressInput';
 
 interface FilterModalProps {
   isOpen: boolean;
@@ -69,7 +70,16 @@ const OrdersFilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onAppl
     };
 
     // 1. Dispatch l'action pour mettre à jour l'état Redux (pour les prochaines fois)
-    dispatch(setFilters(newFilters));
+    dispatch(
+      setFilters({
+        ...newFilters,
+        position: {
+          address: position.address,
+          lat: position.address ? '' : position.lat,
+          lng: position.address ? '' : position.lng,
+        },
+      })
+    );
 
     onApply(buildFilterString(newFilters));
   };
@@ -95,6 +105,10 @@ const OrdersFilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onAppl
   const getCurrentLocation = () => {
     if (!navigator.geolocation) {
       alert(t('geoNotSupported'));
+      return;
+    }
+    if (position.lat && position.lng) {
+      setPosition(prev => ({ ...prev, lat: '', lng: '' }));
       return;
     }
 
@@ -126,6 +140,8 @@ const OrdersFilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onAppl
   };
 
   if (!isOpen) return null;
+
+  console.log({ position });
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center md:px-0 px-4">
@@ -159,7 +175,12 @@ const OrdersFilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onAppl
           <h2 className="text-lg font-medium mb-3">{t('orders')}</h2>
           <select
             value={status}
-            onChange={e => setStatus(e.target.value as OrderStatus | '')}
+            onChange={e => {
+              setStatus(e.target.value as OrderStatus | '');
+              if (e.target.value !== 'ACTIVE') {
+                setPosition({ lat: '', lng: '', address: '' });
+              }
+            }}
             className="w-1/2 p-2 border-2 border-[#22C55D] text-[#22C55D] rounded-lg focus:outline-none appearance-none bg-white relative pr-10"
             style={{
               backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2322C55D' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
@@ -174,132 +195,94 @@ const OrdersFilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onAppl
         </div>
 
         {/* Address Search */}
-        <div className="mb-6">
-          <h3 className="text-lg font-medium mb-3">{t('addressSort')}</h3>
-          <div className="relative">
-            <PlacesAutocomplete
-              value={position.address}
-              onChange={address => setPosition(prev => ({ ...prev, address }))}
-              onSelect={handleSelectAddress}
-              debounce={1000}
-              shouldFetchSuggestions={position.address.length >= 10}
-            >
-              {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
-                <div className="w-full">
-                  <input
-                    {...getInputProps({
-                      placeholder: t('enterAddress'),
-                      className:
-                        'w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent placeholder-gray-400 focus:placeholder-transparent transition-all pr-3 text-sm',
-                    })}
-                  />
-                  {(loading || suggestions.length > 0) && (
-                    <div className="absolute left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-sm z-10 max-h-48 overflow-y-auto mt-1">
-                      {loading && <div className="px-4 py-2.5 text-gray-500">{t('loading')}</div>}
-                      {suggestions.map(suggestion => {
-                        const style = {
-                          backgroundColor: suggestion.active ? '#f0f0f0' : '#fff',
-                          cursor: 'pointer',
-                        };
-                        return (
-                          <div
-                            {...getSuggestionItemProps(suggestion, {
-                              className:
-                                'px-4 py-2.5 hover:bg-gray-50 cursor-pointer text-sm border-b border-gray-100 last:border-b-0',
-                              style,
-                            })}
-                            key={suggestion.placeId}
-                          >
-                            <div className="flex items-center gap-2">
-                              <svg
-                                className="w-4 h-4 text-gray-400"
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                                <circle
-                                  cx="12"
-                                  cy="9"
-                                  r="2"
-                                  strokeWidth="2"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                />
-                              </svg>
-                              {suggestion.description}
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              )}
-            </PlacesAutocomplete>
-            <div className="absolute right-0 inset-y-0 flex items-center border-l border-gray-200">
-              <button
-                onClick={getCurrentLocation}
-                className="w-full text-green-500 h-full px-2 transition-colors"
-                data-testid="geolocation-button"
-              >
-                <svg
-                  className="w-6 h-6"
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24"
-                  height="24"
-                  viewBox="0 0 21 24"
-                  fill="none"
+        {status == 'ACTIVE' && (
+          <div className="mb-6">
+            <h3 className="text-lg font-medium mb-3">{t('addressSort')}</h3>
+            <div className="relative">
+              <AddressInput
+                onSelect={address => setPosition(position => ({ ...position, address }))}
+                disabled={position.lat && position.lng ? true : false}
+                inputProps={{
+                  onChange: e => {
+                    setPosition(position => ({ ...position, address: e.target.value }));
+                  },
+                  className:
+                    'w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent placeholder-gray-400 focus:placeholder-transparent',
+                  placeholder: t('enterAddress'),
+                }}
+              />
+              <div className="absolute right-0 inset-y-0 flex items-center border-l border-gray-200">
+                <button
+                  onClick={getCurrentLocation}
+                  className="w-full text-green-500 h-full px-2 transition-colors"
+                  data-testid="geolocation-button"
                 >
-                  <path
-                    d="M15.5 7.16663C15.5 10.1775 12.2758 13.3575 11.0058 14.4958C10.8606 14.6068 10.6828 14.6669 10.5 14.6669C10.3172 14.6669 10.1394 14.6068 9.99417 14.4958C8.725 13.3575 5.5 10.1775 5.5 7.16663C5.5 5.84054 6.02678 4.56877 6.96447 3.63109C7.90215 2.69341 9.17392 2.16663 10.5 2.16663C11.8261 2.16663 13.0979 2.69341 14.0355 3.63109C14.9732 4.56877 15.5 5.84054 15.5 7.16663Z"
-                    stroke="#22C55D"
-                    strokeWidth="1.3"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M10.5 8.83333C11.4205 8.83333 12.1667 8.08714 12.1667 7.16667C12.1667 6.24619 11.4205 5.5 10.5 5.5C9.57954 5.5 8.83334 6.24619 8.83334 7.16667C8.83334 8.08714 9.57954 8.83333 10.5 8.83333Z"
-                    stroke="#22C55D"
-                    strokeWidth="1.3"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M7.76167 12.1666H4.67C4.49528 12.1667 4.32499 12.2217 4.18323 12.3238C4.04146 12.426 3.93539 12.5701 3.88 12.7358L2.21 17.7358C2.16814 17.8611 2.15664 17.9945 2.17646 18.125C2.19629 18.2556 2.24686 18.3796 2.32402 18.4868C2.40118 18.594 2.5027 18.6813 2.62023 18.7415C2.73776 18.8018 2.86793 18.8332 3 18.8333H18C18.132 18.8332 18.262 18.8017 18.3795 18.7416C18.4969 18.6814 18.5984 18.5941 18.6755 18.487C18.7527 18.38 18.8033 18.2561 18.8232 18.1256C18.8431 17.9952 18.8317 17.8618 18.79 17.7366L17.1233 12.7366C17.068 12.5706 16.9619 12.4262 16.82 12.3239C16.678 12.2216 16.5075 12.1666 16.3325 12.1666H13.2392"
-                    stroke="#22C55D"
-                    strokeWidth="1.3"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
+                  {position.lat && position.lng ? (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                    >
+                      <path
+                        d="M19.2801 2.13799C20.8961 1.51599 22.4861 3.10599 21.8641 4.72199L15.7121 20.716C15.0141 22.528 12.4041 22.386 11.9121 20.508L10.3061 14.408C10.2608 14.2367 10.1709 14.0805 10.0454 13.9554C9.91996 13.8303 9.76352 13.7408 9.5921 13.696L3.4921 12.09C1.6161 11.596 1.4721 8.98599 3.2841 8.28999L19.2801 2.13799Z"
+                        fill="#22C55D"
+                      />
+                    </svg>
+                  ) : (
+                    <svg
+                      className="w-6 h-6"
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 21 24"
+                      fill="none"
+                    >
+                      <path
+                        d="M15.5 7.16663C15.5 10.1775 12.2758 13.3575 11.0058 14.4958C10.8606 14.6068 10.6828 14.6669 10.5 14.6669C10.3172 14.6669 10.1394 14.6068 9.99417 14.4958C8.725 13.3575 5.5 10.1775 5.5 7.16663C5.5 5.84054 6.02678 4.56877 6.96447 3.63109C7.90215 2.69341 9.17392 2.16663 10.5 2.16663C11.8261 2.16663 13.0979 2.69341 14.0355 3.63109C14.9732 4.56877 15.5 5.84054 15.5 7.16663Z"
+                        stroke="#22C55D"
+                        strokeWidth="1.3"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M10.5 8.83333C11.4205 8.83333 12.1667 8.08714 12.1667 7.16667C12.1667 6.24619 11.4205 5.5 10.5 5.5C9.57954 5.5 8.83334 6.24619 8.83334 7.16667C8.83334 8.08714 9.57954 8.83333 10.5 8.83333Z"
+                        stroke="#22C55D"
+                        strokeWidth="1.3"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M7.76167 12.1666H4.67C4.49528 12.1667 4.32499 12.2217 4.18323 12.3238C4.04146 12.426 3.93539 12.5701 3.88 12.7358L2.21 17.7358C2.16814 17.8611 2.15664 17.9945 2.17646 18.125C2.19629 18.2556 2.24686 18.3796 2.32402 18.4868C2.40118 18.594 2.5027 18.6813 2.62023 18.7415C2.73776 18.8018 2.86793 18.8332 3 18.8333H18C18.132 18.8332 18.262 18.8017 18.3795 18.7416C18.4969 18.6814 18.5984 18.5941 18.6755 18.487C18.7527 18.38 18.8033 18.2561 18.8232 18.1256C18.8431 17.9952 18.8317 17.8618 18.79 17.7366L17.1233 12.7366C17.068 12.5706 16.9619 12.4262 16.82 12.3239C16.678 12.2216 16.5075 12.1666 16.3325 12.1666H13.2392"
+                        stroke="#22C55D"
+                        strokeWidth="1.3"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Note Search */}
         <div className="mb-6">
           <h3 className="text-lg font-medium mb-3">{t('notesSort')}</h3>
           <div className="relative">
-            <div className="relative border border-gray-200 rounded-lg">
-              <input
-                type="text"
-                value={searchValue}
-                placeholder={t('enterNote')}
-                className="w-full p-3 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm"
-                onChange={e => {
-                  setSearchValue(e.target.value);
-                  debouncedSearchTag(e.target.value);
-                }}
-              />
-            </div>
+            <input
+              // focus:outline-none focus:ring-2 focus:ring-gray-400 text-base
+              type="text"
+              value={searchValue}
+              placeholder={t('enterNote')}
+              className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent placeholder-gray-400 focus:placeholder-transparent"
+              onChange={e => {
+                setSearchValue(e.target.value);
+                debouncedSearchTag(e.target.value);
+              }}
+            />
 
             {/* Suggestions dropdown */}
             {suggestedTags.length > 0 && searchValue && searchValue.trim() !== '' && (
