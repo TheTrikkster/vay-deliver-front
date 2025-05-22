@@ -12,4 +12,9 @@ export const ENDPOINTS = {
   TAGS: {
     SUGGEST: '/tags/suggest',
   },
+  SETTINGS: {
+    BASE: '/settings',
+    SITE_STATUS: '/settings/site-status',
+    OFFLINE_MESSAGE: '/settings/offline-message',
+  },
 };

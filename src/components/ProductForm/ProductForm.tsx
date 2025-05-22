@@ -79,7 +79,7 @@ function ProductForm({ initialValues, onSubmit, isEditing, isLoading = false }: 
     return <Loading />;
   }
   return (
-    <div className="w-full min-h-screen flex justify-center md:items-center md:bg-gray-50 md:pt-10 pt-4">
+    <div className="w-full min-h-screen flex justify-center md:items-center md:bg-gray-50 md:pt-0 pt-4">
       <div className="h-fit md:bg-white md:rounded-xl md:shadow-sm max-w-lg p-6">
         <h1 className="text-center text-xl font-bold mb-5">
           {isEditing ? t('editProduct') : t('addNewProduct')}

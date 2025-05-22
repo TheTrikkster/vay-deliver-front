@@ -82,6 +82,14 @@ import settingsFR from './locales/fr/settings.json';
 import settingsEN from './locales/en/settings.json';
 import settingsRU from './locales/ru/settings.json';
 import settingsDE from './locales/de/settings.json';
+import completedOrderFR from './locales/fr/completedOrder.json';
+import completedOrderEN from './locales/en/completedOrder.json';
+import completedOrderRU from './locales/ru/completedOrder.json';
+import completedOrderDE from './locales/de/completedOrder.json';
+import addressInputFR from './locales/fr/addressInput.json';
+import addressInputEN from './locales/en/addressInput.json';
+import addressInputRU from './locales/ru/addressInput.json';
+import addressInputDE from './locales/de/addressInput.json';
 
 // Les ressources contiennent les traductions par langue et par namespace
 const resources = {
@@ -106,6 +114,8 @@ const resources = {
     confirmModal: confirmModalFR,
     notFound: notFoundFR,
     settings: settingsFR,
+    completedOrder: completedOrderFR,
+    addressInput: addressInputFR,
   },
   en: {
     common: commonEN,
@@ -128,6 +138,8 @@ const resources = {
     confirmModal: confirmModalEN,
     notFound: notFoundEN,
     settings: settingsEN,
+    completedOrder: completedOrderEN,
+    addressInput: addressInputEN,
   },
   ru: {
     menu: menuRU,
@@ -149,6 +161,8 @@ const resources = {
     confirmModal: confirmModalRU,
     notFound: notFoundRU,
     settings: settingsRU,
+    completedOrder: completedOrderRU,
+    addressInput: addressInputRU,
   },
   de: {
     menu: menuDE,
@@ -170,6 +184,8 @@ const resources = {
     confirmModal: confirmModalDE,
     notFound: notFoundDE,
     settings: settingsDE,
+    completedOrder: completedOrderDE,
+    addressInput: addressInputDE,
   },
 };
 
@@ -208,6 +224,8 @@ i18n
       'confirmModal',
       'notFound',
       'settings',
+      'completedOrder',
+      'addressInput',
     ],
     defaultNS: 'common',
 

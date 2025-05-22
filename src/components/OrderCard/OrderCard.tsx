@@ -1,10 +1,13 @@
 import React from 'react';
+import { OrderStatus } from '../../types/order';
+import { useTranslation } from 'react-i18next';
 
 interface OrderCardProps {
   firstName: string;
   lastName: string;
   address: string;
   tagNames: string[];
+  status: OrderStatus;
   description?: string;
   isSelectionMode?: boolean;
   isSelected?: boolean;
@@ -15,10 +18,13 @@ const OrderCard: React.FC<OrderCardProps> = ({
   lastName,
   address,
   tagNames,
+  status,
   description,
   isSelectionMode = false,
   isSelected = false,
 }) => {
+  const { t } = useTranslation('order');
+
   return (
     <div className="min-w-[343px] w-11/12 md:w-2/4 bg-white rounded-xl p-4 shadow-md cursor-pointer relative hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-green-500">
       {/* Checkbox en mode sélection */}
@@ -43,10 +49,27 @@ const OrderCard: React.FC<OrderCardProps> = ({
         </div>
       )}
 
-      <div className="flex justify-between items-center mb-2">
+      <div className="h-8 flex justify-between items-center mb-2">
         <h2 className="text-lg font-medium m-0">
           {firstName} {lastName}
         </h2>
+        {!isSelectionMode && (
+          <span
+            className={`px-3 py-1.5 rounded text-sm ${
+              status === 'ACTIVE'
+                ? 'bg-green-50 text-green-500'
+                : status === 'COMPLETED'
+                  ? 'bg-gray-100 text-gray-500'
+                  : 'bg-red-50 text-red-500'
+            }`}
+          >
+            {status === 'ACTIVE'
+              ? t('active')
+              : status === 'COMPLETED'
+                ? t('completed')
+                : t('canceled')}
+          </span>
+        )}
       </div>
 
       <div className="flex items-center gap-2 text-gray-600">

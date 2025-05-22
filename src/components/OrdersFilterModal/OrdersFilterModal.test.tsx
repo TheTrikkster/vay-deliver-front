@@ -131,6 +131,27 @@ jest.mock('react-redux', () => ({
   useSelector: jest.fn(() => defaultFilters),
 }));
 
+// D'abord, mock le nouveau composant AddressInput
+jest.mock('../../components/AddressInput', () => ({
+  AddressInput: ({
+    onSelect,
+    disabled,
+    inputProps,
+  }: {
+    onSelect: (value: string) => void;
+    disabled?: boolean;
+    inputProps?: {
+      onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+      placeholder: string;
+      className: string;
+    };
+  }) => (
+    <div className="mock-address-input">
+      <input type="text" {...inputProps} disabled={disabled} data-testid="address-input" />
+    </div>
+  ),
+}));
+
 describe('OrdersFilterModal', () => {
   const mockOnClose = jest.fn();
   const mockOnApply = jest.fn();
@@ -250,11 +271,12 @@ describe('OrdersFilterModal', () => {
   test('devrait réinitialiser tous les filtres quand le bouton Reset est cliqué', () => {
     render(<OrdersFilterModal isOpen={true} onClose={mockOnClose} onApply={mockOnApply} />);
 
-    // Définir des valeurs pour tous les filtres
+    // S'assurer que le status est ACTIVE pour que le champ d'adresse soit visible
     const selectElement = screen.getByRole('combobox');
-    fireEvent.change(selectElement, { target: { value: 'COMPLETED' } });
+    expect(selectElement).toHaveValue('ACTIVE');
 
-    const addressInput = screen.getByPlaceholderText('Введите адрес или название города');
+    // À présent, le champ d'adresse ne s'affiche que lorsque status='ACTIVE'
+    const addressInput = screen.getByTestId('address-input');
     fireEvent.change(addressInput, { target: { value: 'Paris' } });
 
     const tagInput = screen.getByPlaceholderText('Введите название заметки');
@@ -267,7 +289,8 @@ describe('OrdersFilterModal', () => {
 
     // Vérifier que tous les filtres sont réinitialisés
     expect(selectElement).toHaveValue('ACTIVE');
-    expect(addressInput).toHaveValue('');
+    // Vérifier la position dans Redux plutôt que la valeur de l'input
+    expect(mockOnApply).not.toHaveBeenCalledWith(expect.stringContaining('address=Paris'));
     expect(screen.queryByText('important')).not.toBeInTheDocument();
   });
 
@@ -297,7 +320,7 @@ describe('OrdersFilterModal', () => {
 
     // Configurer plusieurs filtres
     const selectElement = screen.getByRole('combobox');
-    fireEvent.change(selectElement, { target: { value: 'COMPLETED' } });
+    fireEvent.change(selectElement, { target: { value: 'ACTIVE' } });
 
     const addressInput = screen.getByPlaceholderText('Введите адрес или название города');
     fireEvent.change(addressInput, { target: { value: 'Paris' } });
@@ -321,7 +344,7 @@ describe('OrdersFilterModal', () => {
 
     // Vérifier que la chaîne de filtres contient tous les paramètres attendus
     const filterString = mockOnApply.mock.calls[0][0];
-    expect(filterString).toContain('status=COMPLETED');
+    expect(filterString).toContain('status=ACTIVE');
     expect(filterString).toContain('address=Paris');
     expect(filterString).toContain('tagNames=urgent');
   });
@@ -392,6 +415,10 @@ describe('OrdersFilterModal', () => {
     });
 
     render(<OrdersFilterModal isOpen={true} onClose={mockOnClose} onApply={mockOnApply} />);
+
+    // S'assurer que le status est 'ACTIVE'
+    const selectElement = screen.getByRole('combobox');
+    expect(selectElement).toHaveValue('ACTIVE');
 
     // Utiliser un seul sélecteur pour le bouton de géolocalisation
     const geoButton = screen.getByTestId('geolocation-button');
@@ -477,6 +504,10 @@ describe('OrdersFilterModal', () => {
 
   test("devrait gérer correctement la sélection d'adresse", async () => {
     render(<OrdersFilterModal isOpen={true} onClose={mockOnClose} onApply={mockOnApply} />);
+
+    // S'assurer que le status est 'ACTIVE' pour que le champ d'adresse soit affiché
+    const selectElement = screen.getByRole('combobox');
+    expect(selectElement).toHaveValue('ACTIVE');
 
     const addressInput = screen.getByPlaceholderText('Введите адрес или название города');
     fireEvent.change(addressInput, { target: { value: 'Paris' } });

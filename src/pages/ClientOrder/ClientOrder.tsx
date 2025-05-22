@@ -7,6 +7,7 @@ import { toCents, fromCents } from '../../utils/orderCalcul';
 import { ordersApi } from '../../api/services/ordersApi';
 import { useTranslation } from 'react-i18next';
 import PlacesAutocomplete, { geocodeByAddress, getLatLng } from 'react-places-autocomplete';
+import { AddressInput } from '../../components/AddressInput';
 
 // Typage des données de formulaire
 interface FormData {
@@ -29,22 +30,20 @@ function ClientOrder() {
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  // State unique pour toutes les valeurs du formulaire
   const [formData, setFormData] = useState<FormData>({
     firstName: '',
     lastName: '',
     phoneNumber: '',
     address: '',
   });
-
-  // State pour les erreurs
   const [errors, setErrors] = useState<Partial<FormData>>({});
   const buttonDisabled =
     !formData[FORM_FIELDS.FIRST_NAME] ||
     !formData[FORM_FIELDS.LAST_NAME] ||
     !formData[FORM_FIELDS.PHONE_NUMBER] ||
     !formData[FORM_FIELDS.ADDRESS];
+  const [waitForResponse, setWaitForResponse] = useState(false);
+  const [requestError, setRequestError] = useState<string>('');
 
   const total = useMemo(
     () =>
@@ -54,9 +53,6 @@ function ClientOrder() {
       }, 0),
     [products, items]
   );
-
-  // Ajouter un state pour gérer l'affichage du message de succès
-  const [showSuccess, setShowSuccess] = useState(false);
 
   // Fonction générique pour gérer les changements dans les inputs
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -122,6 +118,7 @@ function ClientOrder() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setWaitForResponse(true);
 
     if (validateForm()) {
       try {
@@ -137,18 +134,15 @@ function ClientOrder() {
 
         await ordersApi.createOrder(orderData);
 
-        // Afficher le message de succès en plein écran
-        setShowSuccess(true);
-
-        // Attendre 2 secondes avant de rediriger
-        setTimeout(() => {
-          dispatch(clearClientOrder());
-          navigate('/');
-        }, 3000);
+        dispatch(clearClientOrder());
+        navigate('/completed-order');
       } catch (error: unknown) {
+        setRequestError(t('requestError'));
         if (error instanceof Error) {
           console.error('Erreur détaillée:', (error as any).response?.data);
         }
+      } finally {
+        setWaitForResponse(false);
       }
     }
   };
@@ -158,14 +152,11 @@ function ClientOrder() {
     navigate('/');
   };
 
+  console.log({ focusedField });
+
   return (
     <div className="min-h-screen md:bg-[#F5F7FA]">
-      {showSuccess ? (
-        <div className="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center">
-          <div className="text-2xl font-semibold text-[#4F46E5] mb-4">{t('orderSuccess')}</div>
-          <div className="text-gray-600">{t('redirecting')}</div>
-        </div>
-      ) : products.length === 0 ? (
+      {products.length === 0 ? (
         <div className="min-h-screen flex flex-col items-center justify-center p-5">
           <div className="text-center">
             <h2 className="text-2xl font-semibold text-gray-800 mb-4">{t('emptyCart')}</h2>
@@ -181,7 +172,23 @@ function ClientOrder() {
       ) : (
         <>
           {/* En-tête violet */}
-          <div className="h-16 bg-[#4F46E5]"></div>
+          <div className="h-16 bg-[#4F46E5] flex items-center">
+            {' '}
+            <button onClick={() => navigate('/')} className="ml-4 p-2 rounded-full">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="8"
+                height="15"
+                viewBox="0 0 8 15"
+                fill="none"
+              >
+                <path
+                  d="M7.56327 14.5174C7.67367 14.4044 7.73547 14.2527 7.73547 14.0947C7.73547 13.9367 7.67367 13.785 7.56327 13.672L1.39588 7.34514L7.56327 1.01955C7.67367 0.906533 7.73547 0.754815 7.73547 0.596827C7.73547 0.43884 7.67367 0.28712 7.56327 0.174108C7.50961 0.118998 7.44546 0.075196 7.37459 0.0452874C7.30373 0.0153789 7.22759 -2.91613e-05 7.15067 -2.9168e-05C7.07376 -2.91747e-05 6.99762 0.0153789 6.92676 0.0452874C6.85589 0.0751959 6.79174 0.118998 6.73808 0.174107L0.179611 6.90344C0.0644212 7.02161 -4.68185e-05 7.18011 -4.6833e-05 7.34514C-4.68474e-05 7.51017 0.0644212 7.66867 0.179611 7.78684L6.73808 14.5162C6.79174 14.5713 6.85589 14.6151 6.92675 14.645C6.99762 14.6749 7.07376 14.6903 7.15067 14.6903C7.22759 14.6903 7.30373 14.6749 7.37459 14.645C7.44545 14.6151 7.50961 14.5713 7.56327 14.5162L7.56327 14.5174Z"
+                  fill="white"
+                />
+              </svg>
+            </button>
+          </div>
 
           {/* Contenu principal */}
           <div className="max-w-lg mx-auto px-4 pt-10 pb-4">
@@ -250,49 +257,35 @@ function ClientOrder() {
                         />
                       </svg>
                     </div>
-                    <PlacesAutocomplete
-                      value={formData.address}
-                      onChange={address => setFormData(prev => ({ ...prev, address }))}
-                      onSelect={handleSelectAddress}
-                      debounce={1000}
-                      shouldFetchSuggestions={formData.address.length >= 10}
-                    >
-                      {({ getInputProps, suggestions, getSuggestionItemProps, loading }) => (
-                        <div className="w-full">
-                          <input
-                            {...getInputProps({
-                              placeholder: t('address'),
-                              className: `w-full pl-10 pr-4 py-3 border ${
-                                errors.address ? 'border-red-500' : 'border-gray-300'
-                              } ring-0 ring-offset-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent focus:placeholder-transparent`,
-                              onFocus: () => setFocusedField('address'),
-                              onBlur: () => setFocusedField(null),
-                              name: 'address',
-                            })}
+                    <AddressInput
+                      onSelect={address => setFormData(prev => ({ ...prev, address }))}
+                      inputProps={{
+                        onChange: e => {
+                          setFormData(prev => ({ ...prev, address: e.target.value }));
+                        },
+                        className: `w-full pl-10 pr-4 py-3 border ${
+                          errors.address ? 'border-red-500' : 'border-gray-300'
+                        } ring-0 ring-offset-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent focus:placeholder-transparent`,
+                        placeholder: t('address'),
+                        name: 'address',
+                        onFocus: () => setFocusedField('address'),
+                        onBlur: () => setFocusedField(null),
+                      }}
+                      icon={
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="18"
+                          height="18"
+                          viewBox="0 0 18 18"
+                          fill="none"
+                        >
+                          <path
+                            d="M9 1.5C6.0975 1.5 3.75 3.8475 3.75 6.75C3.75 10.6875 9 16.5 9 16.5C9 16.5 14.25 10.6875 14.25 6.75C14.25 3.8475 11.9025 1.5 9 1.5ZM9 8.625C8.50555 8.625 8.0222 8.4538 7.66092 8.14016C7.29965 7.82652 7.09865 7.39728 7.1018 6.9029C7.10496 6.40851 7.31207 5.98207 7.67799 5.67322C8.04392 5.36438 8.5291 5.19963 9.02353 5.20403C9.51796 5.20842 9.99932 5.38175 10.3595 5.69831C10.7196 6.01487 10.9186 6.44568 10.9131 6.90014C10.9076 7.35461 10.6983 7.78131 10.332 8.08984C9.96576 8.39837 9.48046 8.56174 8.9856 8.55634L9 8.625Z"
+                            fill={focusedField === 'address' ? '#4F46E5' : '#9DA0A5'}
                           />
-                          <div className="absolute z-10 w-full bg-white rounded-lg shadow-lg">
-                            {loading && <div className="p-2 text-gray-500">{t('loading')}</div>}
-                            {suggestions.map(suggestion => {
-                              const style = {
-                                backgroundColor: suggestion.active ? '#f0f0f0' : '#fff',
-                                cursor: 'pointer',
-                                padding: '10px',
-                                fontSize: '14px',
-                                borderBottom: '1px solid #f0f0f0',
-                              };
-                              return (
-                                <div
-                                  {...getSuggestionItemProps(suggestion, { style })}
-                                  key={suggestion.placeId}
-                                >
-                                  {suggestion.description}
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      )}
-                    </PlacesAutocomplete>
+                        </svg>
+                      }
+                    />
                   </div>
                   {errors.address && (
                     <p data-testid="address-error" className="text-red-500 text-xs mt-1">
@@ -323,8 +316,8 @@ function ClientOrder() {
                     </div>
                     <input
                       type="text"
-                      name={FORM_FIELDS.FIRST_NAME}
-                      value={formData[FORM_FIELDS.FIRST_NAME]}
+                      name="firstName"
+                      value={formData.firstName}
                       onChange={handleChange}
                       placeholder={t('firstName')}
                       className={`w-full pl-10 pr-4 py-3 border ${errors[FORM_FIELDS.FIRST_NAME] ? 'border-red-500' : 'border-gray-300'} ring-0 ring-offset-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent focus:placeholder-transparent`}
@@ -366,7 +359,7 @@ function ClientOrder() {
                       onChange={handleChange}
                       placeholder={t('lastName')}
                       className="w-full pl-10 pr-4 py-3 border border-gray-300 ring-0 ring-offset-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent focus:placeholder-transparent"
-                      onFocus={() => setFocusedField('lastName')}
+                      onFocus={() => setFocusedField(FORM_FIELDS.LAST_NAME)}
                       onBlur={() => setFocusedField(null)}
                     />
                   </div>
@@ -397,8 +390,8 @@ function ClientOrder() {
                       value={formData.phoneNumber}
                       onChange={handleChange}
                       placeholder={t('phoneNumber')}
-                      className={`w-full pl-10 pr-4 py-3 border ${errors.phoneNumber ? 'border-red-500' : 'border-gray-300'} ring-0 ring-offset-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent focus:placeholder-transparent`}
-                      onFocus={() => setFocusedField('phoneNumber')}
+                      className={`w-full pl-10 pr-4 py-3 border ${errors[FORM_FIELDS.PHONE_NUMBER] ? 'border-red-500' : 'border-gray-300'} ring-0 ring-offset-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent focus:placeholder-transparent`}
+                      onFocus={() => setFocusedField(FORM_FIELDS.PHONE_NUMBER)}
                       onBlur={() => setFocusedField(null)}
                     />
                   </div>
@@ -409,7 +402,7 @@ function ClientOrder() {
                   )}
                 </div>
               </div>
-
+              {requestError && <p className="text-red-500 text-xs mt-4">{requestError}</p>}
               <div className="flex justify-center gap-4 mt-14 mb-4">
                 <button
                   onClick={handleCancel}
@@ -418,9 +411,9 @@ function ClientOrder() {
                   {t('cancel')}
                 </button>
                 <button
-                  disabled={buttonDisabled}
+                  disabled={buttonDisabled || waitForResponse}
                   type="submit"
-                  className={`${buttonDisabled ? 'bg-gray-300 text-gray-600 border-gray-300' : 'text-whiteborder-[#4355DA] hover:bg-[#4338CA]'} w-full bg-[#4F46E5] text-white py-3 px-6 rounded-full text-lg font-medium transition-colors`}
+                  className={`${buttonDisabled || waitForResponse ? 'bg-gray-300 text-gray-600 border-gray-300' : 'text-whiteborder-[#4355DA] hover:bg-[#4338CA]'} w-full bg-[#4F46E5] text-white py-3 px-6 rounded-full text-lg font-medium transition-colors`}
                 >
                   {t('order')}
                 </button>

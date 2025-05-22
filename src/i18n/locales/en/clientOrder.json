@@ -14,5 +14,6 @@
   "requiredField": "Required field",
   "invalidPhoneFormat": "Invalid phone format",
   "cancel": "Cancel",
-  "order": "Order"
+  "order": "Order",
+  "requestError": "Please check your information and try again."
 }

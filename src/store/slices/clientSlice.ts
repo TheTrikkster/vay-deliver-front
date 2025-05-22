@@ -1,14 +1,19 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ProductType } from '../../types/client';
+import { RootState } from '../userStore';
 
 interface ClientState {
   items: Record<string, number>; // id du produit -> quantité
   products: ProductType[]; // liste des produits dans le panier
+  siteStatus: string;
+  offlineMessage: string;
 }
 
 const initialState: ClientState = {
   items: {},
   products: [],
+  siteStatus: 'ONLINE',
+  offlineMessage: '',
 };
 
 const clientOrderSlice = createSlice({
@@ -52,6 +57,14 @@ const clientOrderSlice = createSlice({
       state.products = [];
     },
 
+    setSiteStatus: (state, action: PayloadAction<string>) => {
+      state.siteStatus = action.payload;
+    },
+
+    setOfflineMessage: (state, action: PayloadAction<string>) => {
+      state.offlineMessage = action.payload;
+    },
+
     // checkoutClientOrder: state => {
     //   // On garde les données intactes mais on pourrait les traiter ici
     //   // par exemple, marquer le panier comme "en cours de commande"
@@ -60,7 +73,18 @@ const clientOrderSlice = createSlice({
   },
 });
 
-export const { addToClientOrder, removeFromClientOrder, clearClientOrder } =
-  clientOrderSlice.actions;
+export const {
+  addToClientOrder,
+  removeFromClientOrder,
+  clearClientOrder,
+  setSiteStatus,
+  setOfflineMessage,
+} = clientOrderSlice.actions;
+
+export const selectClientState = (state: RootState) => state.client;
+export const selectClientItems = (state: RootState) => state.client.items;
+export const selectClientProducts = (state: RootState) => state.client.products;
+export const selectClientSiteStatus = (state: RootState) => state.client.siteStatus;
+export const selectClientOfflineMessage = (state: RootState) => state.client.offlineMessage;
 
 export default clientOrderSlice.reducer;

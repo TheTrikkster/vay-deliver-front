@@ -5,9 +5,11 @@ import { BrowserRouter } from 'react-router-dom';
 import configureStore from 'redux-mock-store';
 import ClientProducts from './ClientProducts';
 import { productsApi } from '../../api/services/productsApi';
+import { settingsApi } from '../../api/services/settingsApi';
 
 // Mock des dépendances
 jest.mock('../../api/services/productsApi');
+jest.mock('../../api/services/settingsApi');
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useNavigate: () => jest.fn(),
@@ -28,7 +30,6 @@ jest.mock('react-i18next', () => ({
 
         // Traductions pour clientProducts
         errorLoading: 'Impossible de charger les produits',
-        order: 'Commander',
       };
       return translations[key] || key;
     },
@@ -45,6 +46,7 @@ describe('ClientProducts Component', () => {
   let store: any;
 
   beforeEach(() => {
+    // Reset store
     store = mockStore({
       client: {
         items: {},
@@ -52,7 +54,12 @@ describe('ClientProducts Component', () => {
       },
     });
 
-    // Mock de la réponse de l'API avec toutes les propriétés nécessaires
+    // Mock settingsApi to allow fetching products
+    (settingsApi.getSettings as jest.Mock).mockResolvedValue({
+      data: { siteStatus: 'ONLINE', offlineMessage: '' },
+    });
+
+    // Mock productsApi response
     (productsApi.getClientProducts as jest.Mock).mockResolvedValue({
       data: {
         products: [
@@ -81,7 +88,10 @@ describe('ClientProducts Component', () => {
       resolvePromise = resolve;
     });
 
-    // Configuration du mock pour qu'il retourne notre promesse contrôlée
+    // Mock settingsApi and productsApi for this test
+    (settingsApi.getSettings as jest.Mock).mockResolvedValue({
+      data: { siteStatus: 'ONLINE', offlineMessage: '' },
+    });
     (productsApi.getClientProducts as jest.Mock).mockReturnValueOnce(loadingPromise);
 
     render(
@@ -119,7 +129,10 @@ describe('ClientProducts Component', () => {
   });
 
   it('devrait gérer les erreurs de chargement', async () => {
-    // Corriger la façon dont on mock l'erreur
+    // Mock settingsApi and simulate error on product fetch
+    (settingsApi.getSettings as jest.Mock).mockResolvedValue({
+      data: { siteStatus: 'ONLINE', offlineMessage: '' },
+    });
     (productsApi.getClientProducts as jest.Mock).mockRejectedValueOnce(
       new Error('Erreur de chargement')
     );
@@ -162,6 +175,7 @@ describe('ClientProducts Component', () => {
   });
 
   it('devrait activer le bouton Commander quand le panier contient des articles', async () => {
+    // Pré-remplir le panier dans le store
     store = mockStore({
       client: {
         items: { '1': 2 },
@@ -178,8 +192,8 @@ describe('ClientProducts Component', () => {
     );
 
     await waitFor(() => {
-      const orderButton = screen.getByText('Commander');
-      expect(orderButton).not.toBeDisabled();
+      const checkoutButton = screen.getByTestId('checkout-button');
+      expect(checkoutButton).not.toBeDisabled();
     });
   });
 });
