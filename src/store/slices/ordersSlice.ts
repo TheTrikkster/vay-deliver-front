@@ -1,26 +1,18 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { Order, OrderStatus, Position } from '../../types/order';
-import { ordersApi } from '../../api/services/ordersApi';
-import { RootState } from '../userStore';
+// store/slices/ordersSlice.ts
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { Order, OrderStatus, Position, AddTagOperationData } from '../../types/order';
 import { buildFilterString } from '../../utils/filterUtils';
+import { RootState } from '../userStore';
+import { ordersApi } from '../../api/services/ordersApi';
 
-// Définir le type d'opération en attente pour les commandes
-interface OrderPendingOperation<T = unknown> {
-  type: 'addTag';
+export interface OrderPendingOperation {
+  type: 'addTag' | 'removeTag';
   timestamp: number;
-  data: T;
+  data: AddTagOperationData;
   endpoint: string;
   method: string;
-  tempId?: string;
 }
 
-// Et définir des interfaces spécifiques pour chaque type d'opération
-export interface AddTagOperationData {
-  tagName: string;
-  orderIds: string[];
-}
-
-// Types
 interface OrdersState {
   orders: Order[];
   loading: boolean;
@@ -30,16 +22,11 @@ interface OrdersState {
   isSelectionMode: boolean;
   selectedOrderIds: string[];
   currentFilters: string;
-  isOnline: boolean; // État de connexion
-  pendingOperations: OrderPendingOperation[]; // Opérations en attente
-  filtersObject: {
-    status: OrderStatus | '';
-    tagNames: string[];
-    position: Position;
-  };
+  filtersObject: { status: OrderStatus | ''; tagNames: string[]; position: Position };
+  isOnline: boolean;
+  pendingOperations: OrderPendingOperation[];
 }
 
-// État initial
 const initialState: OrdersState = {
   orders: [],
   loading: false,
@@ -48,36 +35,27 @@ const initialState: OrdersState = {
   totalPages: 1,
   isSelectionMode: false,
   selectedOrderIds: [],
-  currentFilters: 'status=ACTIVE',
-  isOnline: navigator.onLine,
-  pendingOperations: [],
-  filtersObject: {
+  currentFilters: buildFilterString({
     status: 'ACTIVE',
     tagNames: [],
     position: { lat: '', lng: '', address: '' },
-  },
+  }),
+  filtersObject: { status: 'ACTIVE', tagNames: [], position: { lat: '', lng: '', address: '' } },
+  isOnline: navigator.onLine,
+  pendingOperations: [],
 };
 
-// Thunks
 export const fetchOrders = createAsyncThunk(
   'orders/fetchOrders',
   async (
     { page, filters, limit = 30 }: { page: number; filters?: string; limit?: number },
-    { rejectWithValue, dispatch }
+    { rejectWithValue }
   ) => {
+    console.log('fetchOrders', page, limit);
     try {
       const response = await ordersApi.getAll(page, filters, limit);
       return response.data;
-    } catch (error) {
-      dispatch(setCurrentFilters('status=ACTIVE'));
-      dispatch(
-        setFilters({
-          status: 'ACTIVE',
-          tagNames: [],
-          position: { lat: '', lng: '', address: '' },
-        })
-      );
-      console.error('Erreur lors de la récupération des commandes:', error);
+    } catch (err) {
       return rejectWithValue('fetchOrdersError');
     }
   }
@@ -86,168 +64,169 @@ export const fetchOrders = createAsyncThunk(
 export const addTagToOrders = createAsyncThunk(
   'orders/addTagToOrders',
   async (
-    { tagName, orderIds }: { tagName: string; orderIds: string[] },
+    { tagName, orderIds }: { tagName: string; orderIds: string[] | string },
     { getState, dispatch, rejectWithValue }
   ) => {
+    const state = getState() as { orders: OrdersState };
+    const isOnline = state.orders.isOnline;
+    if (!isOnline) {
+      dispatch(
+        addPendingOperation({
+          type: 'addTag',
+          timestamp: Date.now(),
+          data: { tagName, orderIds },
+          endpoint: 'orders/tags',
+          method: 'POST',
+        })
+      );
+      return { tagName, orderIds };
+    }
     try {
-      // Récupérer l'état pour vérifier la connexion
-      const state = getState() as { orders: OrdersState }; // Type any pour faciliter l'accès
-      const isOnline = state.orders.isOnline;
-
-      // Optimistic update géré dans les extraReducers
-
-      if (isOnline) {
-        // Si en ligne, appel API normal
-        await ordersApi.addTagToOrders([tagName], orderIds);
-        return { tagName, orderIds };
-      } else {
-        // Si hors ligne, stocker l'opération pour synchronisation ultérieure
-        dispatch(
-          addPendingOperation({
-            type: 'addTag',
-            timestamp: Date.now(),
-            data: { tagName, orderIds },
-            endpoint: 'orders/tags', // URL relative
-            method: 'POST',
-          })
-        );
-        return { tagName, orderIds };
-      }
-    } catch (error) {
-      console.error("Erreur lors de l'ajout du tag:", error);
+      await ordersApi.addTagToOrders([tagName], orderIds);
+      return { tagName, orderIds };
+    } catch {
       return rejectWithValue('addTagToOrdersError');
     }
   }
 );
 
-// Slice
-const ordersSlice = createSlice({
+export const removeTagFromOrders = createAsyncThunk(
+  'orders/removeTagFromOrders',
+  async (
+    { tagName, orderId }: { tagName: string; orderId: string },
+    { getState, dispatch, rejectWithValue }
+  ) => {
+    const state = getState() as { orders: OrdersState };
+    const isOnline = state.orders.isOnline;
+    if (!isOnline) {
+      dispatch(
+        addPendingOperation({
+          type: 'removeTag',
+          timestamp: Date.now(),
+          data: { tagName, orderIds: orderId },
+          endpoint: 'orders/tags',
+          method: 'DELETE',
+        })
+      );
+      return { tagName, orderId };
+    }
+    try {
+      await ordersApi.removeTagFromOrders(orderId, tagName);
+      return { tagName, orderId };
+    } catch {
+      return rejectWithValue('removeTagFromOrdersError');
+    }
+  }
+);
+
+export const ordersSlice = createSlice({
   name: 'orders',
   initialState,
   reducers: {
-    setCurrentPage: (state, action: PayloadAction<number>) => {
-      state.currentPage = action.payload;
+    setCurrentPage: (state, { payload }: PayloadAction<number>) => {
+      state.currentPage = payload;
     },
-    toggleSelectionMode: (state, action: PayloadAction<boolean>) => {
-      state.isSelectionMode = action.payload;
-      if (!action.payload) {
-        state.selectedOrderIds = [];
-      }
+    setFiltersObject: (state, { payload }: PayloadAction<OrdersState['filtersObject']>) => {
+      state.filtersObject = payload;
+      state.currentFilters = buildFilterString(payload);
+      state.currentPage = 1;
     },
-    toggleOrderSelection: (state, action: PayloadAction<string>) => {
-      const orderId = action.payload;
-      const index = state.selectedOrderIds.indexOf(orderId);
-
-      if (index >= 0) {
-        state.selectedOrderIds.splice(index, 1);
-      } else {
-        state.selectedOrderIds.push(orderId);
-      }
+    setOnlineStatus: (state, { payload }: PayloadAction<boolean>) => {
+      state.isOnline = payload;
     },
-    selectAllOrders: state => {
-      if (state.selectedOrderIds.length === state.orders.length) {
-        state.selectedOrderIds = [];
-      } else {
-        state.selectedOrderIds = state.orders.map(order => order._id);
-      }
+    addPendingOperation: (state, { payload }: PayloadAction<OrderPendingOperation>) => {
+      state.pendingOperations.push(payload);
+    },
+    removePendingOperation: (state, { payload }: PayloadAction<number>) => {
+      state.pendingOperations.splice(payload, 1);
     },
     clearSelection: state => {
       state.isSelectionMode = false;
       state.selectedOrderIds = [];
     },
-    setCurrentFilters: (state, action: PayloadAction<string>) => {
-      state.currentFilters = action.payload;
+    toggleSelectionMode: (state, { payload }: PayloadAction<boolean>) => {
+      state.isSelectionMode = payload;
+      if (!payload) state.selectedOrderIds = [];
     },
-    // Nouveaux reducers pour la gestion hors ligne
-    setOnlineStatus: (state, action: PayloadAction<boolean>) => {
-      state.isOnline = action.payload;
+    toggleOrderSelection: (state, { payload }: PayloadAction<string>) => {
+      const idx = state.selectedOrderIds.indexOf(payload);
+      if (idx >= 0) state.selectedOrderIds.splice(idx, 1);
+      else state.selectedOrderIds.push(payload);
     },
-    addPendingOperation: (state, action: PayloadAction<OrderPendingOperation>) => {
-      state.pendingOperations.push(action.payload);
-    },
-    removePendingOperation: (state, action: PayloadAction<number>) => {
-      state.pendingOperations = state.pendingOperations.filter(
-        (_, index) => index !== action.payload
-      );
-    },
-    clearPendingOperations: state => {
-      state.pendingOperations = [];
-    },
-    setFilters: (state, action: PayloadAction<typeof initialState.filtersObject>) => {
-      state.filtersObject = action.payload;
-      state.currentFilters = buildFilterString(action.payload);
-    },
-    setError: (state, action: PayloadAction<string | null>) => {
-      state.error = action.payload;
+    selectAllOrders: state => {
+      state.selectedOrderIds =
+        state.selectedOrderIds.length === state.orders.length ? [] : state.orders.map(o => o._id);
     },
   },
   extraReducers: builder => {
     builder
-      // Gérer fetchOrders
       .addCase(fetchOrders.pending, state => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchOrders.fulfilled, (state, action) => {
-        state.orders = action.payload.orders;
-        state.totalPages = action.payload.totalPages;
+      .addCase(fetchOrders.fulfilled, (state, { payload }) => {
+        state.orders = payload.orders;
+        state.totalPages = payload.totalPages;
         state.loading = false;
       })
-      .addCase(fetchOrders.rejected, (state, action) => {
+      .addCase(fetchOrders.rejected, (state, { payload, error }) => {
         state.loading = false;
-        if (action.payload) {
-          state.error = action.payload as string;
-        } else {
-          state.error = action.error.message as string;
-        }
+        state.error = (payload as string) || error.message || null;
       })
-      // Gérer addTagToOrders (mise à jour optimiste)
-      .addCase(addTagToOrders.fulfilled, (state, action) => {
-        const { tagName, orderIds } = action.payload;
-        state.orders = state.orders.map(order =>
-          orderIds.includes(order._id)
-            ? { ...order, tagNames: [...(order.tagNames || []), tagName] }
-            : order
+
+      // optimistic: apply on pending for add
+      .addCase(addTagToOrders.pending, (state, { meta }) => {
+        state.error = null;
+        const { tagName, orderIds } = meta.arg;
+        state.orders = state.orders.map(o =>
+          orderIds.includes(o._id)
+            ? { ...o, tagNames: Array.from(new Set([...(o.tagNames || []), tagName])) }
+            : o
         );
         state.isSelectionMode = false;
         state.selectedOrderIds = [];
       })
-      .addCase(addTagToOrders.rejected, (state, action) => {
-        state.error = action.payload as string;
+      .addCase(addTagToOrders.rejected, (state, { payload }) => {
+        state.error = payload as string;
+      })
+
+      // optimistic: apply on pending for remove
+      .addCase(removeTagFromOrders.pending, (state, { meta }) => {
+        state.error = null;
+        const { tagName, orderId } = meta.arg;
+        state.orders = state.orders.map(o =>
+          o._id === orderId ? { ...o, tagNames: (o.tagNames || []).filter(t => t !== tagName) } : o
+        );
+      })
+      .addCase(removeTagFromOrders.rejected, (state, { payload }) => {
+        state.error = payload as string;
       });
   },
 });
 
-// Actions
 export const {
   setCurrentPage,
-  toggleSelectionMode,
-  toggleOrderSelection,
-  selectAllOrders,
-  clearSelection,
-  setCurrentFilters,
+  setFiltersObject,
   setOnlineStatus,
   addPendingOperation,
   removePendingOperation,
-  clearPendingOperations,
-  setFilters,
-  setError,
+  clearSelection,
+  toggleSelectionMode,
+  toggleOrderSelection,
+  selectAllOrders,
 } = ordersSlice.actions;
 
 // Selectors
-export const selectOrders = (state: RootState) => state.orders.orders;
-export const selectOrdersLoading = (state: { orders: OrdersState }) => state.orders.loading;
-export const selectOrdersError = (state: { orders: OrdersState }) => state.orders.error;
-export const selectCurrentPage = (state: { orders: OrdersState }) => state.orders.currentPage;
-export const selectTotalPages = (state: { orders: OrdersState }) => state.orders.totalPages;
-export const selectIsSelectionMode = (state: { orders: OrdersState }) =>
-  state.orders.isSelectionMode;
-export const selectSelectedOrderIds = (state: { orders: OrdersState }) =>
-  state.orders.selectedOrderIds;
-export const selectCurrentFilters = (state: { orders: OrdersState }) => state.orders.currentFilters;
-export const selectOrdersIsOnline = (state: { orders: OrdersState }) => state.orders.isOnline;
-export const selectOrdersPendingOperations = (state: { orders: OrdersState }) =>
-  state.orders.pendingOperations;
-export const selectFiltersObject = (state: RootState) => state.orders.filtersObject;
+export const selectOrders = (s: RootState) => s.orders.orders;
+export const selectOrdersLoading = (s: RootState) => s.orders.loading;
+export const selectOrdersError = (s: RootState) => s.orders.error;
+export const selectCurrentPage = (s: RootState) => s.orders.currentPage;
+export const selectTotalPages = (s: RootState) => s.orders.totalPages;
+export const selectCurrentFilters = (s: RootState) => s.orders.currentFilters;
+export const selectFiltersObject = (s: RootState) => s.orders.filtersObject;
+export const selectOrdersIsOnline = (s: RootState) => s.orders.isOnline;
+export const selectOrdersPendingOperations = (s: RootState) => s.orders.pendingOperations;
+export const selectSelectedOrderIds = (s: RootState) => s.orders.selectedOrderIds;
+export const selectIsSelectionMode = (s: RootState) => s.orders.isSelectionMode;
 
 export default ordersSlice.reducer;

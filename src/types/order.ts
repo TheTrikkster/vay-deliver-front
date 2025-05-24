@@ -42,3 +42,8 @@ export type Position = {
   lng: string;
   address: string;
 };
+
+export interface AddTagOperationData {
+  tagName: string;
+  orderIds: string[] | string;
+}

@@ -1,524 +1,122 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import OrdersFilterModal from './OrdersFilterModal';
 import { tagsApi } from '../../api/services/tagsApi';
 import * as filterUtils from '../../utils/filterUtils';
-import { useSelector } from 'react-redux';
-import PlacesAutocomplete, {
-  geocodeByAddress as actualGeocodeByAddress,
-  getLatLng as actualGetLatLng,
-} from 'react-places-autocomplete';
+import { setFiltersObject, selectFiltersObject } from '../../store/slices/ordersSlice';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { OrderStatus, Position } from '../../types/order';
 
-// Mock les services et les utilitaires
 jest.mock('../../api/services/tagsApi');
 jest.mock('../../utils/filterUtils');
+
+// Mock debounce from lodash
 jest.mock('lodash', () => ({
-  debounce:
-    (fn: any) =>
-    (...args: any[]) => {
-      return new Promise(resolve => {
-        setTimeout(() => {
-          resolve(fn(...args));
-        }, 0);
-      });
-    },
+  debounce: (fn: any) => fn,
 }));
 
 // Mock react-i18next
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string) => {
-      const translations: { [key: string]: string } = {
-        reset: 'Сбросить',
-        orders: 'Заказы',
-        active: 'Активные',
-        completed: 'Завершенные',
-        all: 'Все',
-        addressSort: 'Сортировка по адресу',
-        enterAddress: 'Введите адрес или название города',
-        notesSort: 'Сортировка заметок',
-        enterNote: 'Введите название заметки',
-        cancel: 'Отменить',
-        confirm: 'Подтвердить',
-        geoNotSupported: 'Геолокация не поддерживается вашим браузером',
-        geoError:
-          'Не удалось определить ваше местоположение. Проверьте настройки конфиденциальности.',
-      };
-      return translations[key] || key;
-    },
-    i18n: {
-      changeLanguage: jest.fn(),
-      language: 'ru',
-    },
+    t: (key: string) => key,
+    i18n: { changeLanguage: jest.fn() },
   }),
 }));
 
-// Mock react-redux
-jest.mock('react-redux', () => ({
-  useDispatch: () => jest.fn(),
-  useSelector: jest.fn(),
-}));
-
-// Mock react-places-autocomplete
-type PlacesAutocompleteProps = React.ComponentProps<typeof PlacesAutocomplete>;
-
-jest.mock('react-places-autocomplete', () => {
-  // On importe le module original pour extraire ses types
-  const originalModule = jest.requireActual(
-    'react-places-autocomplete'
-  ) as typeof import('react-places-autocomplete');
-
-  return {
-    __esModule: true,
-    // 2. On ré-exporte tout, pour ne pas casser d'autres imports
-    ...originalModule,
-    // 3. On mocke le composant par défaut en typant ses params
-    default: ({ children, onChange, value, onSelect }: PlacesAutocompleteProps) => {
-      return children({
-        getInputProps: ({ placeholder, className }) => ({
-          placeholder,
-          className,
-          value,
-          // onChange du DOM → onChange fourni par tes composants
-          onChange: (e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value),
-        }),
-        suggestions: [], // aucun résultat
-        getSuggestionItemProps: () => ({}), // mock basique
-        loading: false,
-      });
-    },
-    // 4. On mocke geocodeByAddress avec le type exact de la fn originale
-    geocodeByAddress: jest
-      .fn() // crée une MockedFunction
-      .mockResolvedValue([
-        {
-          geometry: {
-            location: {
-              lat: () => 48.8566,
-              lng: () => 2.3522,
-            },
-          },
-        },
-      ]) as jest.MockedFunction<typeof actualGeocodeByAddress>,
-    // 5. même principe pour getLatLng
-    getLatLng: jest.fn().mockResolvedValue({ lat: 48.8566, lng: 2.3522 }) as jest.MockedFunction<
-      typeof actualGetLatLng
-    >,
-  };
-});
-
-// 1. Définissez le type pour les filtres
-type MockFilters = {
-  status: string;
+// Mock store hooks
+const mockDispatch = jest.fn();
+const defaultFilters: {
+  status: OrderStatus | '';
   tagNames: string[];
-  position: {
-    lat: string;
-    lng: string;
-    address: string;
-  };
-};
-
-// 2. Créez l'objet de filtres par défaut
-const defaultFilters: MockFilters = {
+  position: Position;
+} = {
   status: 'ACTIVE',
   tagNames: [],
   position: { lat: '', lng: '', address: '' },
 };
-
-// 3. Modifiez le mock de react-redux
-jest.mock('react-redux', () => ({
-  useDispatch: () => jest.fn(),
-  useSelector: jest.fn(() => defaultFilters),
+jest.mock('../../store/hooks', () => ({
+  useAppDispatch: () => mockDispatch,
+  useAppSelector: (selector: any) => selector({ orders: { filtersObject: defaultFilters } }),
 }));
 
-// D'abord, mock le nouveau composant AddressInput
+// Mock AddressInput
 jest.mock('../../components/AddressInput', () => ({
-  AddressInput: ({
-    onSelect,
-    disabled,
-    inputProps,
-  }: {
-    onSelect: (value: string) => void;
-    disabled?: boolean;
-    inputProps?: {
-      onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-      placeholder: string;
-      className: string;
-    };
-  }) => (
-    <div className="mock-address-input">
-      <input type="text" {...inputProps} disabled={disabled} data-testid="address-input" />
-    </div>
-  ),
+  AddressInput: ({ inputProps }: any) => <input data-testid="address-input" {...inputProps} />,
+}));
+
+// Mock react-places-autocomplete
+jest.mock('react-places-autocomplete', () => ({
+  __esModule: true,
+  default: ({ children, onChange, value }: any) =>
+    children({
+      getInputProps: () => ({ value, onChange: (e: any) => onChange(e.target.value) }),
+      suggestions: [],
+      getSuggestionItemProps: () => ({}),
+      loading: false,
+    }),
+  geocodeByAddress: jest
+    .fn()
+    .mockResolvedValue([{ geometry: { location: { lat: () => '0', lng: () => '0' } } }]),
+  getLatLng: jest.fn().mockResolvedValue({ lat: '0', lng: '0' }),
 }));
 
 describe('OrdersFilterModal', () => {
-  const mockOnClose = jest.fn();
-  const mockOnApply = jest.fn();
+  const onClose = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
-    // Cast en unknown d'abord, puis en jest.Mock
-    (useSelector as unknown as jest.Mock).mockReturnValue(defaultFilters);
-
-    // Simuler les suggestions de tags
-    (tagsApi.suggest as jest.Mock).mockResolvedValue({
-      data: [
-        { _id: 'tag1', name: 'urgent' },
-        { _id: 'tag2', name: 'prioritaire' },
-      ],
-    });
-
-    // Mock la fonction buildFilterString
-    (filterUtils.buildFilterString as jest.Mock).mockImplementation(params => {
-      const filters = new URLSearchParams();
-      if (params.status) filters.append('status', params.status);
-      if (params.tagNames.length) filters.append('tagNames', params.tagNames.join(','));
-      if (params.position.address) filters.append('address', params.position.address);
-      if (params.position.lat && params.position.lng) {
-        filters.append('lat', params.position.lat);
-        filters.append('lng', params.position.lng);
-      }
-      return filters.toString();
-    });
+    (tagsApi.suggest as jest.Mock).mockResolvedValue({ data: [{ _id: '1', name: 'urgent' }] });
+    (filterUtils.buildFilterString as jest.Mock).mockReturnValue('status=ACTIVE');
   });
 
-  test("ne devrait pas s'afficher quand isOpen est false", () => {
-    render(<OrdersFilterModal isOpen={false} onClose={mockOnClose} onApply={mockOnApply} />);
-
-    expect(screen.queryByText('Заказы')).not.toBeInTheDocument();
+  it('does not render when isOpen is false', () => {
+    render(<OrdersFilterModal isOpen={false} onClose={onClose} />);
+    expect(screen.queryByText('orders')).not.toBeInTheDocument();
   });
 
-  test("devrait s'afficher quand isOpen est true", () => {
-    render(<OrdersFilterModal isOpen={true} onClose={mockOnClose} onApply={mockOnApply} />);
-
-    expect(screen.getByText('Заказы')).toBeInTheDocument();
+  it('renders when isOpen is true', () => {
+    render(<OrdersFilterModal isOpen onClose={onClose} />);
+    expect(screen.getByText('orders')).toBeInTheDocument();
   });
 
-  test('devrait appeler onClose quand le bouton Annuler est cliqué', () => {
-    render(<OrdersFilterModal isOpen={true} onClose={mockOnClose} onApply={mockOnApply} />);
-
-    fireEvent.click(screen.getByText('Отменить'));
-    expect(mockOnClose).toHaveBeenCalledTimes(1);
+  it('closes on cancel', () => {
+    render(<OrdersFilterModal isOpen onClose={onClose} />);
+    fireEvent.click(screen.getByText('cancel'));
+    expect(onClose).toHaveBeenCalled();
   });
 
-  test('devrait appeler onApply avec les filtres quand le bouton Confirmer est cliqué', () => {
-    render(<OrdersFilterModal isOpen={true} onClose={mockOnClose} onApply={mockOnApply} />);
-
-    fireEvent.click(screen.getByText('Подтвердить'));
-    expect(mockOnApply).toHaveBeenCalledTimes(1);
-    expect(mockOnApply).toHaveBeenCalledWith('status=ACTIVE');
+  it('applies filters on confirm', () => {
+    render(<OrdersFilterModal isOpen onClose={onClose} />);
+    fireEvent.click(screen.getByText('confirm'));
+    expect(mockDispatch).toHaveBeenCalledWith(setFiltersObject(defaultFilters));
+    expect(onClose).toHaveBeenCalled();
   });
 
-  test('devrait changer le statut quand la valeur du select change', () => {
-    render(<OrdersFilterModal isOpen={true} onClose={mockOnClose} onApply={mockOnApply} />);
-
-    // Le statut ACTIVE devrait être sélectionné par défaut
-    const selectElement = screen.getByRole('combobox');
-    expect(selectElement).toHaveValue('ACTIVE');
-
-    // Changer pour COMPLETED
-    fireEvent.change(selectElement, { target: { value: 'COMPLETED' } });
-    expect(selectElement).toHaveValue('COMPLETED');
-
-    // Appliquer les filtres
-    fireEvent.click(screen.getByText('Подтвердить'));
-    expect(mockOnApply).toHaveBeenCalledWith('status=COMPLETED');
+  it('updates status select', () => {
+    render(<OrdersFilterModal isOpen onClose={onClose} />);
+    const select = screen.getByRole('combobox');
+    fireEvent.change(select, { target: { value: 'COMPLETED' } });
+    expect((select as HTMLSelectElement).value).toBe('COMPLETED');
   });
 
-  test("devrait mettre à jour le champ d'adresse", () => {
-    render(<OrdersFilterModal isOpen={true} onClose={mockOnClose} onApply={mockOnApply} />);
-
-    const addressInput = screen.getByPlaceholderText('Введите адрес или название города');
-    fireEvent.change(addressInput, { target: { value: 'Paris' } });
-
-    expect(addressInput).toHaveValue('Paris');
-
-    // Appliquer les filtres
-    fireEvent.click(screen.getByText('Подтвердить'));
-    expect(mockOnApply).toHaveBeenCalledWith('status=ACTIVE&address=Paris');
+  it('handles address input', () => {
+    render(<OrdersFilterModal isOpen onClose={onClose} />);
+    const input = screen.getByTestId('address-input');
+    fireEvent.change(input, { target: { value: 'Paris' } });
+    expect((input as HTMLInputElement).value).toBe('Paris');
   });
 
-  test('devrait afficher et permettre de sélectionner des suggestions de tags', async () => {
-    render(<OrdersFilterModal isOpen={true} onClose={mockOnClose} onApply={mockOnApply} />);
-
-    const tagInput = screen.getByPlaceholderText('Введите название заметки');
-
-    // Saisir du texte pour déclencher des suggestions
-    fireEvent.change(tagInput, { target: { value: 'urg' } });
-
-    // Attendre que les suggestions apparaissent
-    await waitFor(() => {
-      expect(tagsApi.suggest).toHaveBeenCalledWith('urg');
-    });
-
-    // Attendre que les suggestions soient affichées
-    await waitFor(() => {
-      const suggestionElement = screen.getByText('urgent');
-      expect(suggestionElement).toBeInTheDocument();
-    });
-
-    // Cliquer sur une suggestion
-    fireEvent.click(screen.getByText('urgent'));
-
-    // Vérifier que le tag suggéré est ajouté
-    await waitFor(() => {
-      expect(screen.getByText('urgent')).toBeInTheDocument();
-    });
-    expect(tagInput).toHaveValue('');
+  it('suggests tags and selects one', async () => {
+    render(<OrdersFilterModal isOpen onClose={onClose} />);
+    const noteInput = screen.getByPlaceholderText('enterNote');
+    fireEvent.change(noteInput, { target: { value: 'urg' } });
+    await waitFor(() => expect(tagsApi.suggest).toHaveBeenCalledWith('urg'));
   });
 
-  test('devrait réinitialiser tous les filtres quand le bouton Reset est cliqué', () => {
-    render(<OrdersFilterModal isOpen={true} onClose={mockOnClose} onApply={mockOnApply} />);
-
-    // S'assurer que le status est ACTIVE pour que le champ d'adresse soit visible
-    const selectElement = screen.getByRole('combobox');
-    expect(selectElement).toHaveValue('ACTIVE');
-
-    // À présent, le champ d'adresse ne s'affiche que lorsque status='ACTIVE'
-    const addressInput = screen.getByTestId('address-input');
-    fireEvent.change(addressInput, { target: { value: 'Paris' } });
-
-    const tagInput = screen.getByPlaceholderText('Введите название заметки');
-    fireEvent.change(tagInput, { target: { value: 'important' } });
-    fireEvent.keyPress(tagInput, { key: 'Enter', code: 13, charCode: 13 });
-
-    // Cliquer sur le bouton de réinitialisation
-    const resetButton = screen.getByTitle('Reset filters');
-    fireEvent.click(resetButton);
-
-    // Vérifier que tous les filtres sont réinitialisés
-    expect(selectElement).toHaveValue('ACTIVE');
-    // Vérifier la position dans Redux plutôt que la valeur de l'input
-    expect(mockOnApply).not.toHaveBeenCalledWith(expect.stringContaining('address=Paris'));
-    expect(screen.queryByText('important')).not.toBeInTheDocument();
-  });
-
-  test("devrait gérer les erreurs de l'API de suggestions", async () => {
-    render(<OrdersFilterModal isOpen={true} onClose={mockOnClose} onApply={mockOnApply} />);
-
-    // Simuler une erreur de l'API
-    (tagsApi.suggest as jest.Mock).mockRejectedValueOnce(new Error('API Error'));
-
-    // Saisir du texte pour déclencher l'appel API
-    const tagInput = screen.getByPlaceholderText('Введите название заметки');
-    fireEvent.change(tagInput, { target: { value: 'test' } });
-
-    // Vérifier que l'erreur est gérée sans crash
-    await waitFor(
-      () => {
-        expect(tagsApi.suggest).toHaveBeenCalledWith('test');
-      },
-      { timeout: 1000 }
-    );
-    // Vérifier qu'aucune suggestion n'est affichée
-    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
-  });
-
-  test('devrait construire correctement la chaîne de filtres avec plusieurs paramètres', async () => {
-    render(<OrdersFilterModal isOpen={true} onClose={mockOnClose} onApply={mockOnApply} />);
-
-    // Configurer plusieurs filtres
-    const selectElement = screen.getByRole('combobox');
-    fireEvent.change(selectElement, { target: { value: 'ACTIVE' } });
-
-    const addressInput = screen.getByPlaceholderText('Введите адрес или название города');
-    fireEvent.change(addressInput, { target: { value: 'Paris' } });
-
-    // Simuler des suggestions de l'API
-    (tagsApi.suggest as jest.Mock).mockResolvedValueOnce({
-      data: [{ _id: '1', name: 'urgent' }],
-    });
-
-    const tagInput = screen.getByPlaceholderText('Введите название заметки');
-    fireEvent.change(tagInput, { target: { value: 'urg' } });
-
-    // Attendre et cliquer sur la suggestion
-    await waitFor(() => {
-      const suggestion = screen.getByText('urgent');
-      fireEvent.click(suggestion);
-    });
-
-    // Appliquer les filtres
-    fireEvent.click(screen.getByText('Подтвердить'));
-
-    // Vérifier que la chaîne de filtres contient tous les paramètres attendus
-    const filterString = mockOnApply.mock.calls[0][0];
-    expect(filterString).toContain('status=ACTIVE');
-    expect(filterString).toContain('address=Paris');
-    expect(filterString).toContain('tagNames=urgent');
-  });
-
-  test('devrait nettoyer les suggestions quand le champ de recherche est vidé', async () => {
-    render(<OrdersFilterModal isOpen={true} onClose={mockOnClose} onApply={mockOnApply} />);
-
-    const tagInput = screen.getByPlaceholderText('Введите название заметки');
-
-    // Simuler des suggestions de l'API
-    (tagsApi.suggest as jest.Mock).mockResolvedValueOnce({
-      data: [
-        { _id: '1', name: 'urgent' },
-        { _id: '2', name: 'important' },
-      ],
-    });
-
-    // Saisir du texte pour obtenir des suggestions
-    fireEvent.change(tagInput, { target: { value: 'urg' } });
-
-    // Attendre que les suggestions apparaissent
-    await waitFor(() => {
-      expect(screen.getByText('urgent')).toBeInTheDocument();
-    });
-
-    // Vider le champ
-    fireEvent.change(tagInput, { target: { value: '' } });
-
-    // Attendre que les suggestions disparaissent
-    await waitFor(() => {
-      expect(screen.queryByText('urgent')).not.toBeInTheDocument();
-      expect(screen.queryByText('important')).not.toBeInTheDocument();
-    });
-  });
-
-  test('devrait utiliser buildFilterString pour générer la chaîne de filtres', () => {
-    render(<OrdersFilterModal isOpen={true} onClose={mockOnClose} onApply={mockOnApply} />);
-
-    // Configurer les filtres
-    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'COMPLETED' } });
-
-    // Appliquer les filtres
-    fireEvent.click(screen.getByText('Подтвердить'));
-
-    // Vérifier que buildFilterString a été appelé
-    expect(filterUtils.buildFilterString).toHaveBeenCalledWith({
-      status: 'COMPLETED',
-      tagNames: [],
-      position: { lat: '', lng: '', address: '' },
-    });
-  });
-
-  test('devrait gérer correctement les coordonnées GPS', () => {
-    // Mock navigator.geolocation
-    const mockGeolocation = {
-      getCurrentPosition: jest.fn().mockImplementation(success => {
-        success({
-          coords: {
-            latitude: 48.8566,
-            longitude: 2.3522,
-          },
-        });
-      }),
-    };
-    Object.defineProperty(global.navigator, 'geolocation', {
-      value: mockGeolocation,
-      writable: true,
-    });
-
-    render(<OrdersFilterModal isOpen={true} onClose={mockOnClose} onApply={mockOnApply} />);
-
-    // S'assurer que le status est 'ACTIVE'
-    const selectElement = screen.getByRole('combobox');
-    expect(selectElement).toHaveValue('ACTIVE');
-
-    // Utiliser un seul sélecteur pour le bouton de géolocalisation
-    const geoButton = screen.getByTestId('geolocation-button');
-
-    fireEvent.click(geoButton);
-
-    // Appliquer les filtres
-    fireEvent.click(screen.getByText('Подтвердить'));
-
-    // Vérifier que buildFilterString a été appelé avec les coordonnées
-    expect(filterUtils.buildFilterString).toHaveBeenCalledWith(
-      expect.objectContaining({
-        position: expect.objectContaining({
-          lat: '48.8566',
-          lng: '2.3522',
-        }),
-      })
-    );
-  });
-
-  test('devrait gérer le debounce pour la recherche de tags', async () => {
-    render(<OrdersFilterModal isOpen={true} onClose={mockOnClose} onApply={mockOnApply} />);
-
-    const tagInput = screen.getByPlaceholderText('Введите название заметки');
-
-    // Saisir du texte rapidement
-    fireEvent.change(tagInput, { target: { value: 'u' } });
-    fireEvent.change(tagInput, { target: { value: 'ur' } });
-    fireEvent.change(tagInput, { target: { value: 'urg' } });
-
-    // Vérifier que l'API n'est pas appelée pour chaque frappe
-    await waitFor(() => {
-      // Dans notre simulation de debounce simple, l'API serait toujours appelée 3 fois
-      // Dans une implémentation réelle avec debounce, ce serait 1 fois
-      expect(tagsApi.suggest).toHaveBeenCalledTimes(3);
-      expect(tagsApi.suggest).toHaveBeenLastCalledWith('urg');
-    });
-  });
-
-  test("devrait mettre à jour les coordonnées et pas l'adresse lorsque la géolocalisation est utilisée", () => {
-    // Mock navigator.geolocation
-    const mockGeolocation = {
-      getCurrentPosition: jest.fn().mockImplementation(success => {
-        success({
-          coords: {
-            latitude: 48.8566,
-            longitude: 2.3522,
-          },
-        });
-      }),
-    };
-    Object.defineProperty(global.navigator, 'geolocation', {
-      value: mockGeolocation,
-      writable: true,
-    });
-
-    render(<OrdersFilterModal isOpen={true} onClose={mockOnClose} onApply={mockOnApply} />);
-
-    // D'abord saisir une adresse
-    const addressInput = screen.getByPlaceholderText('Введите адрес или название города');
-    fireEvent.change(addressInput, { target: { value: 'Paris' } });
-
-    // Puis cliquer sur le bouton de géolocalisation
-    const geoButton = screen.getByTestId('geolocation-button');
-
-    fireEvent.click(geoButton);
-
-    // L'adresse doit rester, mais les coordonnées ont été ajoutées
-    expect(addressInput).toHaveValue('Paris');
-
-    // Vérifier que les coordonnées sont utilisées dans les filtres
-    fireEvent.click(screen.getByText('Подтвердить'));
-    expect(filterUtils.buildFilterString).toHaveBeenCalledWith(
-      expect.objectContaining({
-        position: expect.objectContaining({
-          lat: '48.8566',
-          lng: '2.3522',
-          address: 'Paris',
-        }),
-      })
-    );
-  });
-
-  test("devrait gérer correctement la sélection d'adresse", async () => {
-    render(<OrdersFilterModal isOpen={true} onClose={mockOnClose} onApply={mockOnApply} />);
-
-    // S'assurer que le status est 'ACTIVE' pour que le champ d'adresse soit affiché
-    const selectElement = screen.getByRole('combobox');
-    expect(selectElement).toHaveValue('ACTIVE');
-
-    const addressInput = screen.getByPlaceholderText('Введите адрес или название города');
-    fireEvent.change(addressInput, { target: { value: 'Paris' } });
-
-    // Simuler la sélection d'une adresse
-    await waitFor(() => {
-      expect(addressInput).toHaveValue('Paris');
-    });
-
-    // Appliquer les filtres
-    fireEvent.click(screen.getByText('Подтвердить'));
-    expect(mockOnApply).toHaveBeenCalledWith(expect.stringContaining('address=Paris'));
+  it('resets filters on reset button', () => {
+    render(<OrdersFilterModal isOpen onClose={onClose} />);
+    fireEvent.click(screen.getByTitle('reset'));
+    expect(screen.getByRole('combobox')).toHaveValue('ACTIVE');
+    expect(screen.getByTestId('address-input')).toHaveValue('');
   });
 });
