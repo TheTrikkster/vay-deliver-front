@@ -1,44 +1,36 @@
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { addTagToOrders } from '../../store/slices/ordersSlice';
-import { useAppDispatch } from '../../store/hooks';
 
 interface AddTagModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onConfirm: (tagName: string, orderIds: string[] | string) => void;
   orderId?: string;
   selectedOrderIds?: string[];
-  onSuccess?: (tagName: string) => void;
 }
 
 const AddTagModal: React.FC<AddTagModalProps> = ({
   isOpen,
   onClose,
+  onConfirm,
   orderId,
   selectedOrderIds,
-  onSuccess,
 }) => {
   const [tagName, setTagName] = useState<string>('');
   const { t } = useTranslation('addTagModal');
-  const dispatch = useAppDispatch();
 
-  const handleAddTag = useCallback(async () => {
-    if (!tagName.trim()) return;
-
+  const handleConfirm = useCallback(async () => {
+    const name = tagName.trim();
+    if (name.length < 2) return;
+    const ids = orderId ? [orderId] : selectedOrderIds || [];
     try {
-      const orderIds = orderId ? [orderId] : selectedOrderIds || [];
-      await dispatch(addTagToOrders({ tagName, orderIds })).unwrap();
-      onSuccess?.(tagName);
+      await onConfirm(name, ids);
       setTagName('');
       onClose();
     } catch (error) {
-      console.error("Erreur lors de l'ajout du tag:", error);
+      console.error(error);
     }
-  }, [dispatch, tagName, orderId, selectedOrderIds, onClose, onSuccess]);
-
-  const handleConfirm = useCallback(() => {
-    handleAddTag();
-  }, [handleAddTag]);
+  }, [tagName, orderId, selectedOrderIds, onConfirm, onClose]);
 
   const handleClose = useCallback(() => {
     setTagName('');

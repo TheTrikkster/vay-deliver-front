@@ -2,156 +2,125 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { OrderStatus, Position, Tag } from '../../types/order';
 import { tagsApi } from '../../api/services/tagsApi';
-import { useDispatch, useSelector } from 'react-redux';
-import { selectFiltersObject, setFilters } from '../../store/slices/ordersSlice';
-import { buildFilterString } from '../../utils/filterUtils';
 import { debounce } from 'lodash';
 import PlacesAutocomplete, { geocodeByAddress, getLatLng } from 'react-places-autocomplete';
 import { AddressInput } from '../AddressInput';
+import { buildFilterString } from '../../utils/filterUtils';
+import { selectFiltersObject, setFiltersObject } from '../../store/slices/ordersSlice';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
 
 interface FilterModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onApply: (filters: string) => void;
 }
 
-const OrdersFilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onApply }) => {
+const OrdersFilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose }) => {
   const { t } = useTranslation('ordersFilterModal');
-  const dispatch = useDispatch();
-  const filtersFromRedux = useSelector(selectFiltersObject);
-  const [status, setStatus] = useState<OrderStatus | ''>('ACTIVE');
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [position, setPosition] = useState<Position>({ lat: '', lng: '', address: '' });
+  const filtersObject = useAppSelector(selectFiltersObject);
+  const dispatch = useAppDispatch();
+
+  // 2) États locaux pour manipuler temporairement les filtres dans le modal
+  const [status, setStatus] = useState<OrderStatus | ''>(filtersObject.status);
+  const [selectedTags, setSelectedTags] = useState<string[]>(filtersObject.tagNames);
+  const [position, setPosition] = useState<Position>(filtersObject.position);
+
+  // Pour la recherche de tags suggérés
   const [searchValue, setSearchValue] = useState<string>('');
   const [suggestedTags, setSuggestedTags] = useState<Tag[]>([]);
 
+  // 3) À chaque ouverture, on remet à jour les valeurs locales
   useEffect(() => {
     if (isOpen) {
-      if (status !== filtersFromRedux.status) {
-        setStatus(filtersFromRedux.status);
-      }
-      if (JSON.stringify(selectedTags) !== JSON.stringify(filtersFromRedux.tagNames)) {
-        setSelectedTags(filtersFromRedux.tagNames);
-      }
-      if (JSON.stringify(position) !== JSON.stringify(filtersFromRedux.position)) {
-        setPosition(filtersFromRedux.position);
-      }
+      setStatus(filtersObject.status);
+      setSelectedTags(filtersObject.tagNames);
+      setPosition(filtersObject.position);
       setSearchValue('');
+      setSuggestedTags([]);
+      console.log({ filtersObject }, 'heelloa');
     }
-  }, [isOpen, filtersFromRedux]);
+  }, [isOpen, filtersObject]);
 
-  const debouncedSearchTag = useCallback(
-    debounce((value: string) => {
-      if (!value || value.trim() === '') {
-        setSuggestedTags([]);
-        return;
-      }
-      searchTag(value);
-    }, 300),
-    []
-  );
-
+  // 4) Recherche de tags avec debounce
   const searchTag = useCallback(async (value: string) => {
-    if (!value) return;
+    if (!value.trim()) {
+      setSuggestedTags([]);
+      return;
+    }
     try {
       const response = await tagsApi.suggest(value);
       setSuggestedTags(response.data);
-    } catch (error) {
-      console.error('Failed to fetch tags:', error);
+    } catch {
       setSuggestedTags([]);
     }
   }, []);
 
-  const handleApply = () => {
-    const newFilters = {
-      status,
-      tagNames: selectedTags,
-      position,
-    };
+  const debouncedSearchTag = useCallback(debounce(searchTag, 300), [searchTag]);
 
-    // 1. Dispatch l'action pour mettre à jour l'état Redux (pour les prochaines fois)
-    dispatch(
-      setFilters({
-        ...newFilters,
-        position: {
-          address: position.address,
-          lat: position.address ? '' : position.lat,
-          lng: position.address ? '' : position.lng,
-        },
-      })
-    );
-
-    onApply(buildFilterString(newFilters));
-  };
-
-  const initValues = () => {
-    setStatus('ACTIVE');
-    setSelectedTags([]);
-    setPosition({ lat: '', lng: '', address: '' });
-    setSearchValue('');
-  };
-
-  const handleSuggestedTagClick = useCallback(
-    (tag: Tag) => {
-      if (!selectedTags.includes(tag.name)) {
-        setSelectedTags(prev => [...prev, tag.name]);
-        setSearchValue('');
-        setSuggestedTags([]);
-      }
-    },
-    [selectedTags]
-  );
-
+  // 5) Géolocalisation
   const getCurrentLocation = () => {
     if (!navigator.geolocation) {
       alert(t('geoNotSupported'));
       return;
     }
+    console.log({ position });
     if (position.lat && position.lng) {
-      setPosition(prev => ({ ...prev, lat: '', lng: '' }));
+      // si déjà positionné, on réinitialise
+      setPosition({ lat: '', lng: '', address: '' });
       return;
     }
-
     navigator.geolocation.getCurrentPosition(
-      position => {
-        const { latitude, longitude } = position.coords;
-        setPosition(prev => ({ ...prev, lat: latitude.toString(), lng: longitude.toString() }));
+      ({ coords }) => {
+        setPosition({
+          lat: coords.latitude.toString(),
+          lng: coords.longitude.toString(),
+          address: '',
+        });
       },
-      error => {
-        console.error('Erreur de géolocalisation :', error);
-        alert(t('geoError'));
-      }
+      () => alert(t('geoError'))
     );
   };
 
+  // 6) Sélection d’adresse via PlacesAutocomplete
   const handleSelectAddress = async (address: string) => {
     try {
+      console.log({ address }, '1111zezezepappp');
       const results = await geocodeByAddress(address);
-      const latLng = await getLatLng(results[0]);
-
-      setPosition({
-        lat: latLng.lat.toString(),
-        lng: latLng.lng.toString(),
-        address,
-      });
-    } catch (error) {
-      console.error('Error selecting address:', error);
+      console.log({ results }, 'zezezepappp');
+      // const latLng = await getLatLng(results[0]);
+      setPosition(prev => ({ ...prev, address }));
+    } catch {
+      // ignore
     }
+  };
+
+  // 7) Appliquer les filtres et fermer
+  const handleApply = () => {
+    dispatch(setFiltersObject({ status, tagNames: selectedTags, position }));
+
+    // applyFilters(status, selectedTags, position);
+
+    onClose();
+  };
+
+  // 8) Réinitialiser à l’ouverture
+  const handleReset = () => {
+    setStatus('ACTIVE');
+    setSelectedTags([]);
+    setPosition({ lat: '', lng: '', address: '' });
+    setSearchValue('');
+    setSuggestedTags([]);
   };
 
   if (!isOpen) return null;
 
+  // console.log({ filtersObject });
   console.log({ position });
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center md:px-0 px-4">
       <div className="bg-white rounded-3xl w-full max-w-lg p-4 pb-8">
         <div className="w-full flex justify-end items-center mb-1.5">
-          <button
-            onClick={initValues}
-            className="text-gray-500 flex items-center gap-1"
-            title="Reset filters"
-          >
+          <button onClick={handleReset} title={t('reset')} className="text-gray-500">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="24"
@@ -165,8 +134,7 @@ const OrdersFilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onAppl
                 d="M14.4999 4V5.33334L12.3541 5.33325C13.4815 6.32256 14.1725 7.77044 14.1711 9.34803C14.1691 11.7912 12.5074 13.9205 10.138 14.516C7.76858 15.1116 5.29745 14.0211 4.14045 11.8693C3.70989 11.0686 3.50229 10.197 3.50429 9.33331H4.83361C4.83334 9.35331 4.83321 9.37331 4.83323 9.39331C4.86605 11.579 6.64729 13.3336 8.83323 13.3333C10.8355 13.3663 12.5429 11.8898 12.799 9.90369C12.9904 8.41984 12.3261 7.00556 11.1666 6.18656L11.1666 8.66666H9.83323V4H14.4999ZM6.08886 2L6.08889 2.71363C6.41073 2.82755 6.70878 2.99988 6.96808 3.22197L7.58673 2.86478L8.51267 4.46853L7.89442 4.82553C7.9253 4.99304 7.94081 5.16302 7.94073 5.33334C7.94073 5.50678 7.92483 5.6765 7.89442 5.84116L8.51267 6.19813L7.58673 7.80188L6.96808 7.44469C6.70878 7.66678 6.41073 7.83911 6.08889 7.95303V8.66666H4.23701V7.95303C3.91518 7.83912 3.61713 7.6668 3.35783 7.44472L2.73917 7.80188L1.81323 6.19813L2.43148 5.84116C2.4006 5.67365 2.3851 5.50367 2.38517 5.33334C2.38517 5.15991 2.40108 4.99013 2.43148 4.8255L1.81323 4.46853L2.73917 2.86478L3.3578 3.22197C3.6171 2.99988 3.91516 2.82754 4.23701 2.71363V2H6.08886ZM5.16292 4.22222C4.54929 4.22222 4.05183 4.71969 4.05183 5.33334C4.05183 5.947 4.54933 6.44444 5.16295 6.44444C5.77661 6.44444 6.27404 5.94697 6.27404 5.33334C6.27404 4.71969 5.77661 4.22222 5.16295 4.22222"
                 fill="#8C8F94"
               />
-            </svg>
-            <span className="text-xs">{t('reset')}</span>
+            </svg>{' '}
           </button>
         </div>
 
@@ -180,6 +148,7 @@ const OrdersFilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onAppl
               if (e.target.value !== 'ACTIVE') {
                 setPosition({ lat: '', lng: '', address: '' });
               }
+              setSelectedTags([]);
             }}
             className="w-1/2 p-2 border-2 border-[#22C55D] text-[#22C55D] rounded-lg focus:outline-none appearance-none bg-white relative pr-10"
             style={{
@@ -203,6 +172,7 @@ const OrdersFilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onAppl
                 onSelect={address => setPosition(position => ({ ...position, address }))}
                 disabled={position.lat && position.lng ? true : false}
                 inputProps={{
+                  value: position.address,
                   onChange: e => {
                     setPosition(position => ({ ...position, address: e.target.value }));
                   },
@@ -291,7 +261,13 @@ const OrdersFilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose, onAppl
                   <div
                     key={tag._id}
                     className="px-4 py-2.5 hover:bg-gray-50 cursor-pointer flex items-center gap-2 text-sm"
-                    onClick={() => handleSuggestedTagClick(tag)}
+                    onClick={() => {
+                      if (!selectedTags.includes(tag.name)) {
+                        setSelectedTags(prev => [...prev, tag.name]);
+                      }
+                      setSearchValue('');
+                      setSuggestedTags([]);
+                    }}
                   >
                     <svg
                       className="w-4 h-4 text-gray-400"

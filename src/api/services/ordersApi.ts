@@ -13,7 +13,7 @@ export const ordersApi = {
   updateStatus: (id: string, status: string) =>
     api.patch(`${ENDPOINTS.ORDERS.BASE}/${id}/status`, { status }),
 
-  addTagToOrders: (tagNames: string[], orderIds: string[]) =>
+  addTagToOrders: (tagNames: string[], orderIds: string | string[]) =>
     api.post(`${ENDPOINTS.ORDERS.BASE}/tags`, { tagNames, orderIds }),
 
   removeTagFromOrders: (orderId: string, tagName: string) =>

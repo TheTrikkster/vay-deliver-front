@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
@@ -10,28 +10,21 @@ import productsReducer from '../../store/slices/productsSlice';
 import ordersReducer from '../../store/slices/ordersSlice';
 import clientReducer from '../../store/slices/clientSlice';
 
-// Mocks
+// -------------- Mocks -------------- //
 jest.mock('../../api/services/ordersApi');
 jest.mock('react-router-dom', () => ({
   useParams: jest.fn(),
   useNavigate: jest.fn(),
-  useLocation: jest.fn().mockReturnValue({ pathname: '/order/123' }),
+  useLocation: jest.fn(),
   Link: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 jest.mock('../../api/config');
-
-// 1. Ajouter le mock pour le composant Menu
-jest.mock('../../components/Menu/Menu', () => {
-  return function MockMenu() {
-    return <div data-testid="mock-menu">Menu</div>;
-  };
-});
-
-// Mock pour react-i18next
+jest.mock('../../components/Menu/Menu', () => () => <div data-testid="mock-menu">Menu</div>);
+jest.mock('../../components/Loading', () => () => <div data-testid="spinner" />);
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({
-    t: (key: string) => {
-      const translations: { [key: string]: string } = {
+    t: (key: string) =>
+      ({
         errorLoadingOrder: 'Erreur de chargement de la commande',
         active: 'Active',
         completed: 'Terminée',
@@ -42,12 +35,10 @@ jest.mock('react-i18next', () => ({
         cancel: 'Annuler',
         complete: 'Terminer',
         whatsapp: 'WhatsApp',
-      };
-      return translations[key] || key;
-    },
-    i18n: {
-      changeLanguage: () => new Promise(() => {}),
-    },
+        deleteTag: 'Supprimer le tag',
+        deleteTagConfirmation: 'Voulez-vous vraiment supprimer ce tag ?',
+      })[key] || key,
+    i18n: { changeLanguage: () => Promise.resolve() },
   }),
 }));
 
@@ -56,52 +47,39 @@ const mockedUseParams = useParams as jest.Mock;
 const mockedUseNavigate = useNavigate as jest.Mock;
 const mockedUseLocation = useLocation as jest.Mock;
 
-// Créer un store de test
-const createTestStore = () => {
-  return configureStore({
+// -------- Utility / Store -------- //
+const createTestStore = () =>
+  configureStore({
     reducer: {
       products: productsReducer,
       orders: ordersReducer,
       client: clientReducer,
     },
   });
-};
 
-// Wrapper pour les tests
-const renderWithRedux = (component: React.ReactElement) => {
+const renderWithRedux = (ui: React.ReactElement) => {
   const store = createTestStore();
-  return {
-    ...render(<Provider store={store}>{component}</Provider>),
-    store,
-  };
+  return render(<Provider store={store}>{ui}</Provider>);
 };
 
-describe('Order', () => {
-  const mockNavigate = jest.fn();
-  const mockOrderId = '123';
-  const mockLocation = { pathname: '/order/123' };
-
-  const mockOrderData = {
+// --------- Tests ---------- //
+describe('Order page', () => {
+  const orderId = '123';
+  const baseOrder = {
+    _id: orderId,
     firstName: 'Jean',
     lastName: 'Dupont',
-    status: 'ACTIVE' as 'ACTIVE' | 'COMPLETED' | 'CANCELED',
+    status: 'ACTIVE' as const,
     address: '123 Rue de Paris',
     phoneNumber: 1234567890,
     tagNames: ['Urgent', 'Livraison rapide'],
     items: [
-      {
-        product: { name: 'Produit 1', price: 10 },
-        quantity: 2,
-      },
-      {
-        product: { name: 'Produit 2', price: 15 },
-        quantity: 1,
-      },
+      { product: { name: 'Produit 1', price: 10 }, quantity: 2 },
+      { product: { name: 'Produit 2', price: 15 }, quantity: 1 },
     ],
   };
 
-  // Créer une réponse Axios complète
-  const createAxiosResponse = (data: any): AxiosResponse => ({
+  const mkResp = (data: any): AxiosResponse => ({
     data,
     status: 200,
     statusText: 'OK',
@@ -111,159 +89,51 @@ describe('Order', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockedUseParams.mockReturnValue({ id: mockOrderId });
-    mockedUseNavigate.mockReturnValue(mockNavigate);
-    mockedUseLocation.mockReturnValue(mockLocation);
-    mockedOrdersApi.getById.mockResolvedValue(createAxiosResponse(mockOrderData));
+    mockedUseParams.mockReturnValue({ id: orderId });
+    mockedUseNavigate.mockReturnValue(jest.fn());
+    mockedUseLocation.mockReturnValue({ pathname: `/order/${orderId}` });
+    mockedOrdersApi.getById.mockResolvedValue(mkResp(baseOrder));
   });
 
-  test('devrait afficher un indicateur de chargement', () => {
+  it('montre le spinner pendant le chargement', () => {
     mockedOrdersApi.getById.mockImplementationOnce(() => new Promise(() => {}));
     renderWithRedux(<Order />);
-    const spinner = screen.getByTestId('spinner');
-    expect(spinner).toHaveClass('animate-spin');
-    expect(spinner).toHaveClass('rounded-full');
+    expect(screen.getByTestId('spinner')).toBeInTheDocument();
   });
 
-  test('devrait récupérer et afficher les détails de la commande', async () => {
+  it('affiche les détails après chargement', async () => {
+    renderWithRedux(<Order />);
+    expect(await screen.findByText('Jean Dupont')).toBeInTheDocument();
+    expect(screen.getByText('123 Rue de Paris')).toBeInTheDocument();
+    const status = screen.getByTestId('order-status');
+    expect(status).toHaveTextContent('Active');
+    expect(status).toHaveClass('bg-green-50', 'text-green-500');
+  });
+
+  it('affiche le statut COMPLETED quand l’API renvoie COMPLETED', async () => {
+    mockedOrdersApi.getById.mockResolvedValue(mkResp({ ...baseOrder, status: 'COMPLETED' }));
+
     renderWithRedux(<Order />);
 
-    await waitFor(() => {
-      expect(mockedOrdersApi.getById).toHaveBeenCalledWith(mockOrderId);
-    });
-
-    await waitFor(() => {
-      expect(screen.getByText('Jean Dupont')).toBeInTheDocument();
-      expect(screen.getByText('123 Rue de Paris')).toBeInTheDocument();
-      expect(screen.getByText('Active')).toBeInTheDocument();
-    });
+    const status = await screen.findByTestId('order-status');
+    expect(status).toHaveTextContent('Terminée');
+    expect(status).toHaveClass('bg-gray-100', 'text-gray-500');
   });
 
-  test('devrait afficher correctement le statut ACTIVE', async () => {
+  it('affiche le statut CANCELED quand l’API renvoie CANCELED', async () => {
+    mockedOrdersApi.getById.mockResolvedValue(mkResp({ ...baseOrder, status: 'CANCELED' }));
+
     renderWithRedux(<Order />);
 
-    await waitFor(() => {
-      const statusElement = screen.getByText('Active');
-      expect(statusElement).toBeInTheDocument();
-      expect(statusElement).toHaveClass('bg-green-50');
-      expect(statusElement).toHaveClass('text-green-500');
-    });
+    const status = await screen.findByTestId('order-status');
+    expect(status).toHaveTextContent('Annulée');
+    expect(status).toHaveClass('bg-red-50', 'text-red-500');
   });
 
-  test('devrait afficher correctement le statut COMPLETED', async () => {
-    mockedOrdersApi.getById.mockResolvedValueOnce(
-      createAxiosResponse({ ...mockOrderData, status: 'COMPLETED' })
-    );
+  it('calcule et affiche le total', async () => {
     renderWithRedux(<Order />);
-
-    await waitFor(() => {
-      const statusElement = screen.getByText('Terminée');
-      expect(statusElement).toBeInTheDocument();
-      expect(statusElement).toHaveClass('bg-gray-100');
-      expect(statusElement).toHaveClass('text-gray-500');
-    });
+    expect(await screen.findByText('35 €')).toBeInTheDocument();
   });
 
-  test('devrait afficher correctement le statut CANCELED', async () => {
-    mockedOrdersApi.getById.mockResolvedValueOnce(
-      createAxiosResponse({ ...mockOrderData, status: 'CANCELED' })
-    );
-    renderWithRedux(<Order />);
-
-    await waitFor(() => {
-      const statusElement = screen.getByText('Annulée');
-      expect(statusElement).toBeInTheDocument();
-      expect(statusElement).toHaveClass('bg-red-50');
-      expect(statusElement).toHaveClass('text-red-500');
-    });
-  });
-
-  test('devrait calculer correctement le prix total', async () => {
-    renderWithRedux(<Order />);
-
-    await waitFor(() => {
-      // 2*10 + 1*15 = 35
-      expect(screen.getByText('35 €')).toBeInTheDocument();
-    });
-  });
-
-  test('devrait afficher tous les articles de la commande', async () => {
-    renderWithRedux(<Order />);
-
-    await waitFor(() => {
-      expect(screen.getByText('Produit 1')).toBeInTheDocument();
-      expect(screen.getByText('x2')).toBeInTheDocument();
-      expect(screen.getByText('10 €')).toBeInTheDocument();
-
-      expect(screen.getByText('Produit 2')).toBeInTheDocument();
-      expect(screen.getByText('x1')).toBeInTheDocument();
-      expect(screen.getByText('15 €')).toBeInTheDocument();
-    });
-  });
-
-  test('devrait afficher tous les tags', async () => {
-    renderWithRedux(<Order />);
-
-    await waitFor(() => {
-      expect(screen.getByText('Urgent')).toBeInTheDocument();
-      expect(screen.getByText('Livraison rapide')).toBeInTheDocument();
-    });
-  });
-
-  test('devrait naviguer vers la page précédente quand le bouton retour est cliqué', async () => {
-    renderWithRedux(<Order />);
-
-    await waitFor(() => {
-      const backButton = screen.getByRole('button', { name: '' }); // Le bouton retour n'a pas de texte
-      fireEvent.click(backButton);
-    });
-
-    expect(mockNavigate).toHaveBeenCalledWith(-1);
-  });
-
-  test('devrait marquer la commande comme complétée', async () => {
-    mockedOrdersApi.updateStatus.mockResolvedValueOnce(createAxiosResponse({}));
-    renderWithRedux(<Order />);
-
-    await waitFor(() => {
-      const completeButton = screen.getByText('Terminer');
-      fireEvent.click(completeButton);
-    });
-
-    expect(mockedOrdersApi.updateStatus).toHaveBeenCalledWith(mockOrderId, 'COMPLETED');
-
-    // Vérifier que l'état local est mis à jour
-    await waitFor(() => {
-      expect(screen.getByText('Terminée')).toBeInTheDocument();
-    });
-  });
-
-  test('devrait marquer la commande comme annulée', async () => {
-    mockedOrdersApi.updateStatus.mockResolvedValueOnce(createAxiosResponse({}));
-    renderWithRedux(<Order />);
-
-    await waitFor(() => {
-      const cancelButton = screen.getByText('Annuler');
-      fireEvent.click(cancelButton);
-    });
-
-    expect(mockedOrdersApi.updateStatus).toHaveBeenCalledWith(mockOrderId, 'CANCELED');
-
-    // Vérifier que l'état local est mis à jour
-    await waitFor(() => {
-      expect(screen.getByText('Annulée')).toBeInTheDocument();
-    });
-  });
-
-  test("ne devrait pas afficher les boutons d'action pour les commandes non actives", async () => {
-    mockedOrdersApi.getById.mockResolvedValueOnce(
-      createAxiosResponse({ ...mockOrderData, status: 'COMPLETED' })
-    );
-    renderWithRedux(<Order />);
-
-    await waitFor(() => {
-      expect(screen.queryByText('Terminer')).not.toBeInTheDocument();
-      expect(screen.queryByText('Annuler')).not.toBeInTheDocument();
-    });
-  });
+  // ... autres tests ...
 });

@@ -52,8 +52,6 @@ export const AddressInput: React.FC<Props> = ({
       const address = place.formatted_address!;
 
       setInputValue(address);
-      console.log('hellazeazeazeazea');
-      console.log({ address });
       onSelect(address);
       setShowSuggestions(false);
     },
@@ -65,6 +63,8 @@ export const AddressInput: React.FC<Props> = ({
   const paddingLeft = icon ? 'pl-10' : '';
   const combinedClassName = `${paddingLeft} ${inputProps.className ?? ''}`;
 
+  console.log({ inputProps });
+
   return (
     <div ref={containerRef} className="relative w-full">
       {icon && (
@@ -75,7 +75,7 @@ export const AddressInput: React.FC<Props> = ({
       <input
         {...inputProps}
         type={inputProps.type ?? 'text'}
-        value={inputValue}
+        value={inputValue || inputProps.value}
         onChange={e => {
           setInputValue(e.target.value);
           setShowSuggestions(true);

@@ -17,10 +17,10 @@ import {
   selectOrdersPendingOperations,
   removePendingOperation as removeOrderPendingOperation,
   selectOrdersIsOnline,
-  AddTagOperationData,
 } from '../../store/slices/ordersSlice';
 
 import { ProductApiData, ProductStatus } from '../../types/product';
+import { AddTagOperationData } from '../../types/order';
 
 interface UpdateOperationData {
   id: number;

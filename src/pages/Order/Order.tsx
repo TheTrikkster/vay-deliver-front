@@ -7,6 +7,7 @@ import Menu from '../../components/Menu/Menu';
 import { useTranslation } from 'react-i18next';
 import AddTagModal from '../../components/AddTagModal/AddTagModal';
 import ConfirmModal from '../../components/ConfirmModal';
+import { useOrders } from '../../hooks/useOrdersInventory';
 
 interface OrderProps {
   _id: string;
@@ -36,6 +37,7 @@ const Order: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
   const [tagToDelete, setTagToDelete] = useState<{ orderId: string; tagName: string } | null>(null);
+  const { addTag } = useOrders({ limit: 30 });
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -114,14 +116,17 @@ const Order: React.FC = () => {
     }
   };
 
-  const handleTagSuccess = async () => {
-    try {
+  const handleTagSuccess = useCallback(
+    async (tagName: string) => {
+      console.log('handleAddTag', tagName);
+      await addTag(tagName, [orderDetails!._id]);
       const response = await ordersApi.getById(id!);
       setOrderDetails(response.data);
-    } catch (error) {
-      console.error('Erreur lors de la mise à jour:', error);
-    }
-  };
+      console.log('response', response.data);
+      setIsAddTagModalOpen(false);
+    },
+    [addTag, orderDetails?._id]
+  );
 
   const handleDeleteTagClick = (orderId: string, tagName: string) => {
     setTagToDelete({ orderId, tagName });
@@ -163,6 +168,7 @@ const Order: React.FC = () => {
           <div className="flex flex-col mb-5 gap-5">
             <div className="flex justify-end">
               <span
+                data-testid="order-status"
                 className={`px-3 py-1.5 rounded text-sm ${
                   orderDetails.status === 'ACTIVE'
                     ? 'bg-green-50 text-green-500'
@@ -328,7 +334,7 @@ const Order: React.FC = () => {
         isOpen={isAddTagModalOpen}
         onClose={() => setIsAddTagModalOpen(false)}
         orderId={orderDetails._id}
-        onSuccess={handleTagSuccess}
+        onConfirm={handleTagSuccess}
       />
       <ConfirmModal
         isOpen={isConfirmModalOpen}
