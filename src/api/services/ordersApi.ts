@@ -4,7 +4,9 @@ import { ENDPOINTS } from '../endpoints';
 
 export const ordersApi = {
   getAll: (page = 1, filters?: string, limit = 1) =>
-    api.get(`${ENDPOINTS.ORDERS.BASE}?page=${page}&limit=${limit}${filters ? `&${filters}` : ''}`),
+    api.post(
+      `${ENDPOINTS.ORDERS.BASE}/search?page=${page}&limit=${limit}${filters ? `&${filters}` : ''}`
+    ),
 
   getById: (id: string) => api.get(`${ENDPOINTS.ORDERS.BASE}/${id}`),
 
