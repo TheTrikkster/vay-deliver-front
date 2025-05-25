@@ -3,10 +3,11 @@ import api from '../config';
 import { ENDPOINTS } from '../endpoints';
 
 export const ordersApi = {
-  getAll: (page = 1, filters?: string, limit = 1) =>
-    api.post(
-      `${ENDPOINTS.ORDERS.BASE}/search?page=${page}&limit=${limit}${filters ? `&${filters}` : ''}`
-    ),
+  getAll: (page = 1, filters?: string, limit = 1, distanceMatrix?: any) => {
+    const url = `${ENDPOINTS.ORDERS.BASE}/search?page=${page}&limit=${limit}${filters ? `&${filters}` : ''}`;
+    const data = distanceMatrix ? { distanceMatrix } : {};
+    return api.post(url, data);
+  },
 
   getById: (id: string) => api.get(`${ENDPOINTS.ORDERS.BASE}/${id}`),
 

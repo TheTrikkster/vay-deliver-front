@@ -25,6 +25,7 @@ interface OrdersState {
   filtersObject: { status: OrderStatus | ''; tagNames: string[]; position: Position };
   isOnline: boolean;
   pendingOperations: OrderPendingOperation[];
+  distanceMatrix: any;
 }
 
 const initialState: OrdersState = {
@@ -43,17 +44,19 @@ const initialState: OrdersState = {
   filtersObject: { status: 'ACTIVE', tagNames: [], position: { lat: '', lng: '', address: '' } },
   isOnline: navigator.onLine,
   pendingOperations: [],
+  distanceMatrix: null,
 };
 
 export const fetchOrders = createAsyncThunk(
   'orders/fetchOrders',
   async (
     { page, filters, limit = 30 }: { page: number; filters?: string; limit?: number },
-    { rejectWithValue }
+    { rejectWithValue, getState }
   ) => {
-    console.log('fetchOrders', page, limit);
+    const state = getState() as { orders: OrdersState };
+    const distanceMatrix = state.orders.distanceMatrix;
     try {
-      const response = await ordersApi.getAll(page, filters, limit);
+      const response = await ordersApi.getAll(page, filters, limit, distanceMatrix);
       return response.data;
     } catch (err) {
       return rejectWithValue('fetchOrdersError');
@@ -168,6 +171,7 @@ export const ordersSlice = createSlice({
         state.orders = payload.orders;
         state.totalPages = payload.totalPages;
         state.loading = false;
+        state.distanceMatrix = payload.distanceMatrix || null;
       })
       .addCase(fetchOrders.rejected, (state, { payload, error }) => {
         state.loading = false;
@@ -228,5 +232,6 @@ export const selectOrdersIsOnline = (s: RootState) => s.orders.isOnline;
 export const selectOrdersPendingOperations = (s: RootState) => s.orders.pendingOperations;
 export const selectSelectedOrderIds = (s: RootState) => s.orders.selectedOrderIds;
 export const selectIsSelectionMode = (s: RootState) => s.orders.isSelectionMode;
+export const selectDistanceMatrix = (s: RootState) => s.orders.distanceMatrix;
 
 export default ordersSlice.reducer;

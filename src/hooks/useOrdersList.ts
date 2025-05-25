@@ -11,6 +11,7 @@ import {
   selectTotalPages,
   selectCurrentFilters,
   selectFiltersObject,
+  selectDistanceMatrix,
 } from '../store/slices/ordersSlice';
 import { OrderStatus, Position } from '../types/order';
 import { useAppDispatch } from '../store/hooks';
@@ -27,6 +28,7 @@ export function useOrdersList({ limit = 30 } = {}) {
   const totalPages = useSelector(selectTotalPages);
   const currentFilters = useSelector(selectCurrentFilters);
   const filtersObject = useSelector(selectFiltersObject);
+  const distanceMatrix = useSelector(selectDistanceMatrix);
 
   useEffect(() => {
     if (isOnline) {
@@ -42,6 +44,7 @@ export function useOrdersList({ limit = 30 } = {}) {
     totalPages,
     currentFilters,
     filtersObject,
+    distanceMatrix,
     setPage: (page: number) => dispatch(setCurrentPage(page)),
     applyFilters: (status: OrderStatus | '', tagNames: string[], position: Position) =>
       dispatch(setFiltersObject({ status, tagNames, position })),
