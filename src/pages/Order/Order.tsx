@@ -7,7 +7,7 @@ import Menu from '../../components/Menu/Menu';
 import { useTranslation } from 'react-i18next';
 import AddTagModal from '../../components/AddTagModal/AddTagModal';
 import ConfirmModal from '../../components/ConfirmModal';
-import { useOrders } from '../../hooks/useOrdersInventory';
+import { useOrderTags } from '../../hooks/useOrderTags';
 
 interface OrderProps {
   _id: string;
@@ -37,7 +37,7 @@ const Order: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
   const [tagToDelete, setTagToDelete] = useState<{ orderId: string; tagName: string } | null>(null);
-  const { addTag } = useOrders({ limit: 30 });
+  const { addTag } = useOrderTags();
 
   useEffect(() => {
     const fetchOrder = async () => {
