@@ -1,7 +1,7 @@
 import React, { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ClientCardProps } from '../../types/client';
-import { fromCents, toCents } from '../../utils/orderCalcul';
+import { sumCurrency } from '../../utils/sumCurrency';
 
 const ClientCard: React.FC<ClientCardProps> = memo(({ product, quantity, cartActions }) => {
   const { t } = useTranslation('clientCard');
@@ -27,7 +27,7 @@ const ClientCard: React.FC<ClientCardProps> = memo(({ product, quantity, cartAct
         <div className="flex items-center">
           <span className="text-sm text-gray-600 font-semibold">{t('price')}</span>
           <span className="ml-1 text-sm text-[#4F46E5] font-semibold">
-            {fromCents(toCents(price))}/{unitExpression}
+            {sumCurrency({ value: price })}
           </span>
         </div>
       </div>

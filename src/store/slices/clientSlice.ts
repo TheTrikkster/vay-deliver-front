@@ -57,6 +57,14 @@ const clientOrderSlice = createSlice({
       state.products = [];
     },
 
+    setItems: (state, action: PayloadAction<Record<string, number>>) => {
+      state.items = action.payload;
+    },
+
+    setProducts: (state, action: PayloadAction<ProductType[]>) => {
+      state.products = action.payload;
+    },
+
     setSiteStatus: (state, action: PayloadAction<string>) => {
       state.siteStatus = action.payload;
     },
@@ -79,6 +87,8 @@ export const {
   clearClientOrder,
   setSiteStatus,
   setOfflineMessage,
+  setItems,
+  setProducts,
 } = clientOrderSlice.actions;
 
 export const selectClientState = (state: RootState) => state.client;

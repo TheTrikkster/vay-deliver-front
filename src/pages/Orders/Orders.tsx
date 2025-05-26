@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-
 import Menu from '../../components/Menu/Menu';
 import Loading from '../../components/Loading';
 import Pagination from '../../components/PaginationComp/PaginationComp';

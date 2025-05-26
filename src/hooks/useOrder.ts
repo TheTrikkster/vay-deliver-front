@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ordersApi } from '../api/services/ordersApi';
 import { Order, OrderStatus } from '../types/order';
+import { sumCurrency } from '../utils/sumCurrency';
 
 type ActionType = 'COMPLETE' | 'CANCEL' | 'DELETE';
 
@@ -53,9 +54,11 @@ export const useOrder = ({ id }: UseOrderProps) => {
   const calculateTotal = () => {
     if (!orderDetails?.items) return 0;
 
-    return orderDetails.items.reduce((total, item) => {
+    const totalNum = orderDetails.items.reduce((total, item) => {
       return total + item.product.price * item.quantity;
     }, 0);
+
+    return sumCurrency({ value: totalNum });
   };
 
   const handleUpdateStatus = async (status: OrderStatus) => {

@@ -83,6 +83,7 @@ describe('ProductForm', () => {
       unitExpression: 'Kg',
       availableQuantity: 100,
       minOrder: '10',
+      maxOrder: '20',
       price: 15,
     };
 
@@ -152,6 +153,7 @@ describe('ProductForm', () => {
       unitExpression: 'шт',
       availableQuantity: 50,
       minOrder: '5',
+      maxOrder: '',
       price: 25,
     });
   });

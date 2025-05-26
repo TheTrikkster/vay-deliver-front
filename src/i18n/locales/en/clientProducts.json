@@ -1,3 +1,4 @@
 {
-  "errorLoading": "Unable to load products"
+  "errorLoading": "Unable to load products",
+  "noProducts": "No products available"
 }

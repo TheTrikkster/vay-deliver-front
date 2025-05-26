@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { ReactNode } from 'react';
 
 interface OrderItem {
   product: {
@@ -10,7 +11,7 @@ interface OrderItem {
 
 interface OrderItemsProps {
   items: OrderItem[];
-  total: number;
+  total: ReactNode;
 }
 
 const OrderItems = ({ items, total }: OrderItemsProps) => {
@@ -30,7 +31,7 @@ const OrderItems = ({ items, total }: OrderItemsProps) => {
       </div>
       <div className="flex justify-between mt-5 py-3 border-y border-dashed border-gray-300">
         <span className="text-lg font-semibold">{t('total')}</span>
-        <span className="text-lg font-semibold">{total} €</span>
+        <span className="text-lg font-semibold">{total}</span>
       </div>
     </div>
   );

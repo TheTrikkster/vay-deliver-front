@@ -12,12 +12,13 @@ import {
   removeFromClientOrder,
   selectClientItems,
 } from '../../store/slices/clientSlice';
-import { toCents, fromCents, calculatePrice } from '../../utils/orderCalcul';
+import { calculatePrice } from '../../utils/orderCalcul';
 import Loading from '../../components/Loading';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../../components/LanguageSwitcher';
 import { settingsApi } from '../../api/services/settingsApi';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { sumCurrency } from '../../utils/sumCurrency';
 
 function ClientProducts() {
   const { t } = useTranslation('clientProducts');
@@ -38,9 +39,20 @@ function ClientProducts() {
       setIsLoading(true);
       try {
         const response = await productsApi.getClientProducts(currentPage);
-        setTotalPages(response.data.totalPages);
-        setProducts(response.data.products || []);
-        setError(null);
+
+        console.log('/////////////////////////////////////////');
+        console.log(response.data, 'israil');
+
+        if (response.data.siteStatus === 'OFFLINE') {
+          console.log(response.data, 'israil AAAAAAAAA');
+          setSiteStatus('OFFLINE');
+          setOfflineMessage(response.data.offlineMessage);
+          dispatch(clearClientOrder());
+        } else {
+          setTotalPages(response.data.totalPages);
+          setProducts(response.data.products || []);
+          setError(null);
+        }
       } catch (error) {
         console.log('Error fetching products:', error);
         setError(t('errorLoading'));
@@ -49,18 +61,7 @@ function ClientProducts() {
       }
     };
 
-    const handleConnection = async () => {
-      const settings = await settingsApi.getSettings();
-      if (settings.data.siteStatus === 'ONLINE') {
-        fetchProducts();
-      } else {
-        setSiteStatus('OFFLINE');
-        setOfflineMessage(settings.data.offlineMessage);
-        dispatch(clearClientOrder());
-      }
-    };
-
-    handleConnection();
+    fetchProducts();
   }, [currentPage]);
 
   const cartActions = useMemo(
@@ -69,16 +70,24 @@ function ClientProducts() {
         const product = products.find(p => p._id === _id);
         if (!product) return;
 
-        const currentQuantity = cart[_id] || 0;
-        const addQuantity = currentQuantity === 0 ? product.minOrder : 1;
+        console.log('///AZEAZEZAEAZ');
+        console.log({ product });
 
-        dispatch(
-          addToClientOrder({
-            productId: _id,
-            quantity: addQuantity,
-            product,
-          })
-        );
+        const currentQuantity = cart[_id] || 0;
+        const addQuantity =
+          currentQuantity === 0
+            ? Math.min(product.minOrder, product.maxOrder)
+            : Math.min(1, product.maxOrder - currentQuantity);
+
+        if (currentQuantity < product.maxOrder) {
+          dispatch(
+            addToClientOrder({
+              productId: _id,
+              quantity: addQuantity,
+              product,
+            })
+          );
+        }
       },
 
       onRemove: (_id: string) => {
@@ -101,6 +110,8 @@ function ClientProducts() {
     const quantity = cart[product._id] || 0;
     return sum + calculatePrice(product.price, quantity);
   }, 0);
+
+  // console.log({ products });
 
   const handleCheckout = () => {
     // dispatch(checkoutClientOrder());
@@ -148,24 +159,28 @@ function ClientProducts() {
               strokeLinejoin="round"
             />
           </svg>{' '}
-          <span className="font-medium">{fromCents(toCents(total))}</span>
+          <span className="font-medium">{sumCurrency({ value: total })}</span>
         </button>
       </header>
 
-      <section className="p-4">
-        <ul className="flex flex-col justify-center items-center gap-4 pb-5">
-          {(Array.isArray(products) ? products : []).map(product => (
-            <li key={product._id} className="min-w-[343px] w-11/12 md:w-2/4">
-              <ClientCard
-                product={product}
-                quantity={cart[product._id] || 0}
-                cartActions={cartActions}
-                data-testid={`product-${product._id}`}
-              />
-            </li>
-          ))}
-        </ul>
-      </section>
+      {products.length === 0 ? (
+        <div className="text-center py-8 text-gray-500">{t('noProducts')}</div>
+      ) : (
+        <section className="p-4">
+          <ul className="flex flex-col justify-center items-center gap-4 pb-5">
+            {(Array.isArray(products) ? products : []).map(product => (
+              <li key={product._id} className="min-w-[343px] w-11/12 md:w-2/4">
+                <ClientCard
+                  product={product}
+                  quantity={cart[product._id] || 0}
+                  cartActions={cartActions}
+                  data-testid={`product-${product._id}`}
+                />
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {Array.isArray(products) && products.length > 0 && (
         <Pagination

@@ -144,7 +144,6 @@ export const ordersSlice = createSlice({
       state.pendingOperations.splice(payload, 1);
     },
     clearSelection: state => {
-      state.isSelectionMode = false;
       state.selectedOrderIds = [];
     },
     toggleSelectionMode: (state, { payload }: PayloadAction<boolean>) => {

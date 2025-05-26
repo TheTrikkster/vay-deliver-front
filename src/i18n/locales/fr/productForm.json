@@ -6,6 +6,7 @@
   "unitMeasure": "Unité de mesure (Pièce, Gramme, Kg) *",
   "availableQuantity": "Quantité disponible en chiffres *",
   "minOrderVolume": "Volume minimum de commande en chiffres *",
+  "maxOrderVolume": "Volume maximum de commande en chiffres",
   "price": "Prix : 18 *",
   "requiredFields": "Les champs marqués d'un * sont obligatoires.",
   "cancel": "Annuler",

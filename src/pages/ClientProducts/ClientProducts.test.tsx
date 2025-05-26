@@ -152,6 +152,32 @@ describe('ClientProducts Component', () => {
   });
 
   it('devrait ajouter un produit au panier', async () => {
+    // Mock du store avec un état initial vide
+    store = mockStore({
+      client: {
+        items: {},
+        products: [],
+      },
+    });
+
+    // Mock du produit avec maxOrder
+    (productsApi.getClientProducts as jest.Mock).mockResolvedValue({
+      data: {
+        products: [
+          {
+            _id: '1',
+            name: 'Test Product',
+            price: 1000,
+            minOrder: 1,
+            maxOrder: 10,
+            description: 'Description du produit test',
+            unitExpression: 'шт',
+          },
+        ],
+        totalPages: 1,
+      },
+    });
+
     render(
       <Provider store={store}>
         <BrowserRouter>
@@ -165,13 +191,25 @@ describe('ClientProducts Component', () => {
       expect(screen.getByText('Test Product')).toBeInTheDocument();
     });
 
-    // Trouver le bouton par son texte (maintenant traduit)
-    const addButton = screen.getByText('Ajouter');
+    // Trouver le bouton d'ajout par son aria-label
+    const addButton = screen.getByLabelText('Ajouter Test Product au panier');
     fireEvent.click(addButton);
 
-    // Vérifier que l'action a été dispatché au store
-    const actions = store.getActions();
-    expect(actions[0].type).toBe('clientOrder/addToClientOrder');
+    // Vérifier que l'action a été dispatchée
+    await waitFor(() => {
+      const actions = store.getActions();
+      expect(actions).toHaveLength(1);
+      expect(actions[0]).toEqual(
+        expect.objectContaining({
+          type: 'clientOrder/addToClientOrder',
+          payload: expect.objectContaining({
+            productId: '1',
+            quantity: 1,
+            product: expect.any(Object),
+          }),
+        })
+      );
+    });
   });
 
   it('devrait activer le bouton Commander quand le panier contient des articles', async () => {

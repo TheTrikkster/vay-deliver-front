@@ -17,6 +17,7 @@ export interface Product extends BaseProduct {
   unitExpression: string;
   availableQuantity: number;
   minOrder: string;
+  maxOrder?: string;
   price: number;
 }
 

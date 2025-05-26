@@ -19,6 +19,7 @@ type ProductType = {
   unitExpression: string;
   availableQuantity: string;
   minOrder: string;
+  maxOrder: string;
   price: string;
 };
 
@@ -29,6 +30,7 @@ function ProductForm({ initialValues, onSubmit, isEditing, isLoading = false }: 
     name: '',
     availableQuantity: '',
     minOrder: '',
+    maxOrder: '',
     price: '',
     unitExpression: '',
     description: '',
@@ -40,6 +42,7 @@ function ProductForm({ initialValues, onSubmit, isEditing, isLoading = false }: 
         name: initialValues.name || '',
         availableQuantity: initialValues.availableQuantity?.toString() || '',
         minOrder: initialValues.minOrder || '',
+        maxOrder: initialValues.maxOrder || '',
         price: initialValues.price?.toString() || '',
         unitExpression: initialValues.unitExpression || '',
         description: initialValues.description || '',
@@ -139,6 +142,15 @@ function ProductForm({ initialValues, onSubmit, isEditing, isLoading = false }: 
               className="w-full p-3 border border-[#9DA0A5] rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent placeholder-gray-400 focus:placeholder-transparent transition-all"
               placeholder={t('minOrderVolume')}
               required
+            />
+
+            <input
+              type="number"
+              name="maxOrder"
+              value={product.maxOrder}
+              onChange={handleChange}
+              className="w-full p-3 border border-[#9DA0A5] rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent placeholder-gray-400 focus:placeholder-transparent transition-all"
+              placeholder={t('maxOrderVolume')}
             />
 
             <input

@@ -1,15 +1,17 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store/userStore';
 import { useNavigate } from 'react-router-dom';
-import { clearClientOrder } from '../../store/slices/clientSlice';
-import { toCents, fromCents } from '../../utils/orderCalcul';
+import { clearClientOrder, setItems, setProducts } from '../../store/slices/clientSlice';
+import { toCents, mergeAndClean } from '../../utils/orderCalcul';
 import { ordersApi } from '../../api/services/ordersApi';
 import { useTranslation } from 'react-i18next';
-import PlacesAutocomplete, { geocodeByAddress, getLatLng } from 'react-places-autocomplete';
 import { AddressInput } from '../../components/AddressInput';
+import { PhoneNumberInput } from '../../components/PhoneNumberInput';
+import Loading from '../../components/Loading';
+import InsufficientQuantityModal from '../../components/InsufficientQuantityModal';
+import { sumCurrency } from '../../utils/sumCurrency';
 
-// Typage des données de formulaire
 interface FormData {
   firstName: string;
   lastName: string;
@@ -44,6 +46,10 @@ function ClientOrder() {
     !formData[FORM_FIELDS.ADDRESS];
   const [waitForResponse, setWaitForResponse] = useState(false);
   const [requestError, setRequestError] = useState<string>('');
+  const [isPhoneValid, setIsPhoneValid] = useState<boolean>(false);
+  const [phoneTouched, setPhoneTouched] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [insufficientQuantity, setInsufficientQuantity] = useState<any[]>([]);
 
   const total = useMemo(
     () =>
@@ -54,103 +60,96 @@ function ClientOrder() {
     [products, items]
   );
 
-  // Fonction générique pour gérer les changements dans les inputs
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value,
-    }));
-
-    // Effacer l'erreur quand l'utilisateur commence à corriger
+    setFormData(prev => ({ ...prev, [name]: value }));
     if (errors[name as keyof FormData]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: undefined,
-      }));
+      setErrors(prev => ({ ...prev, [name]: undefined }));
     }
   };
 
-  // Validation du formulaire
   const validateForm = (): boolean => {
     const newErrors: Partial<FormData> = {};
-
     if (!formData[FORM_FIELDS.FIRST_NAME].trim()) {
       newErrors[FORM_FIELDS.FIRST_NAME] = t('requiredField');
     }
-
-    if (!formData[FORM_FIELDS.PHONE_NUMBER].trim()) {
+    if (!formData[FORM_FIELDS.PHONE_NUMBER]) {
       newErrors[FORM_FIELDS.PHONE_NUMBER] = t('requiredField');
-    } else if (!/^\+?[0-9]{10,12}$/.test(formData[FORM_FIELDS.PHONE_NUMBER].trim())) {
+    } else if (!/^[+]?\d{10,12}$/.test(formData[FORM_FIELDS.PHONE_NUMBER].trim())) {
+      newErrors[FORM_FIELDS.PHONE_NUMBER] = t('invalidPhoneFormat');
+    } else if (!isPhoneValid) {
       newErrors[FORM_FIELDS.PHONE_NUMBER] = t('invalidPhoneFormat');
     }
-
     if (!formData[FORM_FIELDS.ADDRESS].trim()) {
       newErrors[FORM_FIELDS.ADDRESS] = t('requiredField');
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // Fonction pour gérer la sélection d'adresse
-  const handleSelectAddress = async (address: string) => {
-    try {
-      const results = await geocodeByAddress(address);
-      const latLng = await getLatLng(results[0]);
-
-      setFormData(prev => ({
-        ...prev,
-        address,
+  const submitOrder = useCallback(
+    async (payloadItems?: Record<string, number>) => {
+      setLoading(true);
+      const finalItems = payloadItems ?? items;
+      const orderItems = products.map(p => ({
+        productId: p._id,
+        quantity: finalItems[p._id] || 0,
       }));
+      const orderPayload = { ...formData, items: orderItems };
 
-      // Effacer l'erreur
-      if (errors[FORM_FIELDS.ADDRESS]) {
-        setErrors(prev => ({
-          ...prev,
-          [FORM_FIELDS.ADDRESS]: undefined,
-        }));
-      }
-    } catch (error) {
-      console.error('Error selecting address:', error);
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setWaitForResponse(true);
-
-    if (validateForm()) {
       try {
-        const orderItems = products.map(product => ({
-          productId: product._id,
-          quantity: items[product._id],
-        }));
-
-        const orderData = {
-          ...formData,
-          items: orderItems,
-        };
-
-        await ordersApi.createOrder(orderData);
-
+        await ordersApi.createOrder(orderPayload);
         dispatch(clearClientOrder());
         navigate('/completed-order');
-      } catch (error: unknown) {
+      } catch (error: any) {
         setRequestError(t('requestError'));
-        if (error instanceof Error) {
-          console.error('Erreur détaillée:', (error as any).response?.data);
+        const errs = error.response?.data.errors || [];
+        if (errs.length > 0 && errs[0].type === 'INSUFFICIENT_QUANTITY') {
+          setInsufficientQuantity(errs);
+        } else if (errs.length > 0 && errs[0].type === 'GEOCODING_ERROR') {
+          setErrors({ address: t('invalidAddress') });
+        } else {
+          console.error('Erreur détaillée:', error.response?.data);
         }
       } finally {
         setWaitForResponse(false);
+        setLoading(false);
       }
+    },
+    [items, products, formData, dispatch, navigate]
+  );
+
+  // -- Updated handleSubmit now delegates to submitOrder --
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setWaitForResponse(true);
+
+    if (!validateForm()) {
+      setWaitForResponse(false);
+      return;
     }
+
+    // no dispatch here: data is already in Redux
+    await submitOrder();
   };
+
+  // -- Updated confirmChangeQuantity calls submitOrder with merged data --
+  const confirmChangeQuantity = useCallback(async () => {
+    const merged = mergeAndClean(items, insufficientQuantity);
+    dispatch(setItems(merged));
+    dispatch(setProducts(products.filter(p => merged[p._id] > 0)));
+    setInsufficientQuantity([]);
+
+    // immediately re-submit with updated quantities
+    await submitOrder(merged);
+  }, [insufficientQuantity, items, products, dispatch, submitOrder]);
 
   const handleCancel = () => {
     dispatch(clearClientOrder());
     navigate('/');
   };
+
+  if (loading) return <Loading />;
 
   return (
     <div className="min-h-screen md:bg-[#F5F7FA]">
@@ -210,7 +209,7 @@ function ClientOrder() {
                           x {items[item._id]} {item.unitExpression}
                         </td>
                         <td className="py-3 text-right whitespace-nowrap">
-                          {fromCents(toCents(items[item._id] * item.price))}
+                          {sumCurrency({ value: items[item._id] * item.price })}
                         </td>
                       </tr>
                     ))}
@@ -221,7 +220,7 @@ function ClientOrder() {
                         {t('total')}
                       </td>
                       <td className="pt-4 text-lg font-bold text-right whitespace-nowrap">
-                        {fromCents(toCents(total))}
+                        {sumCurrency({ value: total })}
                       </td>
                     </tr>
                   </tfoot>
@@ -258,9 +257,7 @@ function ClientOrder() {
                     <AddressInput
                       onSelect={address => setFormData(prev => ({ ...prev, address }))}
                       inputProps={{
-                        onChange: e => {
-                          setFormData(prev => ({ ...prev, address: e.target.value }));
-                        },
+                        onChange: handleChange,
                         className: `w-full pl-10 pr-4 py-3 border ${
                           errors.address ? 'border-red-500' : 'border-gray-300'
                         } ring-0 ring-offset-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent focus:placeholder-transparent`,
@@ -366,39 +363,37 @@ function ClientOrder() {
                   )}
                 </div>
 
-                <div>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="18"
-                        height="18"
-                        viewBox="0 0 18 18"
-                        fill="none"
-                      >
-                        <path
-                          d="M14.9625 15.75C13.4 15.75 11.8532 15.4125 10.3222 14.7375C8.79125 14.0625 7.4005 13.1 6.15 11.85C4.8995 10.6 3.937 9.2125 3.2625 7.6875C2.588 6.1625 2.2505 4.6125 2.25 3.0375V2.25H6.675L7.36875 6.01875L5.23125 8.175C5.50625 8.6625 5.8125 9.125 6.15 9.5625C6.4875 10 6.85 10.4062 7.2375 10.7812C7.6 11.1438 7.997 11.4907 8.4285 11.8222C8.86 12.1537 9.3255 12.463 9.825 12.75L12 10.575L15.75 11.3438V15.75H14.9625Z"
-                          fill={focusedField === 'phoneNumber' ? '#4F46E5' : '#9DA0A5'}
-                        />
-                      </svg>
-                    </div>
-                    <input
-                      type="tel"
-                      name="phoneNumber"
-                      value={formData.phoneNumber}
-                      onChange={handleChange}
-                      placeholder={t('phoneNumber')}
-                      className={`w-full pl-10 pr-4 py-3 border ${errors[FORM_FIELDS.PHONE_NUMBER] ? 'border-red-500' : 'border-gray-300'} ring-0 ring-offset-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent focus:placeholder-transparent`}
-                      onFocus={() => setFocusedField(FORM_FIELDS.PHONE_NUMBER)}
-                      onBlur={() => setFocusedField(null)}
-                    />
-                  </div>
-                  {errors.phoneNumber && (
-                    <p data-testid="phone-error" className="text-red-500 text-xs mt-1">
-                      {errors.phoneNumber}
-                    </p>
-                  )}
-                </div>
+                <PhoneNumberInput
+                  value={formData.phoneNumber}
+                  defaultCountry="FR"
+                  onChange={(e164, formatted, isValid) => {
+                    setFormData(prev => ({ ...prev, phoneNumber: e164 }));
+                    setIsPhoneValid(isValid);
+                    // si l'utilisateur corrige et que c'est valide, on efface l'erreur
+                    if (isValid && errors.phoneNumber) {
+                      setErrors(prev => ({ ...prev, phoneNumber: undefined }));
+                    }
+                  }}
+                  error={
+                    // only once “touched” and *not* currently focused
+                    phoneTouched &&
+                    focusedField !== FORM_FIELDS.PHONE_NUMBER &&
+                    (errors.phoneNumber ??
+                      (!isPhoneValid && formData.phoneNumber ? t('invalidPhoneFormat') : undefined))
+                  }
+                  fillIcone={focusedField === 'phoneNumber' ? '#4F46E5' : '#9DA0A5'}
+                  inputProps={{
+                    name: 'phoneNumber',
+                    placeholder: t('phoneNumber'),
+                    onFocus: () => {
+                      setFocusedField(FORM_FIELDS.PHONE_NUMBER);
+                    },
+                    onBlur: e => {
+                      setFocusedField(null);
+                      setPhoneTouched(true);
+                    },
+                  }}
+                />
               </div>
               {requestError && <p className="text-red-500 text-xs mt-4">{requestError}</p>}
               <div className="flex justify-center gap-4 mt-14 mb-4">
@@ -417,6 +412,13 @@ function ClientOrder() {
                 </button>
               </div>
             </form>
+            {insufficientQuantity.length > 0 && (
+              <InsufficientQuantityModal
+                products={insufficientQuantity}
+                onClose={() => setInsufficientQuantity([])}
+                onConfirm={confirmChangeQuantity}
+              />
+            )}
           </div>
         </>
       )}

@@ -122,7 +122,6 @@ describe('orders reducer', () => {
   it('should handle clearSelection', () => {
     const start = { ...initialState, isSelectionMode: true, selectedOrderIds: ['order1'] };
     const state = ordersReducer(start, clearSelection());
-    expect(state.isSelectionMode).toBe(false);
     expect(state.selectedOrderIds).toEqual([]);
   });
 
