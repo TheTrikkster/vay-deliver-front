@@ -32,6 +32,7 @@
     "i18next": "^23.6.0",
     "i18next-browser-languagedetector": "^8.1.0",
     "i18next-http-backend": "^3.0.2",
+    "libphonenumber-js": "^1.12.8",
     "lodash": "^4.17.21",
     "postcss": "^8.4.14",
     "postcss-cli": "^9.1.0",
