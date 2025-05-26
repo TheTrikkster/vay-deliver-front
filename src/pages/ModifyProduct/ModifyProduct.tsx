@@ -26,6 +26,7 @@ function ModifyProduct() {
       dispatch(setLoading(true));
       try {
         const response = await productsApi.getById(id!);
+        console.log({ response });
         setProductData(response.data);
       } catch (error) {
         console.error('Erreur lors du chargement du produit:', error);
@@ -42,6 +43,8 @@ function ModifyProduct() {
 
   const handleUpdateProduct = async (updatedProductData: Product) => {
     dispatch(setError(null));
+
+    console.log({ updatedProductData });
     try {
       const formattedData = {
         name: updatedProductData.name,
@@ -49,6 +52,7 @@ function ModifyProduct() {
         unitExpression: updatedProductData.unitExpression,
         availableQuantity: Number(updatedProductData.availableQuantity),
         minOrder: Number(updatedProductData.minOrder),
+        maxOrder: Number(updatedProductData.maxOrder) || undefined,
         price: Number(updatedProductData.price),
       };
 

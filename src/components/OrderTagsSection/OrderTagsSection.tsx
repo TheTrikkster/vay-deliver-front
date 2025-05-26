@@ -82,7 +82,7 @@ const OrderTagsSection = ({ orderId, tagNames, onTagsUpdated }: OrderTagsSection
         isOpen={isConfirmModalOpen}
         onClose={cancelDeleteTag}
         onConfirm={confirmDeleteTag}
-        title={t('deleteTagTitle')}
+        title={t('deleteTag')}
         message={t('deleteTagConfirmation')}
       />
     </div>

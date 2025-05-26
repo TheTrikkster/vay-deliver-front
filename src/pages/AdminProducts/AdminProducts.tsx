@@ -19,6 +19,7 @@ function AdminProducts() {
     id: 0,
     availableQuantity: 0,
   });
+  const [inputValue, setInputValue] = useState<string>('0');
   const [openCardMenuId, setOpenCardMenuId] = useState<number | null>(null);
   const [isDeletePopupOpen, setIsDeletePopupOpen] = useState<boolean>(false);
   const [itemToDelete, setItemToDelete] = useState<number | null>(null);
@@ -100,6 +101,7 @@ function AdminProducts() {
         id,
         availableQuantity: currentQuantity,
       });
+      setInputValue(currentQuantity.toString());
       setIsQuantityPopupOpen(true);
     },
     [currentItems, dispatch]
@@ -189,9 +191,31 @@ function AdminProducts() {
             </p>
             <input
               type="number"
+              min={0}
               className="w-full border border-[#9DA0A5] rounded-md p-3 mb-5"
-              value={quantityToEdit.availableQuantity}
-              onChange={e => handleQuantityChange(e.target.value)}
+              value={inputValue}
+              onChange={e => {
+                const val = e.target.value;
+                // autoriser uniquement les chiffres (évitant le signe négatif)
+                if (/^\d*$/.test(val)) {
+                  setInputValue(val);
+                  // on met à jour la quantité métier, ou 0 si champ vide
+                  setQuantityToEdit(prev => ({
+                    ...prev,
+                    availableQuantity: val === '' ? 0 : Number(val),
+                  }));
+                }
+              }}
+              onBlur={() => {
+                // dès qu'on sort du champ, on replace un "0" si vide
+                if (inputValue === '') {
+                  setInputValue('0');
+                  setQuantityToEdit(prev => ({
+                    ...prev,
+                    availableQuantity: 0,
+                  }));
+                }
+              }}
             />
             <div className="flex justify-center gap-2">
               <button

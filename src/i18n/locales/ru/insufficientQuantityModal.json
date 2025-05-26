@@ -1,0 +1,9 @@
+{
+  "modalTitle": "Недостаточно товара",
+  "tableHeaderProduct": "Товар",
+  "tableHeaderRequested": "Добавлено",
+  "tableHeaderAvailable": "В наличии",
+  "orderPrompt": "Заказать в доступном объёме?",
+  "cancel": "Отменить",
+  "confirm": "Подтвердить"
+}

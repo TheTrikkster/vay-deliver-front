@@ -3,6 +3,7 @@ export interface ProductType {
   name: string;
   description: string;
   minOrder: number;
+  maxOrder: number;
   price: number;
   unitExpression: string;
 }

@@ -1,0 +1,9 @@
+{
+  "modalTitle": "Stock insuffisant",
+  "tableHeaderProduct": "Produit",
+  "tableHeaderRequested": "Demandé",
+  "tableHeaderAvailable": "Disponible",
+  "orderPrompt": "Commander la quantité disponible ?",
+  "cancel": "Annuler",
+  "confirm": "Confirmer"
+}

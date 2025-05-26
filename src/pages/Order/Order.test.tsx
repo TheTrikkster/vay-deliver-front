@@ -132,7 +132,7 @@ describe('Order page', () => {
 
   it('calcule et affiche le total', async () => {
     renderWithRedux(<Order />);
-    expect(await screen.findByText('35 €')).toBeInTheDocument();
+    expect(await screen.findByText('35,00 €')).toBeInTheDocument();
   });
 
   // ... autres tests ...

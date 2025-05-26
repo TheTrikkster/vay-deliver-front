@@ -46,7 +46,7 @@ jest.mock('react-i18next', () => ({
       const translations: { [key: string]: string } = {
         notes: 'Notes',
         addTag: 'Ajouter tag',
-        deleteTagTitle: 'Supprimer le tag',
+        deleteTag: 'Supprimer le tag',
         deleteTagConfirmation: 'Êtes-vous sûr de vouloir supprimer ce tag ?',
       };
       return translations[key] || key;

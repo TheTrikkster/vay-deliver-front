@@ -73,7 +73,6 @@ const Order: React.FC = () => {
           />
         </div>
       </div>
-
       {/* Bouton d'action flottant - disponible pour tous les statuts de commande */}
       <OrderActions
         orderStatus={orderDetails.status as OrderStatusType}

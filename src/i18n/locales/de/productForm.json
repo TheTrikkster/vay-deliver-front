@@ -6,6 +6,7 @@
   "unitMeasure": "Maßeinheit (Stück, Gramm, Kg) *",
   "availableQuantity": "Verfügbare Menge in Ziffern *",
   "minOrderVolume": "Mindestbestellmenge in Ziffern *",
+  "maxOrderVolume": "Maximale Bestellmenge in Ziffern",
   "price": "Preis: 18 *",
   "requiredFields": "Mit * markierte Felder sind Pflichtfelder.",
   "cancel": "Abbrechen",

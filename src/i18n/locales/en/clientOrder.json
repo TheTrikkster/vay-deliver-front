@@ -13,6 +13,7 @@
   "address": "Complete address for quick delivery",
   "requiredField": "Required field",
   "invalidPhoneFormat": "Invalid phone format",
+  "invalidAddress": "Invalid address",
   "cancel": "Cancel",
   "order": "Order",
   "requestError": "Please check your information and try again."

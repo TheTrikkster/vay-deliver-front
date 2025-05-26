@@ -13,6 +13,7 @@
   "address": "Vollständige Adresse für schnelle Lieferung",
   "requiredField": "Pflichtfeld",
   "invalidPhoneFormat": "Ungültiges Telefonformat",
+  "invalidAddress": "Ungültige Adresse",
   "cancel": "Stornieren",
   "order": "Bestellen",
   "requestError": "Bitte überprüfen Sie Ihre Angaben und versuchen Sie es erneut."

@@ -2,24 +2,16 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import ClientCard from './ClientCard';
-import { fromCents, toCents } from '../../utils/orderCalcul';
+import { sumCurrency } from '../../utils/sumCurrency';
 import { ProductType } from '../../types/client';
 
-// Mock des fonctions utilitaires
-jest.mock('../../utils/orderCalcul', () => ({
-  fromCents: jest.fn(cents => {
-    const value = cents / 100;
-    return `${value}₽`;
-  }),
-  toCents: jest.fn(amount => Math.round(amount * 100)),
-}));
+// Pas de mock pour sumCurrency: on teste le rendu réel
 
 // Mock i18next
 jest.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string, options?: any) => {
       const translations: { [key: string]: string } = {
-        // Traductions pour clientCard
         productUnavailable: 'Продукт недоступен',
         minOrder: 'Мин. заказ : ',
         price: 'Цена: ',
@@ -42,6 +34,7 @@ describe('ClientCard Component', () => {
     name: 'Test Product',
     description: 'Test Description',
     minOrder: 5,
+    maxOrder: 10,
     price: 10,
     unitExpression: 'шт',
   };
@@ -64,12 +57,9 @@ describe('ClientCard Component', () => {
     expect(screen.getByText('5 шт')).toBeInTheDocument();
     expect(screen.getByText('Цена:')).toBeInTheDocument();
 
-    console.log(screen.debug());
-    console.log({ mockProduct }, 'llokkk');
-
-    // Vérifier le prix
+    // Vérifier le prix au format français euro
     const priceSpan = screen.getByText('Цена:').closest('div')?.querySelector('span:last-child');
-    // expect(priceSpan).toHaveTextContent('10₽/шт');
+    expect(priceSpan).toHaveTextContent(/10,00\s*€/);
   });
 
   test('affiche le bouton Добавить quand quantity est 0', () => {
@@ -97,7 +87,6 @@ describe('ClientCard Component', () => {
   test("affiche l'icône de suppression quand quantity = minOrder", () => {
     render(<ClientCard product={mockProduct} quantity={5} cartActions={mockCartActions} />);
 
-    // On vérifie la présence du SVG de la poubelle
     const deleteIcon = document.querySelector('svg g path[d^="M3.18188"]');
     expect(deleteIcon).toBeInTheDocument();
   });
@@ -105,7 +94,6 @@ describe('ClientCard Component', () => {
   test("affiche l'icône moins quand quantity > minOrder", () => {
     render(<ClientCard product={mockProduct} quantity={6} cartActions={mockCartActions} />);
 
-    // On vérifie la présence du SVG du moins
     const minusIcon = document.querySelector('svg path[d^="M4.16663"]');
     expect(minusIcon).toBeInTheDocument();
   });
@@ -129,13 +117,5 @@ describe('ClientCard Component', () => {
   test('gère correctement le cas où le produit est undefined', () => {
     render(<ClientCard product={undefined} quantity={0} cartActions={mockCartActions} />);
     expect(screen.getByText('Продукт недоступен')).toBeInTheDocument();
-  });
-
-  test('utilise correctement les fonctions fromCents et toCents', () => {
-    render(<ClientCard product={mockProduct} quantity={0} cartActions={mockCartActions} />);
-
-    // Vérifier simplement que les fonctions sont appelées, pas avec quels arguments
-    expect(toCents).toHaveBeenCalled();
-    expect(fromCents).toHaveBeenCalled();
   });
 });

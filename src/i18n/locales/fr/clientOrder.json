@@ -13,6 +13,7 @@
   "address": "Adresse complète pour une livraison rapide",
   "requiredField": "Champ obligatoire",
   "invalidPhoneFormat": "Format de numéro invalide",
+  "invalidAddress": "Adresse invalide",
   "cancel": "Annuler",
   "order": "Commander",
   "requestError": "Veuillez vérifier vos informations et réessayer."

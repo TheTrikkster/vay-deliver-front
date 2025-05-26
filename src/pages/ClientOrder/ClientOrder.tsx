@@ -3,17 +3,15 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store/userStore';
 import { useNavigate } from 'react-router-dom';
 import { clearClientOrder, setItems, setProducts } from '../../store/slices/clientSlice';
-import { toCents, fromCents } from '../../utils/orderCalcul';
+import { toCents, mergeAndClean } from '../../utils/orderCalcul';
 import { ordersApi } from '../../api/services/ordersApi';
 import { useTranslation } from 'react-i18next';
-import PlacesAutocomplete, { geocodeByAddress, getLatLng } from 'react-places-autocomplete';
 import { AddressInput } from '../../components/AddressInput';
 import { PhoneNumberInput } from '../../components/PhoneNumberInput';
 import Loading from '../../components/Loading';
 import InsufficientQuantityModal from '../../components/InsufficientQuantityModal';
-import { ProductType } from '../../types/client';
+import { sumCurrency } from '../../utils/sumCurrency';
 
-// Typage des données de formulaire
 interface FormData {
   firstName: string;
   lastName: string;
@@ -62,145 +60,96 @@ function ClientOrder() {
     [products, items]
   );
 
-  // Fonction générique pour gérer les changements dans les inputs
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value,
-    }));
-
-    // Effacer l'erreur quand l'utilisateur commence à corriger
+    setFormData(prev => ({ ...prev, [name]: value }));
     if (errors[name as keyof FormData]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: undefined,
-      }));
+      setErrors(prev => ({ ...prev, [name]: undefined }));
     }
   };
 
-  // Validation du formulaire
   const validateForm = (): boolean => {
     const newErrors: Partial<FormData> = {};
-
     if (!formData[FORM_FIELDS.FIRST_NAME].trim()) {
       newErrors[FORM_FIELDS.FIRST_NAME] = t('requiredField');
     }
-
     if (!formData[FORM_FIELDS.PHONE_NUMBER]) {
       newErrors[FORM_FIELDS.PHONE_NUMBER] = t('requiredField');
-    } else if (!/^\+?[0-9]{10,12}$/.test(formData[FORM_FIELDS.PHONE_NUMBER].trim())) {
+    } else if (!/^[+]?\d{10,12}$/.test(formData[FORM_FIELDS.PHONE_NUMBER].trim())) {
       newErrors[FORM_FIELDS.PHONE_NUMBER] = t('invalidPhoneFormat');
     } else if (!isPhoneValid) {
       newErrors[FORM_FIELDS.PHONE_NUMBER] = t('invalidPhoneFormat');
     }
-
     if (!formData[FORM_FIELDS.ADDRESS].trim()) {
       newErrors[FORM_FIELDS.ADDRESS] = t('requiredField');
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // Fonction pour gérer la sélection d'adresse
-  const handleSelectAddress = async (address: string) => {
-    try {
-      const results = await geocodeByAddress(address);
-      const latLng = await getLatLng(results[0]);
-
-      setFormData(prev => ({
-        ...prev,
-        address,
+  const submitOrder = useCallback(
+    async (payloadItems?: Record<string, number>) => {
+      setLoading(true);
+      const finalItems = payloadItems ?? items;
+      const orderItems = products.map(p => ({
+        productId: p._id,
+        quantity: finalItems[p._id] || 0,
       }));
+      const orderPayload = { ...formData, items: orderItems };
 
-      // Effacer l'erreur
-      if (errors[FORM_FIELDS.ADDRESS]) {
-        setErrors(prev => ({
-          ...prev,
-          [FORM_FIELDS.ADDRESS]: undefined,
-        }));
-      }
-    } catch (error) {
-      console.error('Error selecting address:', error);
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setWaitForResponse(true);
-    setLoading(true);
-    if (validateForm()) {
       try {
-        const orderItems = products.map(product => ({
-          productId: product._id,
-          quantity: items[product._id],
-        }));
-
-        const orderData = {
-          ...formData,
-          items: orderItems,
-        };
-
-        await ordersApi.createOrder(orderData);
-
+        await ordersApi.createOrder(orderPayload);
         dispatch(clearClientOrder());
         navigate('/completed-order');
-      } catch (error: unknown) {
+      } catch (error: any) {
         setRequestError(t('requestError'));
-        if ((error as any).response?.data.errors?.length > 0) {
-          console.log('insufficient quantity', (error as any).response?.data.errors);
-          setInsufficientQuantity((error as any).response?.data.errors);
-        } else if (error instanceof Error) {
-          console.error('Erreur détaillée:', (error as any).response?.data);
+        const errs = error.response?.data.errors || [];
+        if (errs.length > 0 && errs[0].type === 'INSUFFICIENT_QUANTITY') {
+          setInsufficientQuantity(errs);
+        } else if (errs.length > 0 && errs[0].type === 'GEOCODING_ERROR') {
+          setErrors({ address: t('invalidAddress') });
+        } else {
+          console.error('Erreur détaillée:', error.response?.data);
         }
       } finally {
         setWaitForResponse(false);
         setLoading(false);
       }
+    },
+    [items, products, formData, dispatch, navigate]
+  );
+
+  // -- Updated handleSubmit now delegates to submitOrder --
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setWaitForResponse(true);
+
+    if (!validateForm()) {
+      setWaitForResponse(false);
+      return;
     }
+
+    // no dispatch here: data is already in Redux
+    await submitOrder();
   };
 
-  const confirmChangeQuantity = useCallback(() => {
-    console.log('////////////////////////////////');
-    console.log(insufficientQuantity);
-    console.log(items);
-    // const merged = items
-    //   .map((item: any) => {
-    //     const upd = insufficientQuantity.find((u: any) => u.id === item.id);
-    //     return upd ? { ...item, nombre: upd.nombre } : item;
-    //   })
-    //   // on retire ceux dont nombre === 0
-    //   .filter((item: any) => item.nombre !== 0);
-    const details = insufficientQuantity.map(item => {
-      return [item.details.productId, item.details.availableQuantity];
-    });
-    console.log('The test should be ok');
-    console.log(Object.fromEntries(details));
-    dispatch(setItems({ ...items, ...Object.fromEntries(details) }));
+  // -- Updated confirmChangeQuantity calls submitOrder with merged data --
+  const confirmChangeQuantity = useCallback(async () => {
+    const merged = mergeAndClean(items, insufficientQuantity);
+    dispatch(setItems(merged));
+    dispatch(setProducts(products.filter(p => merged[p._id] > 0)));
     setInsufficientQuantity([]);
-  }, [insufficientQuantity]);
 
-  console.log({ items });
-  console.log({ products });
+    // immediately re-submit with updated quantities
+    await submitOrder(merged);
+  }, [insufficientQuantity, items, products, dispatch, submitOrder]);
 
   const handleCancel = () => {
     dispatch(clearClientOrder());
     navigate('/');
   };
 
-  if (loading) {
-    return <Loading />;
-  }
-
-  const shortList = [
-    {
-      details: { productName: 'Produit A', requestedQuantity: 5, availableQuantity: 2, unit: 'kg' },
-    },
-    {
-      details: { productName: 'Produit B', requestedQuantity: 3, availableQuantity: 1, unit: 'kg' },
-    },
-  ];
+  if (loading) return <Loading />;
 
   return (
     <div className="min-h-screen md:bg-[#F5F7FA]">
@@ -260,7 +209,7 @@ function ClientOrder() {
                           x {items[item._id]} {item.unitExpression}
                         </td>
                         <td className="py-3 text-right whitespace-nowrap">
-                          {fromCents(toCents(items[item._id] * item.price))}
+                          {sumCurrency({ value: items[item._id] * item.price })}
                         </td>
                       </tr>
                     ))}
@@ -271,7 +220,7 @@ function ClientOrder() {
                         {t('total')}
                       </td>
                       <td className="pt-4 text-lg font-bold text-right whitespace-nowrap">
-                        {fromCents(toCents(total))}
+                        {sumCurrency({ value: total })}
                       </td>
                     </tr>
                   </tfoot>
@@ -308,9 +257,7 @@ function ClientOrder() {
                     <AddressInput
                       onSelect={address => setFormData(prev => ({ ...prev, address }))}
                       inputProps={{
-                        onChange: e => {
-                          setFormData(prev => ({ ...prev, address: e.target.value }));
-                        },
+                        onChange: handleChange,
                         className: `w-full pl-10 pr-4 py-3 border ${
                           errors.address ? 'border-red-500' : 'border-gray-300'
                         } ring-0 ring-offset-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4F46E5] focus:border-transparent focus:placeholder-transparent`,

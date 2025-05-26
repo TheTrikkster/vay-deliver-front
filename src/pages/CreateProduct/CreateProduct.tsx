@@ -29,6 +29,7 @@ function CreateProduct() {
       price: productData.price,
       availableQuantity: productData.availableQuantity,
       minOrder: parseInt(productData.minOrder),
+      maxOrder: productData.maxOrder ? parseInt(productData.maxOrder) : undefined,
       status: ProductStatus.ACTIVE,
     };
 
