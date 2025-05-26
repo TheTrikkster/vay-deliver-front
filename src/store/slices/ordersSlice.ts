@@ -160,6 +160,9 @@ export const ordersSlice = createSlice({
       state.selectedOrderIds =
         state.selectedOrderIds.length === state.orders.length ? [] : state.orders.map(o => o._id);
     },
+    resetError: state => {
+      state.error = null;
+    },
   },
   extraReducers: builder => {
     builder
@@ -218,6 +221,7 @@ export const {
   toggleSelectionMode,
   toggleOrderSelection,
   selectAllOrders,
+  resetError,
 } = ordersSlice.actions;
 
 // Selectors

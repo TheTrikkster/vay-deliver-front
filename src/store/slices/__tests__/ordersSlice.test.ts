@@ -38,6 +38,7 @@ describe('orders reducer', () => {
     loading: false,
     error: null,
     currentPage: 1,
+    distanceMatrix: null,
     totalPages: 1,
     isSelectionMode: false,
     selectedOrderIds: [],

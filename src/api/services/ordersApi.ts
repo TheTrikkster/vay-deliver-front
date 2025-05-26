@@ -16,6 +16,8 @@ export const ordersApi = {
   updateStatus: (id: string, status: string) =>
     api.patch(`${ENDPOINTS.ORDERS.BASE}/${id}/status`, { status }),
 
+  deleteOrder: (id: string) => api.delete(`${ENDPOINTS.ORDERS.BASE}/${id}`),
+
   addTagToOrders: (tagNames: string[], orderIds: string | string[]) =>
     api.post(`${ENDPOINTS.ORDERS.BASE}/tags`, { tagNames, orderIds }),
 

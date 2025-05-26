@@ -1,25 +1,58 @@
-import { useSelector } from 'react-redux';
-import {
-  addTagToOrders,
-  removeTagFromOrders,
-  selectOrdersPendingOperations,
-} from '../store/slices/ordersSlice';
-import { useAppDispatch } from '../store/hooks';
+import { useState } from 'react';
+import { ordersApi } from '../api/services/ordersApi';
 
-export function useOrderTags() {
-  const dispatch = useAppDispatch();
+interface UseOrderTagsProps {
+  onSuccess?: () => void;
+  onError?: (error: any) => void;
+}
 
-  const pendingOperations = useSelector(selectOrdersPendingOperations);
+export const useOrderTags = (props?: UseOrderTagsProps) => {
+  const { onSuccess, onError } = props || {};
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const addTag = (tagName: string, orderIds: string[] | string) =>
-    dispatch(addTagToOrders({ tagName, orderIds }));
+  const addTag = async (tagName: string, orderIds: string | string[]) => {
+    setLoading(true);
+    setError(null);
 
-  const removeTag = (tagName: string, orderId: string) =>
-    dispatch(removeTagFromOrders({ tagName, orderId }));
+    try {
+      const normalizedOrderIds = Array.isArray(orderIds) ? orderIds : [orderIds];
+
+      const response = await ordersApi.addTagToOrders([tagName], normalizedOrderIds);
+      setLoading(false);
+      onSuccess?.();
+      return response.data;
+    } catch (err) {
+      setLoading(false);
+      const errorMessage = 'Failed to add tag';
+      setError(errorMessage);
+      onError?.(err);
+      return null;
+    }
+  };
+
+  const removeTag = async (orderId: string, tagName: string) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await ordersApi.removeTagFromOrders(orderId, tagName);
+      setLoading(false);
+      onSuccess?.();
+      return response.data;
+    } catch (err) {
+      setLoading(false);
+      const errorMessage = 'Failed to remove tag';
+      setError(errorMessage);
+      onError?.(err);
+      return null;
+    }
+  };
 
   return {
-    pendingOperations,
     addTag,
     removeTag,
+    loading,
+    error,
   };
-}
+};

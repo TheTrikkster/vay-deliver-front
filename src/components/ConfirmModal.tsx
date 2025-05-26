@@ -34,7 +34,7 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
           </button>
           <button
             onClick={onConfirm}
-            className="flex-1 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+            className="flex-1 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
           >
             {t('confirm')}
           </button>
