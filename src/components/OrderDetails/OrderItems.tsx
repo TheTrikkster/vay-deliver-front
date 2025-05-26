@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { ReactNode } from 'react';
 
 interface OrderItem {
   product: {
@@ -10,7 +11,7 @@ interface OrderItem {
 
 interface OrderItemsProps {
   items: OrderItem[];
-  total: number;
+  total: ReactNode;
 }
 
 const OrderItems = ({ items, total }: OrderItemsProps) => {
