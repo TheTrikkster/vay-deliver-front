@@ -9,5 +9,14 @@
   "cancel": "Stornieren",
   "complete": "Abschließen",
   "whatsapp": "WhatsApp",
-  "addTag": "Hinzufügen"
+  "addTag": "Hinzufügen",
+  "orderActions": "Aktionen",
+  "completeAction": "Bestellung abschließen",
+  "cancelAction": "Bestellung stornieren",
+  "deleteAction": "Bestellung löschen",
+  "confirmDelete": "Sind Sie sicher, dass Sie diese Bestellung endgültig löschen möchten?",
+  "confirmCancel": "Sind Sie sicher, dass Sie diese Bestellung stornieren möchten?",
+  "confirmComplete": "Sind Sie sicher, dass Sie diese Bestellung als abgeschlossen markieren möchten?",
+  "deleteTag": "Tag löschen",
+  "deleteTagConfirmation": "Sind Sie sicher, dass Sie diesen Tag löschen möchten?"
 }

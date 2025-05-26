@@ -1,6 +1,6 @@
 import React from 'react';
 import { OrderStatus } from '../../types/order';
-import { useTranslation } from 'react-i18next';
+import OrderStatusComponent from '../OrderDetails/OrderStatus';
 
 interface OrderCardProps {
   firstName: string;
@@ -23,8 +23,6 @@ const OrderCard: React.FC<OrderCardProps> = ({
   isSelectionMode = false,
   isSelected = false,
 }) => {
-  const { t } = useTranslation('order');
-
   return (
     <div className="min-w-[343px] w-11/12 md:w-2/4 bg-white rounded-xl p-4 shadow-md cursor-pointer relative hover:shadow-lg transition-shadow focus:outline-none focus:ring-2 focus:ring-green-500">
       {/* Checkbox en mode sélection */}
@@ -53,23 +51,7 @@ const OrderCard: React.FC<OrderCardProps> = ({
         <h2 className="text-lg font-medium m-0">
           {firstName} {lastName}
         </h2>
-        {!isSelectionMode && (
-          <span
-            className={`px-3 py-1.5 rounded text-sm ${
-              status === 'ACTIVE'
-                ? 'bg-green-50 text-green-500'
-                : status === 'COMPLETED'
-                  ? 'bg-gray-100 text-gray-500'
-                  : 'bg-red-50 text-red-500'
-            }`}
-          >
-            {status === 'ACTIVE'
-              ? t('active')
-              : status === 'COMPLETED'
-                ? t('completed')
-                : t('canceled')}
-          </span>
-        )}
+        {!isSelectionMode && <OrderStatusComponent status={status} className="" />}
       </div>
 
       <div className="flex items-center gap-2 text-gray-600">
@@ -99,7 +81,7 @@ const OrderCard: React.FC<OrderCardProps> = ({
 
       <div className="flex flex-wrap gap-2">
         {tagNames.map(tag => (
-          <span key={tag} className="font-light bg-gray-100 rounded-lg p-2 text-sm">
+          <span key={tag} className="font-medium bg-gray-100 rounded-lg p-2 text-sm">
             {tag}
           </span>
         ))}

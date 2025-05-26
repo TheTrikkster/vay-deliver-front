@@ -9,5 +9,14 @@
   "cancel": "Annuler",
   "complete": "Terminer",
   "whatsapp": "WhatsApp",
-  "addTag": "Ajouter"
+  "addTag": "Ajouter",
+  "orderActions": "Actions",
+  "completeAction": "Terminer la commande",
+  "cancelAction": "Annuler la commande",
+  "deleteAction": "Supprimer la commande",
+  "confirmDelete": "Êtes-vous sûr de vouloir supprimer définitivement cette commande ?",
+  "confirmCancel": "Êtes-vous sûr de vouloir annuler cette commande ?",
+  "confirmComplete": "Êtes-vous sûr de vouloir marquer cette commande comme terminée ?",
+  "deleteTag": "Supprimer l'étiquette",
+  "deleteTagConfirmation": "Êtes-vous sûr de vouloir supprimer cette étiquette ?"
 }

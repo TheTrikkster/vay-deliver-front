@@ -9,5 +9,14 @@
   "cancel": "Отменить",
   "complete": "Завершить",
   "whatsapp": "WhatsApp",
-  "addTag": "Добавить"
+  "addTag": "Добавить",
+  "orderActions": "Действия",
+  "completeAction": "Завершить заказ",
+  "cancelAction": "Отменить заказ",
+  "deleteAction": "Удалить заказ",
+  "confirmDelete": "Вы уверены, что хотите навсегда удалить этот заказ?",
+  "confirmCancel": "Вы уверены, что хотите отменить этот заказ?",
+  "confirmComplete": "Вы уверены, что хотите отметить этот заказ как завершенный?",
+  "deleteTag": "Удалить тег",
+  "deleteTagConfirmation": "Вы уверены, что хотите удалить этот тег?"
 }

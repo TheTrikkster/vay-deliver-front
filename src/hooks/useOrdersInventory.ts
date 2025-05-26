@@ -1,89 +1,42 @@
-import { useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import {
-  fetchOrders,
-  addTagToOrders,
-  removeTagFromOrders,
-  setOnlineStatus,
-  setCurrentPage,
-  setFiltersObject,
-  selectOrders,
-  selectOrdersLoading,
-  selectOrdersError,
-  selectCurrentPage,
-  selectTotalPages,
-  selectCurrentFilters,
-  selectFiltersObject,
-  selectOrdersIsOnline,
-  selectOrdersPendingOperations,
-  selectSelectedOrderIds,
-  selectIsSelectionMode,
-  toggleSelectionMode,
-  toggleOrderSelection,
-  selectAllOrders,
-  clearSelection,
-} from '../store/slices/ordersSlice';
-import { OrderStatus, Position } from '../types/order';
-import { useAppDispatch } from '../store/hooks';
+import { useOrdersList } from './useOrdersList';
+import { useOrderSelection } from './useOrderSelection';
+import { useOrderTags } from './useOrderTags';
+import { useNetworkStatus } from './useNetworkStatus';
 
 export function useOrders({ limit = 30 } = {}) {
-  const dispatch = useAppDispatch();
-
-  const orders = useSelector(selectOrders);
-  const loading = useSelector(selectOrdersLoading);
-  const error = useSelector(selectOrdersError);
-  const currentPage = useSelector(selectCurrentPage);
-  const totalPages = useSelector(selectTotalPages);
-  const currentFilters = useSelector(selectCurrentFilters);
-  const filtersObject = useSelector(selectFiltersObject);
-  const isOnline = useSelector(selectOrdersIsOnline);
-  const pendingOperations = useSelector(selectOrdersPendingOperations);
-  const selectedOrderIds = useSelector(selectSelectedOrderIds);
-  const isSelectionMode = useSelector(selectIsSelectionMode);
-
-  useEffect(() => {
-    if (isOnline) {
-      dispatch(fetchOrders({ page: currentPage, filters: currentFilters, limit }));
-    }
-  }, [dispatch, isOnline, currentPage, currentFilters, limit]);
-
-  useEffect(() => {
-    const goOnline = () => dispatch(setOnlineStatus(true));
-    const goOffline = () => dispatch(setOnlineStatus(false));
-    window.addEventListener('online', goOnline);
-    window.addEventListener('offline', goOffline);
-    return () => {
-      window.removeEventListener('online', goOnline);
-      window.removeEventListener('offline', goOffline);
-    };
-  }, [dispatch]);
-
-  const addTag = (tagName: string, orderIds: string[] | string) =>
-    dispatch(addTagToOrders({ tagName, orderIds }));
-
-  const removeTag = (tagName: string, orderId: string) =>
-    dispatch(removeTagFromOrders({ tagName, orderId }));
+  const ordersList = useOrdersList({ limit });
+  const orderSelection = useOrderSelection();
+  const orderTags = useOrderTags();
+  const { isOnline } = useNetworkStatus();
 
   return {
-    orders,
-    loading,
-    error,
-    currentPage,
-    totalPages,
-    currentFilters,
-    filtersObject,
+    // Données et états de la liste des commandes
+    orders: ordersList.orders,
+    loading: ordersList.loading,
+    error: ordersList.error, // Erreur principale (chargement des commandes)
+    currentPage: ordersList.currentPage,
+    totalPages: ordersList.totalPages,
+    currentFilters: ordersList.currentFilters,
+    filtersObject: ordersList.filtersObject,
+    distanceMatrix: ordersList.distanceMatrix,
+    setPage: ordersList.setPage,
+    applyFilters: ordersList.applyFilters,
+
+    // États de sélection
+    selectedOrderIds: orderSelection.selectedOrderIds,
+    isSelectionMode: orderSelection.isSelectionMode,
+    toggleSelectionMode: orderSelection.toggleSelectionMode,
+    toggleOrderSelection: orderSelection.toggleOrderSelection,
+    selectAllOrders: orderSelection.selectAllOrders,
+    clearSelection: orderSelection.clearSelection,
+
+    // Gestion des tags
+    addTag: orderTags.addTag,
+    removeTag: orderTags.removeTag,
+    tagError: orderTags.error, // Erreur spécifique aux tags
+    tagLoading: orderTags.loading,
+
+    // Statut réseau
     isOnline,
-    pendingOperations,
-    selectedOrderIds,
-    isSelectionMode,
-    setPage: (page: number) => dispatch(setCurrentPage(page)),
-    applyFilters: (status: OrderStatus | '', tagNames: string[], position: Position) =>
-      dispatch(setFiltersObject({ status, tagNames, position })),
-    addTag,
-    removeTag,
-    toggleSelectionMode: (on: boolean) => dispatch(toggleSelectionMode(on)),
-    toggleOrderSelection: (id: string) => dispatch(toggleOrderSelection(id)),
-    selectAllOrders: () => dispatch(selectAllOrders()),
-    clearSelection: () => dispatch(clearSelection()),
   };
 }

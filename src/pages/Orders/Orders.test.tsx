@@ -5,7 +5,7 @@ import { BrowserRouter } from 'react-router-dom';
 import Orders from './Orders';
 import { store } from '../../store/userStore';
 import { ordersApi } from '../../api/services/ordersApi';
-import { fetchOrders } from '../../store/slices/ordersSlice'; // <— Import du thunk
+import { fetchOrders, resetError } from '../../store/slices/ordersSlice'; // <— Import du thunk et resetError
 
 // Mock des dépendances
 jest.mock('../../api/services/ordersApi');
@@ -26,7 +26,7 @@ jest.mock('react-i18next', () => ({
         filters: 'Filtres',
         addNote: 'Ajouter une note',
         getOrdersError: 'Impossible de charger les commandes',
-        addTagError: 'Erreur lors de l’ajout du tag',
+        addTagError: "Erreur lors de l'ajout du tag",
 
         // statuts du composant Order
         active: 'Active',
@@ -90,6 +90,10 @@ describe('Orders', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+
+    // Réinitialiser l'état du store pour les erreurs
+    store.dispatch(resetError());
+
     (ordersApi.getAll as jest.Mock).mockResolvedValue({
       data: {
         orders: mockOrders,
@@ -161,10 +165,15 @@ describe('Orders', () => {
 
     renderComponent();
 
-    await waitFor(() => {
-      // Comme le thunk retourne rejectWithValue('fetchOrdersError'),
-      // state.error === 'fetchOrdersError' et on affiche t('getOrdersError')
-      expect(screen.getByText('Impossible de charger les commandes')).toBeInTheDocument();
-    });
+    // Attendre que le loading disparaisse et que l'erreur soit affichée
+    await waitFor(
+      () => {
+        // Vérifier que le loading a disparu
+        expect(screen.queryByTestId('spinner')).not.toBeInTheDocument();
+        // Vérifier que le message d'erreur est affiché
+        expect(screen.getByText('Impossible de charger les commandes')).toBeInTheDocument();
+      },
+      { timeout: 5000 }
+    );
   });
 });

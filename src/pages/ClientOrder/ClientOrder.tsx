@@ -152,8 +152,6 @@ function ClientOrder() {
     navigate('/');
   };
 
-  console.log({ focusedField });
-
   return (
     <div className="min-h-screen md:bg-[#F5F7FA]">
       {products.length === 0 ? (

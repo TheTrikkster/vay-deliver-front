@@ -1,10 +1,8 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import OrdersFilterModal from './OrdersFilterModal';
 import { tagsApi } from '../../api/services/tagsApi';
 import * as filterUtils from '../../utils/filterUtils';
-import { setFiltersObject, selectFiltersObject } from '../../store/slices/ordersSlice';
-import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { setFiltersObject } from '../../store/slices/ordersSlice';
 import { OrderStatus, Position } from '../../types/order';
 
 jest.mock('../../api/services/tagsApi');

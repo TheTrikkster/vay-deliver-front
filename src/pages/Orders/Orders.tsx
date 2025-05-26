@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
@@ -25,6 +25,7 @@ function Orders() {
     totalPages,
     isSelectionMode,
     selectedOrderIds,
+    tagError,
 
     // actions
     toggleSelectionMode,
@@ -52,35 +53,20 @@ function Orders() {
     [isSelectionMode, toggleOrderSelection, navigate]
   );
 
-  // 4) Quand on valide le filtre depuis la modale
-  const handleFilterApply = useCallback(
-    (status: OrderStatus | '', tags: string[], position: Position) => {
-      applyFilters(status, tags, position);
-      setIsFilterModalOpen(false);
-    },
-    [applyFilters]
-  );
-
-  // 5) Quand on confirme l’ajout de tag depuis la modale
-  const handleAddTag = useCallback(
-    (tagName: string) => {
-      console.log('handleAddTag', tagName, selectedOrderIds);
-      addTag(tagName, selectedOrderIds);
-      setIsAddTagModalOpen(false);
-    },
-    [addTag, selectedOrderIds]
-  );
-
   if (loading) return <Loading />;
 
   return (
     <div className="min-h-screen bg-gray-100 relative pb-6">
       <Menu />
 
-      {error ? (
+      {error || tagError ? (
         <div className="absolute top-60 left-1/2 transform -translate-x-1/2 bg-red-100 px-6 py-3 rounded-lg shadow-md">
           <p className="text-red-500">
-            {error === 'fetchOrdersError' ? t('getOrdersError') : t('addTagError')}
+            {error === 'fetchOrdersError'
+              ? t('getOrdersError')
+              : tagError
+                ? t('addTagError')
+                : error}
           </p>
         </div>
       ) : (

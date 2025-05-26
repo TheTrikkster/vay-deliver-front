@@ -3,9 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { OrderStatus, Position, Tag } from '../../types/order';
 import { tagsApi } from '../../api/services/tagsApi';
 import { debounce } from 'lodash';
-import PlacesAutocomplete, { geocodeByAddress, getLatLng } from 'react-places-autocomplete';
 import { AddressInput } from '../AddressInput';
-import { buildFilterString } from '../../utils/filterUtils';
 import { selectFiltersObject, setFiltersObject } from '../../store/slices/ordersSlice';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 
@@ -36,7 +34,6 @@ const OrdersFilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose }) => {
       setPosition(filtersObject.position);
       setSearchValue('');
       setSuggestedTags([]);
-      console.log({ filtersObject }, 'heelloa');
     }
   }, [isOpen, filtersObject]);
 
@@ -62,7 +59,7 @@ const OrdersFilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose }) => {
       alert(t('geoNotSupported'));
       return;
     }
-    console.log({ position });
+
     if (position.lat && position.lng) {
       // si déjà positionné, on réinitialise
       setPosition({ lat: '', lng: '', address: '' });
@@ -80,25 +77,9 @@ const OrdersFilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose }) => {
     );
   };
 
-  // 6) Sélection d’adresse via PlacesAutocomplete
-  const handleSelectAddress = async (address: string) => {
-    try {
-      console.log({ address }, '1111zezezepappp');
-      const results = await geocodeByAddress(address);
-      console.log({ results }, 'zezezepappp');
-      // const latLng = await getLatLng(results[0]);
-      setPosition(prev => ({ ...prev, address }));
-    } catch {
-      // ignore
-    }
-  };
-
   // 7) Appliquer les filtres et fermer
   const handleApply = () => {
     dispatch(setFiltersObject({ status, tagNames: selectedTags, position }));
-
-    // applyFilters(status, selectedTags, position);
-
     onClose();
   };
 
@@ -112,9 +93,6 @@ const OrdersFilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose }) => {
   };
 
   if (!isOpen) return null;
-
-  // console.log({ filtersObject });
-  console.log({ position });
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center md:px-0 px-4">
