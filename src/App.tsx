@@ -1,6 +1,6 @@
 import React, { lazy, Suspense, ReactNode } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import { OfflineIndicator } from './components/OfflineIndicator';
+import { OfflineIndicator } from './components/OfflineIndicator/OfflineIndicator';
 import { InstallPrompt } from './components/InstallPrompt';
 import { withAuthenticator } from '@aws-amplify/ui-react';
 import '@aws-amplify/ui-react/styles.css';

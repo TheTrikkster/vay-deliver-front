@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Menu from '../../components/Menu/Menu';
-import LanguageSwitcher from '../../components/LanguageSwitcher';
+import LanguageSwitcher from '../../components/LanguageSwitcher/LanguageSwitcher';
 import { ProductStatus } from '../../types/product';
 import { useAuthenticator } from '@aws-amplify/ui-react';
 import { useTranslation } from 'react-i18next';
@@ -8,7 +8,7 @@ import { settingsApi } from '../../api/services/settingsApi';
 import { ENDPOINTS } from '../../api/endpoints';
 import { API_BASE_URL_PROD } from '../../api/config';
 import axios from 'axios';
-import Toast from '../../components/Toast';
+import Toast from '../../components/Toast/Toast';
 import { useDispatch } from 'react-redux';
 import {
   selectClientOfflineMessage,

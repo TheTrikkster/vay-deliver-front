@@ -38,7 +38,7 @@ jest.mock('../../store/hooks', () => ({
 }));
 
 // Mock AddressInput
-jest.mock('../../components/AddressInput', () => ({
+jest.mock('../../components/AddressInput/AddressInput', () => ({
   AddressInput: ({ inputProps }: any) => <input data-testid="address-input" {...inputProps} />,
 }));
 

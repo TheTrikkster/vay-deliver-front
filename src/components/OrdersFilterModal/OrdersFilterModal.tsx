@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { OrderStatus, Position, Tag } from '../../types/order';
 import { tagsApi } from '../../api/services/tagsApi';
 import { debounce } from 'lodash';
-import { AddressInput } from '../AddressInput';
+import { AddressInput } from '../AddressInput/AddressInput';
 import { selectFiltersObject, setFiltersObject } from '../../store/slices/ordersSlice';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 

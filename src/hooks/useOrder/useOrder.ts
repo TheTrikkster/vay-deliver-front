@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ordersApi } from '../api/services/ordersApi';
-import { Order, OrderStatus } from '../types/order';
-import { sumCurrency } from '../utils/sumCurrency';
+import { ordersApi } from '../../api/services/ordersApi';
+import { Order, OrderStatus } from '../../types/order';
+import { sumCurrency } from '../../utils/sumCurrency';
 
 type ActionType = 'COMPLETE' | 'CANCEL' | 'DELETE';
 

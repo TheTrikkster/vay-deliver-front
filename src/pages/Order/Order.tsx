@@ -9,7 +9,7 @@ import OrderStatus from '../../components/OrderDetails/OrderStatus';
 import OrderItems from '../../components/OrderDetails/OrderItems';
 import OrderTagsSection from '../../components/OrderTagsSection/OrderTagsSection';
 import OrderActions from '../../components/OrderActions/OrderActions';
-import { useOrder } from '../../hooks/useOrder';
+import { useOrder } from '../../hooks/useOrder/useOrder';
 import { OrderStatus as OrderStatusType } from '../../types/order';
 
 const Order: React.FC = () => {

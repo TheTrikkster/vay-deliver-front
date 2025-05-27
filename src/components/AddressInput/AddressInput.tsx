@@ -1,17 +1,17 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { useAutocomplete } from '../hooks/useAutocomplete';
-import { useDebounce } from '../hooks/useDebounce';
+import { useAutocomplete } from '../../hooks/useAutocomplete';
+import { useDebounce } from '../../hooks/useDebounce';
 import { geocodeByPlaceId } from 'react-places-autocomplete';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
-  /** Callback when une adresse est sélectionnée */
+  /** Callback when an address is selected */
   onSelect: (address: string) => void;
-  /** Désactive l'input */
+  /** Disable the input */
   disabled?: boolean;
-  /** Props additionnels pour l'élément <input> */
+  /** Additional props for the <input> element */
   inputProps?: React.InputHTMLAttributes<HTMLInputElement>;
-  /** Icône ou n'importe quel composant à afficher à l'intérieur de l'input */
+  /** Icon or any component to display inside the input */
   icon?: React.ReactNode;
 }
 
@@ -25,14 +25,11 @@ export const AddressInput: React.FC<Props> = ({
   const [inputValue, setInputValue] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
 
-  // Debounce pour limiter les appels API
   const debounced = useDebounce(inputValue, 1000);
   const { predictions, isLoading, error } = useAutocomplete(debounced);
 
-  // Réf pour le container complet
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Ferme les suggestions au clic hors composant
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
@@ -40,30 +37,28 @@ export const AddressInput: React.FC<Props> = ({
       }
     }
     document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const handleSelect = useCallback(
     async (prediction: google.maps.places.PlacePrediction) => {
-      const results = await geocodeByPlaceId(prediction.placeId!);
-      const place = results[0];
-      const address = place.formatted_address!;
+      try {
+        const results = await geocodeByPlaceId(prediction.placeId!);
+        const place = results[0];
+        const address = place.formatted_address!;
 
-      setInputValue(address);
-      onSelect(address);
-      setShowSuggestions(false);
+        setInputValue(address);
+        onSelect(address);
+        setShowSuggestions(false);
+      } catch (err) {
+        console.error('Error fetching address:', err);
+      }
     },
     [onSelect]
   );
 
-  // Combinaison des props de style
-
   const paddingLeft = icon ? 'pl-10' : '';
   const combinedClassName = `${paddingLeft} ${inputProps.className ?? ''}`;
-
-  console.log({ inputProps });
 
   return (
     <div ref={containerRef} className="relative w-full">
@@ -75,16 +70,14 @@ export const AddressInput: React.FC<Props> = ({
       <input
         {...inputProps}
         type={inputProps.type ?? 'text'}
-        value={inputValue || inputProps.value}
+        value={inputValue}
         onChange={e => {
           setInputValue(e.target.value);
           setShowSuggestions(true);
           inputProps.onChange?.(e);
         }}
         onFocus={e => {
-          // callback parent
           inputProps.onFocus?.(e);
-          // ton comportement interne
           if (debounced.length >= 5) setShowSuggestions(true);
         }}
         onBlur={inputProps.onBlur}
@@ -101,6 +94,10 @@ export const AddressInput: React.FC<Props> = ({
             <li
               key={pred.placeId}
               role="option"
+              onMouseDown={e => {
+                e.preventDefault();
+                handleSelect(pred);
+              }}
               onClick={() => handleSelect(pred)}
               className="flex items-center gap-2 px-4 py-2 hover:bg-gray-100 cursor-pointer transition-colors"
             >

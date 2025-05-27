@@ -6,7 +6,9 @@
   "cancel": "Abbrechen",
   "confirm": "Bestätigen",
   "deleteConfirmation": "Löschbestätigung",
-  "deleteConfirmationText": "Sind Sie sicher, dass Sie diesen Artikel löschen möchten?",
+  "deleteConfirmationText": "Sind Sie sicher, dass Sie diesen Artikel löschen möchten ?",
+  "forceDeleteConfirmation": "Erzwingende Löschbestätigung",
+  "forceDeleteConfirmationText": "Sind Sie sicher, dass Sie diesen Artikel erzwingen löschen möchten ?",
   "delete": "Löschen",
   "productNoLongerExists": "Das Produkt existiert nicht mehr oder wurde gelöscht"
 }

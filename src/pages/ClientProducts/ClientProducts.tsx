@@ -15,7 +15,7 @@ import {
 import { calculatePrice } from '../../utils/orderCalcul';
 import Loading from '../../components/Loading';
 import { useTranslation } from 'react-i18next';
-import LanguageSwitcher from '../../components/LanguageSwitcher';
+import LanguageSwitcher from '../../components/LanguageSwitcher/LanguageSwitcher';
 import { settingsApi } from '../../api/services/settingsApi';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { sumCurrency } from '../../utils/sumCurrency';

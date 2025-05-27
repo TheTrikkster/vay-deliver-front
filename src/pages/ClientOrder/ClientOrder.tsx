@@ -6,10 +6,10 @@ import { clearClientOrder, setItems, setProducts } from '../../store/slices/clie
 import { toCents, mergeAndClean } from '../../utils/orderCalcul';
 import { ordersApi } from '../../api/services/ordersApi';
 import { useTranslation } from 'react-i18next';
-import { AddressInput } from '../../components/AddressInput';
-import { PhoneNumberInput } from '../../components/PhoneNumberInput';
+import { AddressInput } from '../../components/AddressInput/AddressInput';
+import { PhoneNumberInput } from '../../components/PhoneNumberInput/PhoneNumberInput';
 import Loading from '../../components/Loading';
-import InsufficientQuantityModal from '../../components/InsufficientQuantityModal';
+import InsufficientQuantityModal from '../../components/InsufficientQuantityModal/InsufficientQuantityModal';
 import { sumCurrency } from '../../utils/sumCurrency';
 
 interface FormData {

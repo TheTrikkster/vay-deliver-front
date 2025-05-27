@@ -248,8 +248,8 @@ function AdminProducts() {
       )}
       {forceOpen && (
         <DeleteProductModal
-          title={t('deleteConfirmation')}
-          message={t('deleteConfirmationText')}
+          title={t('forceDeleteConfirmation')}
+          message={t('forceDeleteConfirmationText')}
           cancelText={t('cancel')}
           confirmText={t('delete')}
           onClose={() => setForceOpen(false)}
