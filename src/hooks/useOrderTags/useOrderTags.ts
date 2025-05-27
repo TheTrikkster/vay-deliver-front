@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ordersApi } from '../api/services/ordersApi';
+import { ordersApi } from '../../api/services/ordersApi';
 
 interface UseOrderTagsProps {
   onSuccess?: () => void;

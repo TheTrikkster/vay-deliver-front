@@ -37,7 +37,9 @@ jest.mock('react-i18next', () => ({
   }),
 }));
 jest.mock('../../components/Menu/Menu', () => () => <div data-testid="menu" />);
-jest.mock('../../components/LanguageSwitcher', () => () => <div data-testid="lang-switcher" />);
+jest.mock('../../components/LanguageSwitcher/LanguageSwitcher', () => () => (
+  <div data-testid="lang-switcher" />
+));
 
 const mockStore = configureStore([]);
 

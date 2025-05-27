@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import AddTagModal from '../AddTagModal/AddTagModal';
 import ConfirmModal from '../ConfirmModal';
-import { useOrderTags } from '../../hooks/useOrderTags';
+import { useOrderTags } from '../../hooks/useOrderTags/useOrderTags';
 
 interface OrderTagsSectionProps {
   orderId: string;

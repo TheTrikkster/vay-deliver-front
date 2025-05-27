@@ -6,7 +6,9 @@
   "cancel": "Отменить",
   "confirm": "Подтвердить",
   "deleteConfirmation": "Подтверждение удаления",
-  "deleteConfirmationText": "Вы уверены, что хотите удалить этот элемент?",
+  "deleteConfirmationText": "Вы уверены, что хотите удалить этот элемент ?",
+  "forceDeleteConfirmation": "Подтверждение принудительного удаления",
+  "forceDeleteConfirmationText": "Вы уверены, что хотите принудительно удалить этот элемент ?",
   "delete": "Удалить",
   "productNoLongerExists": "Продукт больше не существует или был удален"
 }

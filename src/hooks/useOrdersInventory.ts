@@ -1,6 +1,6 @@
 import { useOrdersList } from './useOrdersList';
 import { useOrderSelection } from './useOrderSelection';
-import { useOrderTags } from './useOrderTags';
+import { useOrderTags } from './useOrderTags/useOrderTags';
 import { useNetworkStatus } from './useNetworkStatus';
 
 export function useOrders({ limit = 30 } = {}) {

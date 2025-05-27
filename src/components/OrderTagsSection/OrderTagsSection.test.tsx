@@ -35,7 +35,7 @@ jest.mock('../ConfirmModal', () => {
 const mockAddTag = jest.fn();
 const mockRemoveTag = jest.fn();
 
-jest.mock('../../hooks/useOrderTags', () => ({
+jest.mock('../../hooks/useOrderTags/useOrderTags', () => ({
   useOrderTags: jest.fn(),
 }));
 
@@ -59,7 +59,7 @@ jest.mock('react-i18next', () => ({
 }));
 
 // Import du mock après la déclaration
-import { useOrderTags } from '../../hooks/useOrderTags';
+import { useOrderTags } from '../../hooks/useOrderTags/useOrderTags';
 const mockUseOrderTags = useOrderTags as jest.MockedFunction<typeof useOrderTags>;
 
 describe('OrderTagsSection Component', () => {

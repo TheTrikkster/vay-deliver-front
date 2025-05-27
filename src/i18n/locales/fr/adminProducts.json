@@ -6,7 +6,9 @@
   "cancel": "Annuler",
   "confirm": "Confirmer",
   "deleteConfirmation": "Confirmation de suppression",
-  "deleteConfirmationText": "Êtes-vous sûr de vouloir supprimer cet élément?",
+  "deleteConfirmationText": "Êtes-vous sûr de vouloir supprimer cet élément ?",
+  "forceDeleteConfirmation": "Confirmation de suppression forcée",
+  "forceDeleteConfirmationText": "Êtes-vous sûr de vouloir supprimer de façon forcée cet élément ?",
   "delete": "Supprimer",
   "productNoLongerExists": "Le produit n'existe plus ou a été supprimé"
 }

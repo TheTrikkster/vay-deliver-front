@@ -4,8 +4,11 @@ import { useTranslation } from 'react-i18next';
 import {
   selectIsOnline as selectProductsIsOnline,
   selectPendingOperations as selectProductsPendingOperations,
-} from '../store/slices/productsSlice';
-import { selectOrdersIsOnline, selectOrdersPendingOperations } from '../store/slices/ordersSlice';
+} from '../../store/slices/productsSlice';
+import {
+  selectOrdersIsOnline,
+  selectOrdersPendingOperations,
+} from '../../store/slices/ordersSlice';
 
 export const OfflineIndicator: React.FC = () => {
   const { t } = useTranslation('offlineIndicator');
