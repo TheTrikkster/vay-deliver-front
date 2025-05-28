@@ -2,7 +2,6 @@ import { renderHook, act } from '@testing-library/react-hooks';
 import { useOrder } from './useOrder';
 import { ordersApi } from '../../api/services/ordersApi';
 import type { AxiosResponse } from 'axios';
-import { Order, OrderStatus } from '../../types/order';
 
 // Mock react-router navigate
 const mockNavigate = jest.fn();

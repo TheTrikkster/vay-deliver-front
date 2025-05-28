@@ -20,7 +20,6 @@ export function useOrders({ limit = 30 } = {}) {
     filtersObject: ordersList.filtersObject,
     distanceMatrix: ordersList.distanceMatrix,
     setPage: ordersList.setPage,
-    applyFilters: ordersList.applyFilters,
 
     // États de sélection
     selectedOrderIds: orderSelection.selectedOrderIds,

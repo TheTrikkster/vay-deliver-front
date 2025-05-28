@@ -72,12 +72,6 @@ const clientOrderSlice = createSlice({
     setOfflineMessage: (state, action: PayloadAction<string>) => {
       state.offlineMessage = action.payload;
     },
-
-    // checkoutClientOrder: state => {
-    //   // On garde les données intactes mais on pourrait les traiter ici
-    //   // par exemple, marquer le panier comme "en cours de commande"
-    //   return state;
-    // },
   },
 });
 

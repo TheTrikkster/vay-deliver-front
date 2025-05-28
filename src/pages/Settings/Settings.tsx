@@ -1,15 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import Menu from '../../components/Menu/Menu';
 import LanguageSwitcher from '../../components/LanguageSwitcher/LanguageSwitcher';
-import { ProductStatus } from '../../types/product';
 import { useAuthenticator } from '@aws-amplify/ui-react';
 import { useTranslation } from 'react-i18next';
 import { settingsApi } from '../../api/services/settingsApi';
-import { ENDPOINTS } from '../../api/endpoints';
-import { API_BASE_URL_PROD } from '../../api/config';
-import axios from 'axios';
 import Toast from '../../components/Toast/Toast';
-import { useDispatch } from 'react-redux';
 import {
   selectClientOfflineMessage,
   selectClientSiteStatus,
@@ -33,7 +28,6 @@ function Settings() {
     const fetchSettings = async () => {
       try {
         const settings = await settingsApi.getSettings();
-        // const settings = await axios.get(`${API_BASE_URL_PROD}/${ENDPOINTS.SETTINGS.BASE}`);
 
         console.log({ settings });
         dispatch(setSiteStatus(settings.data.siteStatus));
@@ -50,11 +44,6 @@ function Settings() {
 
   const handleConnetion = async (newStatus: 'OFFLINE' | 'ONLINE') => {
     try {
-      console.log('newStatus', newStatus);
-
-      // const settings = await axios.patch(
-      //   `https://7hogl4xayc.execute-api.us-east-1.amazonaws.com/dev/settings/site-status?status=${newStatus}`
-      // );
       await settingsApi.updateStatus(newStatus);
       setStatus(newStatus);
     } catch (error) {

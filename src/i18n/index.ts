@@ -42,10 +42,10 @@ import productsInventoryFR from './locales/fr/productsInventory.json';
 import productsInventoryEN from './locales/en/productsInventory.json';
 import productsInventoryRU from './locales/ru/productsInventory.json';
 import productsInventoryDE from './locales/de/productsInventory.json';
-import adminProductsFR from './locales/fr/adminProducts.json';
-import adminProductsEN from './locales/en/adminProducts.json';
-import adminProductsRU from './locales/ru/adminProducts.json';
-import adminProductsDE from './locales/de/adminProducts.json';
+import productsFR from './locales/fr/products.json';
+import productsEN from './locales/en/products.json';
+import productsRU from './locales/ru/products.json';
+import productsDE from './locales/de/products.json';
 import clientOrder_fr from './locales/fr/clientOrder.json';
 import clientOrder_en from './locales/en/clientOrder.json';
 import clientOrder_ru from './locales/ru/clientOrder.json';
@@ -104,7 +104,7 @@ const resources = {
     productForm: productFormFR,
     installPrompt: installPromptFR,
     productsInventory: productsInventoryFR,
-    adminProducts: adminProductsFR,
+    products: productsFR,
     clientOrder: clientOrder_fr,
     clientProducts: clientProducts_fr,
     createProduct: createProduct_fr,
@@ -128,7 +128,7 @@ const resources = {
     productForm: productFormEN,
     installPrompt: installPromptEN,
     productsInventory: productsInventoryEN,
-    adminProducts: adminProductsEN,
+    products: productsEN,
     clientOrder: clientOrder_en,
     clientProducts: clientProducts_en,
     createProduct: createProduct_en,
@@ -151,7 +151,7 @@ const resources = {
     productForm: productFormRU,
     installPrompt: installPromptRU,
     productsInventory: productsInventoryRU,
-    adminProducts: adminProductsRU,
+    products: productsRU,
     clientOrder: clientOrder_ru,
     clientProducts: clientProducts_ru,
     createProduct: createProduct_ru,
@@ -174,7 +174,7 @@ const resources = {
     productForm: productFormDE,
     installPrompt: installPromptDE,
     productsInventory: productsInventoryDE,
-    adminProducts: adminProductsDE,
+    products: productsDE,
     clientOrder: clientOrder_de,
     clientProducts: clientProducts_de,
     createProduct: createProduct_de,
@@ -214,7 +214,7 @@ i18n
       'productForm',
       'installPrompt',
       'productsInventory',
-      'adminProducts',
+      'products',
       'clientOrder',
       'clientProducts',
       'createProduct',

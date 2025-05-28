@@ -3,10 +3,7 @@ import { render, cleanup, act } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import { SyncManager } from './SyncManager';
-import {
-  removePendingOperation as removeProductPendingOperation,
-  setError,
-} from '../../store/slices/productsSlice';
+import { removePendingOperation as removeProductPendingOperation } from '../../store/slices/productsSlice';
 import { removePendingOperation as removeOrderPendingOperation } from '../../store/slices/ordersSlice';
 import { productsApi } from '../../api/services/productsApi';
 import { ordersApi } from '../../api/services/ordersApi';

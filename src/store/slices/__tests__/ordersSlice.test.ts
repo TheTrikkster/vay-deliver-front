@@ -23,14 +23,10 @@ import ordersReducer, {
   selectFiltersObject,
 } from '../ordersSlice';
 import { Order, OrderStatus } from '../../../types/order';
-import { ordersApi } from '../../../api/services/ordersApi';
-import { AxiosResponse } from 'axios';
 import { RootState } from '../../../store/userStore';
 
 jest.mock('../../../api/services/ordersApi');
 jest.mock('../../../api/config');
-
-const mockedOrdersApi = ordersApi as jest.Mocked<typeof ordersApi>;
 
 describe('orders reducer', () => {
   const initialState = {
@@ -64,14 +60,6 @@ describe('orders reducer', () => {
     unitExpression: 'kg',
     geoLocation: { lat: 1, lng: 1 },
   };
-
-  const createAxiosResponse = (data: any): AxiosResponse => ({
-    data,
-    status: 200,
-    statusText: 'OK',
-    headers: {},
-    config: {} as any,
-  });
 
   it('should return the initial state', () => {
     expect(ordersReducer(undefined, { type: '' })).toEqual(initialState);

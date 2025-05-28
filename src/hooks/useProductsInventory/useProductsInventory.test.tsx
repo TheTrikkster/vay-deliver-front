@@ -2,7 +2,7 @@ import React from 'react';
 import { renderHook, act } from '@testing-library/react-hooks';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
-import { useProductsInventory } from '../useProductsInventory';
+import { useProductsInventory } from './useProductsInventory';
 import { Store, UnknownAction } from 'redux';
 import { productsApi } from '../../api/services/productsApi';
 

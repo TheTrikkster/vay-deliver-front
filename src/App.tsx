@@ -8,7 +8,7 @@ import { SyncManager } from './components/SyncManager/SyncManager';
 import Settings from './pages/Settings/Settings';
 import { useTranslation } from 'react-i18next';
 
-const AdminProducts = lazy(() => import('./pages/AdminProducts/AdminProducts'));
+const Products = lazy(() => import('./pages/Products/Products'));
 const CreateProduct = lazy(() => import('./pages/CreateProduct/CreateProduct'));
 const ModifyProduct = lazy(() => import('./pages/ModifyProduct/ModifyProduct'));
 const Orders = lazy(() => import('./pages/Orders/Orders'));
@@ -48,7 +48,7 @@ const ProtectedRoutes = ({ children }: { children: ReactNode }) => {
 const AuthProtectedRoutes = withAuthenticator(ProtectedRoutes, { hideSignUp: true });
 
 const protectedRoutes = [
-  { path: '/admin-products', element: <AdminProducts /> },
+  { path: '/admin-products', element: <Products /> },
   { path: '/create-product', element: <CreateProduct /> },
   { path: '/modify-product/:id', element: <ModifyProduct /> },
   { path: '/admin-orders', element: <Orders /> },

@@ -4,11 +4,9 @@ import { ProductType } from '../../types/client';
 import { productsApi } from '../../api/services/productsApi';
 import Pagination from '../../components/PaginationComp/PaginationComp';
 import { useNavigate } from 'react-router-dom';
-import { RootState } from '../../store/userStore';
 import {
   addToClientOrder,
   clearClientOrder,
-  // checkoutClientOrder,
   removeFromClientOrder,
   selectClientItems,
 } from '../../store/slices/clientSlice';
@@ -16,7 +14,6 @@ import { calculatePrice } from '../../utils/orderCalcul';
 import Loading from '../../components/Loading';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../../components/LanguageSwitcher/LanguageSwitcher';
-import { settingsApi } from '../../api/services/settingsApi';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { sumCurrency } from '../../utils/sumCurrency';
 
@@ -106,10 +103,14 @@ function ClientProducts() {
     [cart, products, dispatch]
   );
 
-  const total = (Array.isArray(products) ? products : []).reduce((sum, product) => {
-    const quantity = cart[product._id] || 0;
-    return sum + calculatePrice(product.price, quantity);
-  }, 0);
+  const total = useMemo(
+    () =>
+      (Array.isArray(products) ? products : []).reduce((sum, product) => {
+        const quantity = cart[product._id] || 0;
+        return sum + calculatePrice(product.price, quantity);
+      }, 0),
+    [products, cart]
+  );
 
   // console.log({ products });
 

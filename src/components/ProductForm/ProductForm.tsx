@@ -81,6 +81,7 @@ function ProductForm({ initialValues, onSubmit, isEditing, isLoading = false }: 
   if (isLoading) {
     return <Loading />;
   }
+
   return (
     <div className="w-full min-h-screen flex justify-center md:items-center md:bg-gray-50 md:pt-0 pt-4">
       <div className="h-fit md:bg-white md:rounded-xl md:shadow-sm max-w-lg p-6">

@@ -1,4 +1,4 @@
-jest.mock('../../hooks/useProductsInventory');
+jest.mock('../../hooks/useProductsInventory/useProductsInventory');
 jest.mock('../../hooks/useOutsideClick');
 jest.mock('react-redux', () => ({
   ...jest.requireActual('react-redux'),
@@ -6,8 +6,8 @@ jest.mock('react-redux', () => ({
 }));
 
 import { render, screen, fireEvent, within } from '@testing-library/react';
-import AdminProducts from './AdminProducts';
-import { useProductsInventory } from '../../hooks/useProductsInventory';
+import Products from './Products';
+import { useProductsInventory } from '../../hooks/useProductsInventory/useProductsInventory';
 
 // Mock react-i18next
 jest.mock('react-i18next', () => ({
@@ -64,7 +64,7 @@ const mockInventoryItems = [
   },
 ];
 
-describe('AdminProducts', () => {
+describe('Products', () => {
   beforeEach(() => {
     // Configuration par défaut du mock pour useProductsInventory
     (useProductsInventory as jest.Mock).mockReturnValue({
@@ -84,7 +84,7 @@ describe('AdminProducts', () => {
   });
 
   it('devrait afficher les produits correctement', () => {
-    render(<AdminProducts />);
+    render(<Products />);
 
     expect(screen.getByText('Pommes')).toBeInTheDocument();
 
@@ -119,7 +119,7 @@ describe('AdminProducts', () => {
       setCurrentPage: jest.fn(),
     });
 
-    render(<AdminProducts />);
+    render(<Products />);
 
     expect(screen.getByText('Вы должны добавить продукт')).toBeInTheDocument();
     expect(screen.getByText('Добавить продукт')).toBeInTheDocument();
@@ -137,7 +137,7 @@ describe('AdminProducts', () => {
       setCurrentPage: jest.fn(),
     });
 
-    render(<AdminProducts />);
+    render(<Products />);
 
     // Trouver le spinner par sa classe et non par le rôle
     const spinner = screen.getByTestId('spinner');
@@ -157,7 +157,7 @@ describe('AdminProducts', () => {
       setCurrentPage: jest.fn(),
     });
 
-    render(<AdminProducts />);
+    render(<Products />);
 
     expect(screen.getByText('Erreur lors du chargement des données')).toBeInTheDocument();
   });
@@ -176,7 +176,7 @@ describe('AdminProducts', () => {
       setCurrentPage: jest.fn(),
     });
 
-    render(<AdminProducts />);
+    render(<Products />);
 
     // Simulons l'appel à openQuantityPopup
     const instance = screen.getByText('Pommes').closest('div');
@@ -214,7 +214,7 @@ describe('AdminProducts', () => {
       setCurrentPage: jest.fn(),
     });
 
-    render(<AdminProducts />);
+    render(<Products />);
 
     // Trouver et ouvrir le menu pour le premier élément
     const menuButtons = screen.getAllByLabelText('options');
@@ -260,7 +260,7 @@ describe('AdminProducts', () => {
       setCurrentPage: jest.fn(),
     });
 
-    render(<AdminProducts />);
+    render(<Products />);
 
     // Trouver et ouvrir le menu pour le premier élément
     const menuButtons = screen.getAllByLabelText('options');
@@ -301,7 +301,7 @@ describe('AdminProducts', () => {
       setCurrentPage: mockSetCurrentPage,
     });
 
-    render(<AdminProducts />);
+    render(<Products />);
 
     // Vérifier que la pagination est affichée
     const pageButtons = screen.getAllByRole('button', { name: /^[0-9]+$/ });
