@@ -33,10 +33,6 @@ interface UpdateOperationData {
   status?: ProductStatus;
 }
 
-interface DeleteOperationData {
-  id: number;
-}
-
 export const SyncManager: React.FC = () => {
   const dispatch = useDispatch();
   const productsPendingOperations = useSelector(selectProductsPendingOperations) || [];
@@ -132,7 +128,9 @@ export const SyncManager: React.FC = () => {
           }
 
           case 'DELETE': {
-            const deleteData = operation.data as DeleteOperationData;
+            const deleteData = operation.data as {
+              id: number;
+            };
             await productsApi.delete(deleteData.id);
 
             // Vérifier que l'opération a un ID dans les données

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { InventoryProduct } from '../../types/product';
 import ProductCard from '../../components/ProductCard/ProductCard';
 import { useOutsideClick } from '../../hooks/useOutsideClick';
-import { useProductsInventory } from '../../hooks/useProductsInventory';
+import { useProductsInventory } from '../../hooks/useProductsInventory/useProductsInventory';
 import Pagination from '../../components/PaginationComp/PaginationComp';
 import { Link } from 'react-router-dom';
 import Menu from '../../components/Menu/Menu';
@@ -12,8 +12,8 @@ import { setError } from '../../store/slices/productsSlice';
 import Loading from '../../components/Loading';
 import DeleteProductModal from '../../components/DeleteProductModal';
 
-function AdminProducts() {
-  const { t } = useTranslation('adminProducts');
+function Products() {
+  const { t } = useTranslation('products');
   const [isQuantityPopupOpen, setIsQuantityPopupOpen] = useState<boolean>(false);
   const [quantityToEdit, setQuantityToEdit] = useState<{ id: number; availableQuantity: number }>({
     id: 0,
@@ -118,24 +118,9 @@ function AdminProducts() {
     setIsQuantityPopupOpen(false);
   }, [quantityToEdit, updateItemQuantity, currentItems, dispatch]);
 
-  const handleQuantityChange = useCallback((value: string) => {
-    setQuantityToEdit(prev => ({ ...prev, availableQuantity: Number(value) }));
-  }, []);
-
   const currentProduct = currentItems.find(item => item.id === quantityToEdit.id);
 
   console.log({ error });
-
-  if (error && error !== 'activeOrder') {
-    return (
-      <div className="w-full min-h-screen bg-gray-100 pb-6">
-        <Menu showAddProd={true} />
-        <div className="absolute top-60 left-1/2 transform -translate-x-1/2 bg-red-100 px-6 py-3 rounded-lg shadow-md">
-          <p className="text-red-500">{error}</p>
-        </div>
-      </div>
-    );
-  }
 
   if (loading) {
     return <Loading />;
@@ -144,6 +129,12 @@ function AdminProducts() {
   return (
     <div className="w-full min-h-screen bg-gray-100 pb-6">
       <Menu showAddProd={true} />
+
+      {error && error !== 'activeOrder' && (
+        <div className="absolute top-60 left-1/2 transform -translate-x-1/2 bg-red-100 px-6 py-3 rounded-lg shadow-md">
+          <p className="text-red-500">{error}</p>
+        </div>
+      )}
 
       {!loading && (
         <div className="flex flex-col items-center gap-4 mt-5">
@@ -261,4 +252,4 @@ function AdminProducts() {
   );
 }
 
-export default AdminProducts;
+export default Products;

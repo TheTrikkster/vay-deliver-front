@@ -1,4 +1,3 @@
-// store/slices/ordersSlice.ts
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Order, OrderStatus, Position, AddTagOperationData } from '../../types/order';
 import { buildFilterString } from '../../utils/filterUtils';

@@ -7,15 +7,18 @@ import Pagination from '../../components/PaginationComp/PaginationComp';
 import OrderCard from '../../components/OrderCard/OrderCard';
 import OrdersFilterModal from '../../components/OrdersFilterModal/OrdersFilterModal';
 import AddTagModal from '../../components/AddTagModal/AddTagModal';
-
 import { useOrders } from '../../hooks/useOrdersInventory';
-import { OrderStatus, Position } from '../../types/order';
+import { OrderStatus } from '../../types/order';
 
 function Orders() {
   const { t } = useTranslation('orders');
   const navigate = useNavigate();
 
-  // 1) On récupère tout depuis useOrders
+  // 1) États locaux pour les modals & filtres
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  const [isAddTagModalOpen, setIsAddTagModalOpen] = useState(false);
+
+  // 2) On récupère tout depuis useOrders
   const {
     orders,
     loading,
@@ -31,14 +34,9 @@ function Orders() {
     toggleOrderSelection,
     selectAllOrders,
     clearSelection,
-    applyFilters,
     addTag,
     setPage,
   } = useOrders({ limit: 30 });
-
-  // 2) États locaux pour les modals & filtres
-  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
-  const [isAddTagModalOpen, setIsAddTagModalOpen] = useState(false);
 
   // 3) Gestion du clic sur une carte
   const handleCardClick = useCallback(

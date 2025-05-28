@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux';
 import {
   fetchOrders,
   setCurrentPage,
-  setFiltersObject,
   selectOrders,
   selectOrdersLoading,
   selectOrdersError,
@@ -13,7 +12,6 @@ import {
   selectFiltersObject,
   selectDistanceMatrix,
 } from '../store/slices/ordersSlice';
-import { OrderStatus, Position } from '../types/order';
 import { useAppDispatch } from '../store/hooks';
 import { useNetworkStatus } from './useNetworkStatus';
 
@@ -46,7 +44,5 @@ export function useOrdersList({ limit = 30 } = {}) {
     filtersObject,
     distanceMatrix,
     setPage: (page: number) => dispatch(setCurrentPage(page)),
-    applyFilters: (status: OrderStatus | '', tagNames: string[], position: Position) =>
-      dispatch(setFiltersObject({ status, tagNames, position })),
   };
 }

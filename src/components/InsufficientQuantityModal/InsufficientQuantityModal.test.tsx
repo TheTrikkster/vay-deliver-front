@@ -1,4 +1,3 @@
-// InsufficientQuantityModal.test.tsx
 import React from 'react';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import InsufficientQuantityModal from './InsufficientQuantityModal';
@@ -111,7 +110,6 @@ describe('InsufficientQuantityModal', () => {
     const { container } = render(
       <InsufficientQuantityModal products={mockProducts} onClose={onClose} onConfirm={onConfirm} />
     );
-    // Le conteneur principal doit avoir la classe d'incrustation
     expect(container.firstChild).toHaveClass('fixed inset-0 bg-black bg-opacity-40');
   });
 });

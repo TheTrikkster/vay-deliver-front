@@ -1,5 +1,4 @@
 type ItemsObj = Record<string, number>;
-type Update = { id: string; nombre: number };
 
 export function toCents(amount: number) {
   return Math.round(amount * 100);

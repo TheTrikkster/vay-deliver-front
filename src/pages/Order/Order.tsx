@@ -24,7 +24,6 @@ const Order: React.FC = () => {
     total,
     handleActionClick,
     handleConfirmAction,
-    currentAction,
     isConfirmModalOpen,
     setIsConfirmModalOpen,
     getConfirmationInfo,

@@ -1,10 +1,7 @@
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { OrderStatus } from '../../types/order';
+import { ActionType, OrderStatus } from '../../types/order';
 import { useOutsideClick } from '../../hooks/useOutsideClick';
-
-export type ActionType = 'COMPLETE' | 'CANCEL' | 'DELETE';
-
 interface OrderActionsProps {
   orderStatus: OrderStatus;
   onActionClick: (action: ActionType) => void;
@@ -15,7 +12,6 @@ const OrderActions = ({ orderStatus, onActionClick }: OrderActionsProps) => {
   const [showActionMenu, setShowActionMenu] = useState<boolean>(false);
   const actionMenuRef = useRef<HTMLDivElement>(null);
 
-  // Utilisation du hook useOutsideClick
   useOutsideClick(actionMenuRef, () => setShowActionMenu(false));
 
   const handleAction = (action: ActionType) => {

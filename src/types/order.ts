@@ -47,3 +47,5 @@ export interface AddTagOperationData {
   tagName: string;
   orderIds: string[] | string;
 }
+
+export type ActionType = 'COMPLETE' | 'CANCEL' | 'DELETE';

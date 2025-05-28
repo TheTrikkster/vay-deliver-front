@@ -1,8 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { InventoryProduct, ProductStatus } from '../types/product';
-import { handleApiError } from '../utils/errorHandling';
+import { InventoryProduct, ProductStatus } from '../../types/product';
 import {
   setProductsItems,
   setLoading,
@@ -14,8 +13,8 @@ import {
   selectProductsLoading,
   selectProductsError,
   selectIsOnline,
-} from '../store/slices/productsSlice';
-import { productsApi } from '../api/services/productsApi';
+} from '../../store/slices/productsSlice';
+import { productsApi } from '../../api/services/productsApi';
 
 interface Item {
   _id: number;

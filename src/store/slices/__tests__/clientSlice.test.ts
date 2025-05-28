@@ -10,6 +10,7 @@ describe('clientOrderSlice', () => {
     name: 'Test Product',
     description: 'Description du produit test',
     minOrder: 1,
+    maxOrder: 10,
     price: 1000,
     unitExpression: 'kg',
   };
@@ -17,6 +18,8 @@ describe('clientOrderSlice', () => {
   const initialState = {
     items: {},
     products: [],
+    siteStatus: 'ONLINE',
+    offlineMessage: '',
   };
 
   describe('addToClientOrder', () => {
@@ -38,6 +41,8 @@ describe('clientOrderSlice', () => {
       const stateWithProduct = {
         items: { '1': 2 },
         products: [mockProduct],
+        siteStatus: 'ONLINE',
+        offlineMessage: '',
       };
 
       const action = addToClientOrder({
@@ -58,6 +63,7 @@ describe('clientOrderSlice', () => {
         name: 'Existing Product',
         description: 'Description du produit existant',
         minOrder: 1,
+        maxOrder: 10,
         price: 2000,
         unitExpression: 'kg',
       };
@@ -65,6 +71,8 @@ describe('clientOrderSlice', () => {
       const stateWithProduct = {
         items: { '2': 1 },
         products: [existingProduct],
+        siteStatus: 'ONLINE',
+        offlineMessage: '',
       };
 
       const action = addToClientOrder({
@@ -86,6 +94,8 @@ describe('clientOrderSlice', () => {
       const stateWithProduct = {
         items: { '1': 5 },
         products: [mockProduct],
+        siteStatus: 'ONLINE',
+        offlineMessage: '',
       };
 
       const action = removeFromClientOrder({
@@ -103,6 +113,8 @@ describe('clientOrderSlice', () => {
       const stateWithProduct = {
         items: { '1': 2 },
         products: [mockProduct],
+        siteStatus: 'ONLINE',
+        offlineMessage: '',
       };
 
       const action = removeFromClientOrder({
@@ -133,6 +145,8 @@ describe('clientOrderSlice', () => {
       const stateWithProducts = {
         items: { '1': 2, '2': 3 },
         products: [mockProduct, { ...mockProduct, _id: '2' }],
+        siteStatus: 'ONLINE',
+        offlineMessage: '',
       };
 
       const action = clearClientOrder();

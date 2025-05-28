@@ -1,10 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ordersApi } from '../../api/services/ordersApi';
-import { Order, OrderStatus } from '../../types/order';
+import { ActionType, Order, OrderStatus } from '../../types/order';
 import { sumCurrency } from '../../utils/sumCurrency';
-
-type ActionType = 'COMPLETE' | 'CANCEL' | 'DELETE';
 
 // Type enrichi pour les items avec les détails du produit
 interface OrderItemExtended {
@@ -20,11 +18,7 @@ interface OrderExtended extends Omit<Order, 'items'> {
   items: OrderItemExtended[];
 }
 
-interface UseOrderProps {
-  id: string;
-}
-
-export const useOrder = ({ id }: UseOrderProps) => {
+export const useOrder = ({ id }: { id: string }) => {
   const navigate = useNavigate();
   const [orderDetails, setOrderDetails] = useState<OrderExtended | null>(null);
   const [loading, setLoading] = useState<boolean>(true);

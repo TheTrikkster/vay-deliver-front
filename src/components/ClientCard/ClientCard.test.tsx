@@ -2,10 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import ClientCard from './ClientCard';
-import { sumCurrency } from '../../utils/sumCurrency';
 import { ProductType } from '../../types/client';
-
-// Pas de mock pour sumCurrency: on teste le rendu réel
 
 // Mock i18next
 jest.mock('react-i18next', () => ({

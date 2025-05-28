@@ -11,7 +11,7 @@ const api = axios.create({
   },
 });
 
-// // Intercepteur pour injecter dynamiquement le token JWT d'Amplify v6 dans chaque requête
+// Intercepteur pour injecter dynamiquement le token JWT d'Amplify v6 dans chaque requête
 api.interceptors.request.use(
   async config => {
     try {
