@@ -45,7 +45,7 @@ describe('useProductsInventory hook', () => {
     // Configurer le store
     store = mockStore({
       products: {
-        items: [{ id: 1, name: 'Pomme', price: '5₽', quantity: '10', unitExpression: 'kg' }],
+        items: [{ id: 1, name: 'Pomme', price: '5€', quantity: '10', unitExpression: 'kg' }],
         isLoading: false,
         error: null,
         lastFetched: Date.now(),
@@ -197,7 +197,7 @@ describe('useProductsInventory hook', () => {
     // Configurer un état hors ligne
     const offlineStore = mockStore({
       products: {
-        items: [{ id: 1, name: 'Pomme', price: '5₽', quantity: '10', unitExpression: 'kg' }],
+        items: [{ id: 1, name: 'Pomme', price: '5€', quantity: '10', unitExpression: 'kg' }],
         isLoading: false,
         error: null,
         lastFetched: Date.now(),

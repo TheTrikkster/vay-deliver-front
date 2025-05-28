@@ -96,7 +96,7 @@ describe('CreateProduct', () => {
       data: {
         _id: '123',
         name: 'Test Product',
-        price: '10₽',
+        price: '10€',
         availableQuantity: 20,
         unitExpression: 'kg',
         description: 'Test Description',

@@ -67,7 +67,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
       {/* Prix/Unité */}
       <div className=" text-sm md:text-base">
         <p className="text-[#9DA0A5] mb-1 text-sm">
-          {product.price}₽/{product.unitExpression} | {product.minOrder} {t('minOrder')}
+          {product.price}€/{product.unitExpression} | {product.minOrder} {t('minOrder')}
         </p>
         <p className="text-[#9DA0A5] mb-4 text-sm">{product.description}</p>
       </div>
