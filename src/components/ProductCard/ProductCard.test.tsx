@@ -57,7 +57,7 @@ describe('Composant ProductCard', () => {
     expect(screen.getByText('Pommes')).toBeInTheDocument();
 
     // Modifier la façon de vérifier le texte
-    const priceElement = screen.getByText(/2.5₽\/kg/);
+    const priceElement = screen.getByText(/2.5€\/kg/);
     expect(priceElement).toBeInTheDocument();
     expect(priceElement.textContent).toContain('1');
     expect(priceElement.textContent).toContain('мин');
