@@ -25,7 +25,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const { t } = useTranslation('productCard');
 
   return (
-    <div className="min-w-[343px] w-11/12 md:w-2/4 bg-white rounded-3xl p-5 relative shadow-md">
+    <div className="min-w-[343px] w-11/12 md:w-2/4 bg-white rounded-2xl p-5 relative shadow-md">
       <div className="flex justify-between items-start mb-2">
         <h3 className="text-lg md:text-2xl font-semibold text-[#333333]">{product.name}</h3>
         <button
