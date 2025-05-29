@@ -39,21 +39,21 @@ const Order: React.FC = () => {
       <Menu />
       <button
         onClick={() => navigate(-1)}
-        className="absolute top-3 left-4 p-2 rounded-full transition-colors z-10 md:bg-transparent"
+        className="absolute top-4 left-4 p-2.5 rounded-full transition-colors z-10 md:bg-white md:shadow-sm md:border md:border-gray-200 hover:bg-gray-50"
       >
         <svg
-          width="24"
-          height="24"
+          width="20"
+          height="20"
           viewBox="0 0 24 24"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
-          <path d="M15.41 7.41L14 6L8 12L14 18L15.41 16.59L10.83 12L15.41 7.41Z" fill="#666666" />
+          <path d="M15.41 7.41L14 6L8 12L14 18L15.41 16.59L10.83 12L15.41 7.41Z" fill="#374151" />
         </svg>
       </button>
 
-      <div className="flex justify-center mt-8 pb-24">
-        <div className="min-w-[343px] w-full md:w-5/12 bg-white rounded-2xl p-5 md:shadow-md max-w-[500px] md:mx-0 mx-4">
+      <div className="flex justify-center mt-10 pb-28">
+        <div className="min-w-[343px] w-full md:w-5/12 bg-white rounded-2xl p-6 md:shadow-md max-w-[500px] md:mx-0 mx-4">
           <OrderStatus status={orderDetails.status as OrderStatusType} />
 
           <CustomerInfo
@@ -90,9 +90,9 @@ const Order: React.FC = () => {
   ) : (
     <div
       data-testid="error-message"
-      className="absolute top-60 left-1/2 transform -translate-x-1/2 bg-red-100 px-6 py-3 rounded-lg shadow-md"
+      className="absolute top-60 left-1/2 transform -translate-x-1/2 bg-red-50 border border-red-200 px-6 py-4 rounded-xl shadow-sm"
     >
-      <p className="text-red-500">{error}</p>
+      <p className="text-red-600 font-medium">{error}</p>
     </div>
   );
 };

@@ -28,6 +28,8 @@ function Orders() {
     isSelectionMode,
     selectedOrderIds,
     tagError,
+    filtersObject,
+    distanceMatrix,
 
     // actions
     toggleSelectionMode,
@@ -37,6 +39,40 @@ function Orders() {
     addTag,
     setPage,
   } = useOrders({ limit: 30 });
+
+  // 3) Fonction pour obtenir la distance d'une commande
+  const getOrderDistance = useCallback(
+    (orderId: string): string | undefined => {
+      if (!distanceMatrix || !filtersObject.position.address) {
+        return undefined;
+      }
+
+      // Le distanceMatrix contient destinations (array d'IDs) et distances (array de distances en mètres)
+      const { destinations, distances } = distanceMatrix;
+
+      if (!destinations || !distances) {
+        return undefined;
+      }
+
+      // Trouver l'index de cette commande dans le tableau destinations
+      const orderIndex = destinations.indexOf(orderId);
+
+      if (orderIndex === -1 || orderIndex >= distances.length) {
+        return undefined;
+      }
+
+      // Récupérer la distance en mètres et la convertir en format lisible
+      const distanceInMeters = distances[orderIndex];
+
+      if (distanceInMeters < 1000) {
+        return `${distanceInMeters} m`;
+      } else {
+        const distanceInKm = (distanceInMeters / 1000).toFixed(1);
+        return `${distanceInKm} km`;
+      }
+    },
+    [distanceMatrix, filtersObject.position.address]
+  );
 
   // 3) Gestion du clic sur une carte
   const handleCardClick = useCallback(
@@ -128,6 +164,7 @@ function Orders() {
                     status={order.status as OrderStatus}
                     isSelectionMode={isSelectionMode}
                     isSelected={selectedOrderIds.includes(order._id)}
+                    distance={getOrderDistance(order._id)}
                   />
                 </div>
               ))

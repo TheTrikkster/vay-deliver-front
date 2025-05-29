@@ -6,19 +6,19 @@ interface OrderStatusProps {
   className?: string;
 }
 
-const OrderStatus = ({ status, className = 'flex justify-end mb-5' }: OrderStatusProps) => {
+const OrderStatus = ({ status, className = 'flex justify-end mb-6' }: OrderStatusProps) => {
   const { t } = useTranslation('order');
 
   return (
     <div className={className}>
       <span
         data-testid="order-status"
-        className={`px-3 py-1.5 rounded text-sm ${
+        className={`px-4 py-2 rounded-lg text-sm font-medium ${
           status === 'ACTIVE'
-            ? 'bg-green-50 text-green-500'
+            ? 'bg-green-50 text-green-600 border border-green-200'
             : status === 'COMPLETED'
-              ? 'bg-gray-100 text-gray-500'
-              : 'bg-red-50 text-red-500'
+              ? 'bg-gray-100 text-gray-600 border border-gray-200'
+              : 'bg-red-50 text-red-600 border border-red-200'
         }`}
       >
         {status === 'ACTIVE'
