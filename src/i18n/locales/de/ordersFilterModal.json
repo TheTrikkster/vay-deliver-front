@@ -3,6 +3,7 @@
   "orders": "Bestellungen",
   "active": "Aktiv",
   "completed": "Abgeschlossen",
+  "canceled": "Storniert",
   "all": "Alle",
   "addressSort": "Nach Adresse sortieren",
   "enterAddress": "Geben Sie eine Adresse oder einen Stadtnamen ein",

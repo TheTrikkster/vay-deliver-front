@@ -141,6 +141,7 @@ const OrdersFilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose }) => {
           >
             <option value="ACTIVE">{t('active')}</option>
             <option value="COMPLETED">{t('completed')}</option>
+            <option value="CANCELED">{t('canceled')}</option>
             <option value="">{t('all')}</option>
           </select>
         </div>
@@ -212,30 +213,20 @@ const OrdersFilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose }) => {
                       xmlns="http://www.w3.org/2000/svg"
                       width="24"
                       height="24"
-                      viewBox="0 0 21 24"
+                      viewBox="0 0 24 24"
                       fill="none"
+                      stroke="#22C55D"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                     >
-                      <path
-                        d="M15.5 7.16663C15.5 10.1775 12.2758 13.3575 11.0058 14.4958C10.8606 14.6068 10.6828 14.6669 10.5 14.6669C10.3172 14.6669 10.1394 14.6068 9.99417 14.4958C8.725 13.3575 5.5 10.1775 5.5 7.16663C5.5 5.84054 6.02678 4.56877 6.96447 3.63109C7.90215 2.69341 9.17392 2.16663 10.5 2.16663C11.8261 2.16663 13.0979 2.69341 14.0355 3.63109C14.9732 4.56877 15.5 5.84054 15.5 7.16663Z"
-                        stroke="#22C55D"
-                        strokeWidth="1.3"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M10.5 8.83333C11.4205 8.83333 12.1667 8.08714 12.1667 7.16667C12.1667 6.24619 11.4205 5.5 10.5 5.5C9.57954 5.5 8.83334 6.24619 8.83334 7.16667C8.83334 8.08714 9.57954 8.83333 10.5 8.83333Z"
-                        stroke="#22C55D"
-                        strokeWidth="1.3"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M7.76167 12.1666H4.67C4.49528 12.1667 4.32499 12.2217 4.18323 12.3238C4.04146 12.426 3.93539 12.5701 3.88 12.7358L2.21 17.7358C2.16814 17.8611 2.15664 17.9945 2.17646 18.125C2.19629 18.2556 2.24686 18.3796 2.32402 18.4868C2.40118 18.594 2.5027 18.6813 2.62023 18.7415C2.73776 18.8018 2.86793 18.8332 3 18.8333H18C18.132 18.8332 18.262 18.8017 18.3795 18.7416C18.4969 18.6814 18.5984 18.5941 18.6755 18.487C18.7527 18.38 18.8033 18.2561 18.8232 18.1256C18.8431 17.9952 18.8317 17.8618 18.79 17.7366L17.1233 12.7366C17.068 12.5706 16.9619 12.4262 16.82 12.3239C16.678 12.2216 16.5075 12.1666 16.3325 12.1666H13.2392"
-                        stroke="#22C55D"
-                        strokeWidth="1.3"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
+                      <circle cx="12" cy="12" r="8" />
+                      <circle cx="12" cy="12" r="3" />
+                      <circle cx="12" cy="12" r="1" fill="#22C55D" />
+                      <path d="M12 2v4" />
+                      <path d="M12 18v4" />
+                      <path d="M2 12h4" />
+                      <path d="M18 12h4" />
                     </svg>
                   )}
                 </button>

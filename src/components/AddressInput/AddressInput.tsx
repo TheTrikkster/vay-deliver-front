@@ -64,7 +64,8 @@ export const AddressInput: React.FC<Props> = ({
   );
 
   const paddingLeft = icon ? 'pl-10' : '';
-  const combinedClassName = `${paddingLeft} ${inputProps.className ?? ''}`;
+  const paddingRight = 'pr-12';
+  const combinedClassName = `${paddingLeft} ${paddingRight} ${inputProps.className ?? ''}`;
 
   return (
     <div ref={containerRef} className="relative w-full">

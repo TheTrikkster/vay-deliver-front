@@ -4,8 +4,8 @@ import { useAddressFilter } from '../../hooks/useAddressFilter';
 interface AddressQuickSetProps {
   /** Adresse prédéfinie à injecter */
   address: string;
-  /** Texte du bouton (optionnel) */
-  buttonText?: string;
+  /** Texte du bouton (optionnel) - peut être une string ou du JSX */
+  buttonText?: string | React.ReactNode;
   /** Classes CSS additionnelles */
   className?: string;
 }
