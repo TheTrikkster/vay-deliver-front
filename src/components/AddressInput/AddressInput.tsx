@@ -22,8 +22,14 @@ export const AddressInput: React.FC<Props> = ({
   icon,
 }) => {
   const { t } = useTranslation('addressInput');
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState(String(inputProps.value || ''));
   const [showSuggestions, setShowSuggestions] = useState(false);
+
+  useEffect(() => {
+    if (inputProps.value !== undefined) {
+      setInputValue(String(inputProps.value));
+    }
+  }, [inputProps.value]);
 
   const debounced = useDebounce(inputValue, 1000);
   const { predictions, isLoading, error } = useAutocomplete(debounced);
@@ -72,13 +78,14 @@ export const AddressInput: React.FC<Props> = ({
         type={inputProps.type ?? 'text'}
         value={inputValue}
         onChange={e => {
-          setInputValue(e.target.value);
+          const newValue = e.target.value;
+          setInputValue(newValue);
           setShowSuggestions(true);
           inputProps.onChange?.(e);
         }}
         onFocus={e => {
           inputProps.onFocus?.(e);
-          if (debounced.length >= 5) setShowSuggestions(true);
+          if (inputValue.length >= 5) setShowSuggestions(true);
         }}
         onBlur={inputProps.onBlur}
         className={combinedClassName}

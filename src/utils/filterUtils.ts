@@ -13,13 +13,9 @@ export function buildFilterString(params: {
   if (status) filters.append('status', status);
   if (tagNames.length > 0) filters.append('tagNames', tagNames.join(','));
 
-  if (position.address || (position.lat && position.lng)) filters.append('sortBy', 'geoLocation');
-
   if (position.address) {
+    filters.append('sortBy', 'geoLocation');
     filters.append('address', position.address);
-  } else if (position.lat && position.lng) {
-    filters.append('lat', position.lat);
-    filters.append('lng', position.lng);
   }
 
   console.log(filters.toString(), 'helloooo');

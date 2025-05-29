@@ -44,7 +44,7 @@ describe('orders reducer', () => {
     filtersObject: {
       status: 'ACTIVE' as OrderStatus,
       tagNames: [],
-      position: { lat: '', lng: '', address: '' },
+      position: { address: '' },
     },
   };
 
@@ -117,7 +117,7 @@ describe('orders reducer', () => {
     const filters = {
       status: 'COMPLETED' as OrderStatus,
       tagNames: ['a'],
-      position: { lat: '0', lng: '0', address: '' },
+      position: { address: '0' },
     };
     const state = ordersReducer(initialState, setFiltersObject(filters));
     expect(state.filtersObject).toEqual(filters);
@@ -234,7 +234,7 @@ describe('orders reducer', () => {
         filtersObject: {
           status: 'ACTIVE' as OrderStatus,
           tagNames: ['a'],
-          position: { lat: '0', lng: '0', address: '' },
+          position: { address: '0' },
         },
       },
     } as unknown as RootState;
@@ -255,7 +255,7 @@ describe('orders reducer', () => {
       expect(selectFiltersObject(mockState)).toEqual({
         status: 'ACTIVE',
         tagNames: ['a'],
-        position: { lat: '0', lng: '0', address: '' },
+        position: { address: '0' },
       }));
   });
 });

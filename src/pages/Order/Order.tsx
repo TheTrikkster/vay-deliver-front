@@ -61,6 +61,7 @@ const Order: React.FC = () => {
             lastName={orderDetails.lastName}
             address={orderDetails.address}
             phoneNumber={orderDetails.phoneNumber}
+            orderStatus={orderDetails.status as OrderStatusType}
           />
 
           <OrderItems items={orderDetails.items} total={total} />

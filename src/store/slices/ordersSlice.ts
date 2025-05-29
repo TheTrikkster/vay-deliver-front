@@ -38,9 +38,9 @@ const initialState: OrdersState = {
   currentFilters: buildFilterString({
     status: 'ACTIVE',
     tagNames: [],
-    position: { lat: '', lng: '', address: '' },
+    position: { address: '' },
   }),
-  filtersObject: { status: 'ACTIVE', tagNames: [], position: { lat: '', lng: '', address: '' } },
+  filtersObject: { status: 'ACTIVE', tagNames: [], position: { address: '' } },
   isOnline: navigator.onLine,
   pendingOperations: [],
   distanceMatrix: null,
@@ -161,6 +161,11 @@ export const ordersSlice = createSlice({
     resetError: state => {
       state.error = null;
     },
+    setAddress: (state, { payload }: PayloadAction<string>) => {
+      state.filtersObject.position.address = payload;
+      state.currentFilters = buildFilterString(state.filtersObject);
+      state.currentPage = 1;
+    },
   },
   extraReducers: builder => {
     builder
@@ -220,6 +225,7 @@ export const {
   toggleOrderSelection,
   selectAllOrders,
   resetError,
+  setAddress,
 } = ordersSlice.actions;
 
 // Selectors

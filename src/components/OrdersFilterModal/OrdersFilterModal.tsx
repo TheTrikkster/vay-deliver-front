@@ -6,6 +6,7 @@ import { debounce } from 'lodash';
 import { AddressInput } from '../AddressInput/AddressInput';
 import { selectFiltersObject, setFiltersObject } from '../../store/slices/ordersSlice';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import { useReverseGeocode } from '../../hooks/useReverseGeocode';
 
 interface FilterModalProps {
   isOpen: boolean;
@@ -16,6 +17,7 @@ const OrdersFilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose }) => {
   const { t } = useTranslation('ordersFilterModal');
   const filtersObject = useAppSelector(selectFiltersObject);
   const dispatch = useAppDispatch();
+  const { reverseGeocode, isLoading: isReverseGeocoding } = useReverseGeocode();
 
   // 2) États locaux pour manipuler temporairement les filtres dans le modal
   const [status, setStatus] = useState<OrderStatus | ''>(filtersObject.status);
@@ -53,28 +55,30 @@ const OrdersFilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose }) => {
 
   const debouncedSearchTag = useCallback(debounce(searchTag, 300), [searchTag]);
 
-  // 5) Géolocalisation
-  const getCurrentLocation = () => {
+  // 5) Géolocalisation avec reverse geocoding
+  const getCurrentLocation = async () => {
     if (!navigator.geolocation) {
       alert(t('geoNotSupported'));
       return;
     }
 
-    if (position.lat && position.lng) {
-      // si déjà positionné, on réinitialise
-      setPosition({ lat: '', lng: '', address: '' });
+    // Si l'adresse est déjà remplie, on vide le champ (toggle)
+    if (position.address) {
+      setPosition({ address: '' });
       return;
     }
-    navigator.geolocation.getCurrentPosition(
-      ({ coords }) => {
-        setPosition({
-          lat: coords.latitude.toString(),
-          lng: coords.longitude.toString(),
-          address: '',
-        });
-      },
-      () => alert(t('geoError'))
-    );
+
+    try {
+      const coords = await new Promise<GeolocationPosition>((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject);
+      });
+
+      const address = await reverseGeocode(coords.coords.latitude, coords.coords.longitude);
+      setPosition({ address });
+    } catch (error) {
+      console.error('Erreur géolocalisation:', error);
+      alert(t('geoError'));
+    }
   };
 
   // 7) Appliquer les filtres et fermer
@@ -83,11 +87,11 @@ const OrdersFilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose }) => {
     onClose();
   };
 
-  // 8) Réinitialiser à l’ouverture
+  // 8) Réinitialiser à l'ouverture
   const handleReset = () => {
     setStatus('ACTIVE');
     setSelectedTags([]);
-    setPosition({ lat: '', lng: '', address: '' });
+    setPosition({ address: '' });
     setSearchValue('');
     setSuggestedTags([]);
   };
@@ -124,7 +128,7 @@ const OrdersFilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose }) => {
             onChange={e => {
               setStatus(e.target.value as OrderStatus | '');
               if (e.target.value !== 'ACTIVE') {
-                setPosition({ lat: '', lng: '', address: '' });
+                setPosition({ address: '' });
               }
               setSelectedTags([]);
             }}
@@ -147,12 +151,12 @@ const OrdersFilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose }) => {
             <h3 className="text-lg font-medium mb-3">{t('addressSort')}</h3>
             <div className="relative">
               <AddressInput
-                onSelect={address => setPosition(position => ({ ...position, address }))}
-                disabled={position.lat && position.lng ? true : false}
+                onSelect={address => setPosition({ address })}
+                disabled={false}
                 inputProps={{
                   value: position.address,
                   onChange: e => {
-                    setPosition(position => ({ ...position, address: e.target.value }));
+                    setPosition({ address: e.target.value });
                   },
                   className:
                     'w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent placeholder-gray-400 focus:placeholder-transparent',
@@ -162,21 +166,45 @@ const OrdersFilterModal: React.FC<FilterModalProps> = ({ isOpen, onClose }) => {
               <div className="absolute right-0 inset-y-0 flex items-center border-l border-gray-200">
                 <button
                   onClick={getCurrentLocation}
-                  className="w-full text-green-500 h-full px-2 transition-colors"
+                  disabled={isReverseGeocoding}
+                  className="w-full text-green-500 h-full px-2 transition-colors disabled:opacity-50"
                   data-testid="geolocation-button"
                 >
-                  {position.lat && position.lng ? (
+                  {isReverseGeocoding ? (
+                    <svg
+                      className="w-6 h-6 animate-spin"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                  ) : position.address ? (
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="24"
                       height="24"
                       viewBox="0 0 24 24"
                       fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                     >
-                      <path
-                        d="M19.2801 2.13799C20.8961 1.51599 22.4861 3.10599 21.8641 4.72199L15.7121 20.716C15.0141 22.528 12.4041 22.386 11.9121 20.508L10.3061 14.408C10.2608 14.2367 10.1709 14.0805 10.0454 13.9554C9.91996 13.8303 9.76352 13.7408 9.5921 13.696L3.4921 12.09C1.6161 11.596 1.4721 8.98599 3.2841 8.28999L19.2801 2.13799Z"
-                        fill="#22C55D"
-                      />
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
                     </svg>
                   ) : (
                     <svg

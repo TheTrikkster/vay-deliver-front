@@ -1,14 +1,30 @@
 import { useTranslation } from 'react-i18next';
+import { AddressQuickSet } from '../shared/AddressQuickSet';
+import { useAddressFilter } from '../../hooks/useAddressFilter';
+import { OrderStatus } from '../../types/order';
 
 interface CustomerInfoProps {
   firstName: string;
   lastName: string;
   address: string;
   phoneNumber: number | string;
+  orderStatus?: OrderStatus;
 }
 
-const CustomerInfo = ({ firstName, lastName, address, phoneNumber }: CustomerInfoProps) => {
+const CustomerInfo = ({
+  firstName,
+  lastName,
+  address,
+  phoneNumber,
+  orderStatus,
+}: CustomerInfoProps) => {
   const { t } = useTranslation('order');
+  const { filtersObject } = useAddressFilter();
+
+  const shouldShowAddressFilter =
+    orderStatus === 'ACTIVE' &&
+    filtersObject.status === 'ACTIVE' &&
+    filtersObject.position.address !== '';
 
   return (
     <>
@@ -23,20 +39,30 @@ const CustomerInfo = ({ firstName, lastName, address, phoneNumber }: CustomerInf
 
       {/* Informations de contact */}
       <div className="flex flex-col gap-3 mb-5">
-        <div className="flex items-center text-gray-600 gap-2">
+        <div className="flex items-start text-gray-600 gap-2">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="13"
             height="18"
             viewBox="0 0 13 18"
             fill="none"
+            className="mt-0.5 flex-shrink-0"
           >
             <path
               d="M11.9415 3.6C12.8177 5.553 12.6182 7.857 11.6553 9.729C10.8398 11.25 9.66875 12.537 8.67114 13.95C8.2374 14.58 7.80366 15.255 7.48269 15.984C7.36992 16.227 7.29185 16.479 7.2051 16.731C7.11835 16.983 7.04028 17.235 6.9622 17.487C6.88413 17.721 6.78871 18 6.50244 18C6.16412 18 6.0687 17.604 5.9993 17.334C5.7911 16.677 5.58291 16.047 5.26194 15.444C4.8976 14.733 4.43783 14.076 3.96939 13.437L11.9415 3.6ZM4.00409 5.778L1.14141 9.306C1.67057 10.467 2.45998 11.457 3.21469 12.447C3.39686 12.672 3.57903 12.906 3.75252 13.149L7.36992 8.703L7.33522 8.712C6.0687 9.162 4.66338 8.496 4.16024 7.2C4.09084 7.047 4.03879 6.867 4.00409 6.687C3.95556 6.38911 3.95556 6.08489 4.00409 5.787V5.778ZM1.80069 2.358L1.79202 2.367C0.386699 4.212 0.143804 6.777 0.98526 8.946L4.44651 4.68L4.40314 4.635L1.80069 2.358ZM8.42825 0.324L5.63496 3.753L5.66966 3.744C6.83208 3.33 8.1333 3.852 8.72319 4.95C8.85331 5.202 8.95741 5.472 8.99211 5.742C9.04416 6.084 9.06151 6.327 9.00078 6.66V6.669L11.7767 3.249C11.0503 1.88112 9.86008 0.841918 8.43692 0.333L8.42825 0.324ZM4.67205 4.401L8.06391 0.216L8.02921 0.207C7.52607 0.072 7.01425 0 6.50244 0C4.7935 0 3.17999 0.765 2.03491 2.079L2.01756 2.088L4.67205 4.401Z"
               fill="#22C55D"
             />
-          </svg>{' '}
-          <span className="text-sm">{address}</span>
+          </svg>
+          <div className="flex-1">
+            <span className="text-sm block mb-2">{address}</span>
+            {shouldShowAddressFilter && (
+              <AddressQuickSet
+                address={address}
+                buttonText="🎯 Filtrer par cette adresse"
+                className="text-xs"
+              />
+            )}
+          </div>
         </div>
         <div className="flex items-center text-gray-600 gap-2">
           <svg
