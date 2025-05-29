@@ -1,5 +1,3 @@
-import React from 'react';
-
 interface DeleteProductModalProps {
   title: string;
   message: string;

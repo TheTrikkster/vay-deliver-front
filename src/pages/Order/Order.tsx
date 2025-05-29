@@ -52,7 +52,7 @@ const Order: React.FC = () => {
         </svg>
       </button>
 
-      <div className="flex justify-center mt-8">
+      <div className="flex justify-center mt-8 pb-24">
         <div className="min-w-[343px] w-full md:w-5/12 bg-white rounded-2xl p-5 md:shadow-md max-w-[500px] md:mx-0 mx-4">
           <OrderStatus status={orderDetails.status as OrderStatusType} />
 

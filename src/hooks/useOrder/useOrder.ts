@@ -9,6 +9,7 @@ interface OrderItemExtended {
   product: {
     name: string;
     price: number;
+    unitExpression?: string;
   };
   quantity: number;
 }

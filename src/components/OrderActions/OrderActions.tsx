@@ -20,14 +20,14 @@ const OrderActions = ({ orderStatus, onActionClick }: OrderActionsProps) => {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-20" ref={actionMenuRef}>
+    <div className="fixed bottom-6 right-6 z-30" ref={actionMenuRef}>
       {showActionMenu && (
-        <div className="absolute bottom-16 right-0 bg-white rounded-lg shadow-lg w-60 overflow-hidden mb-2">
+        <div className="absolute bottom-16 right-0 bg-white rounded-lg shadow-xl border border-gray-200 w-60 overflow-hidden mb-2">
           {/* Afficher "Terminer" uniquement si la commande est active */}
           {orderStatus === 'ACTIVE' && (
             <button
               onClick={() => handleAction('COMPLETE')}
-              className="w-full text-left py-3 px-4 hover:bg-green-50 flex items-center gap-3 border-b border-gray-100"
+              className="w-full text-left py-3 px-4 hover:bg-green-50 flex items-center gap-3 border-b border-gray-100 transition-colors"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -52,7 +52,7 @@ const OrderActions = ({ orderStatus, onActionClick }: OrderActionsProps) => {
           {orderStatus === 'ACTIVE' && (
             <button
               onClick={() => handleAction('CANCEL')}
-              className="w-full text-left py-3 px-4 hover:bg-gray-50 flex items-center gap-3 border-b border-gray-100"
+              className="w-full text-left py-3 px-4 hover:bg-gray-50 flex items-center gap-3 border-b border-gray-100 transition-colors"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -77,7 +77,7 @@ const OrderActions = ({ orderStatus, onActionClick }: OrderActionsProps) => {
           {/* Supprimer disponible pour tous les statuts */}
           <button
             onClick={() => handleAction('DELETE')}
-            className="w-full text-left py-3 px-4 hover:bg-red-50 flex items-center gap-3"
+            className="w-full text-left py-3 px-4 hover:bg-red-50 flex items-center gap-3 transition-colors"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -103,7 +103,7 @@ const OrderActions = ({ orderStatus, onActionClick }: OrderActionsProps) => {
 
       <button
         onClick={() => setShowActionMenu(!showActionMenu)}
-        className="bg-green-500 hover:bg-green-600 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg transition-all"
+        className="bg-green-500 hover:bg-green-600 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg transition-all duration-200 hover:scale-105"
       >
         {showActionMenu ? (
           <svg
