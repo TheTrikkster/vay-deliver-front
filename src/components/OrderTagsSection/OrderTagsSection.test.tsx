@@ -45,9 +45,10 @@ jest.mock('react-i18next', () => ({
     t: (key: string) => {
       const translations: { [key: string]: string } = {
         notes: 'Notes',
-        addTag: 'Ajouter tag',
+        addTag: 'Ajouter tag +',
         deleteTag: 'Supprimer le tag',
         deleteTagConfirmation: 'Êtes-vous sûr de vouloir supprimer ce tag ?',
+        noNotesAdded: 'Aucune note ajoutée',
       };
       return translations[key] || key;
     },
@@ -99,7 +100,7 @@ describe('OrderTagsSection Component', () => {
     test('affiche les boutons de suppression pour chaque tag', () => {
       render(<OrderTagsSection {...defaultProps} />);
 
-      const deleteButtons = screen.getAllByText('×');
+      const deleteButtons = screen.getAllByTitle('Supprimer cette note');
       expect(deleteButtons).toHaveLength(3);
     });
 
@@ -107,7 +108,13 @@ describe('OrderTagsSection Component', () => {
       render(<OrderTagsSection {...defaultProps} tagNames={[]} />);
 
       expect(screen.getByText('Notes')).toBeInTheDocument();
-      expect(screen.queryByText('×')).not.toBeInTheDocument();
+      expect(screen.queryByTitle('Supprimer cette note')).not.toBeInTheDocument();
+    });
+
+    test("affiche le message quand aucune note n'est ajoutée", () => {
+      render(<OrderTagsSection {...defaultProps} tagNames={[]} />);
+
+      expect(screen.getByText('Aucune note ajoutée')).toBeInTheDocument();
     });
   });
 
@@ -190,10 +197,10 @@ describe('OrderTagsSection Component', () => {
   });
 
   describe("Suppression d'un tag", () => {
-    test('ouvre la modale de confirmation quand on clique sur ×', async () => {
+    test('ouvre la modale de confirmation quand on clique sur le bouton de suppression', async () => {
       render(<OrderTagsSection {...defaultProps} />);
 
-      const deleteButtons = screen.getAllByText('×');
+      const deleteButtons = screen.getAllByTitle('Supprimer cette note');
 
       await act(async () => {
         fireEvent.click(deleteButtons[0]);
@@ -208,7 +215,7 @@ describe('OrderTagsSection Component', () => {
       render(<OrderTagsSection {...defaultProps} />);
 
       // Ouvrir la modale de confirmation
-      const deleteButtons = screen.getAllByText('×');
+      const deleteButtons = screen.getAllByTitle('Supprimer cette note');
       await act(async () => {
         fireEvent.click(deleteButtons[0]);
       });
@@ -226,7 +233,7 @@ describe('OrderTagsSection Component', () => {
       render(<OrderTagsSection {...defaultProps} />);
 
       // Ouvrir la modale de confirmation et confirmer
-      const deleteButtons = screen.getAllByText('×');
+      const deleteButtons = screen.getAllByTitle('Supprimer cette note');
       await act(async () => {
         fireEvent.click(deleteButtons[0]); // Supprime 'tag1'
       });
@@ -245,7 +252,7 @@ describe('OrderTagsSection Component', () => {
       render(<OrderTagsSection {...defaultProps} />);
 
       // Ouvrir la modale de confirmation et confirmer
-      const deleteButtons = screen.getAllByText('×');
+      const deleteButtons = screen.getAllByTitle('Supprimer cette note');
       await act(async () => {
         fireEvent.click(deleteButtons[0]);
       });
@@ -292,7 +299,7 @@ describe('OrderTagsSection Component', () => {
 
       render(<OrderTagsSection {...defaultProps} />);
 
-      const deleteButtons = screen.getAllByText('×');
+      const deleteButtons = screen.getAllByTitle('Supprimer cette note');
       await act(async () => {
         fireEvent.click(deleteButtons[0]);
       });
@@ -334,7 +341,7 @@ describe('OrderTagsSection Component', () => {
 
       render(<OrderTagsSection {...defaultProps} />);
 
-      const deleteButtons = screen.getAllByText('×');
+      const deleteButtons = screen.getAllByTitle('Supprimer cette note');
       deleteButtons.forEach(button => {
         expect(button).toBeDisabled();
       });
@@ -365,7 +372,7 @@ describe('OrderTagsSection Component', () => {
       const duplicateTags = ['tag1', 'tag1', 'tag2'];
       render(<OrderTagsSection {...defaultProps} tagNames={duplicateTags} />);
 
-      const deleteButtons = screen.getAllByText('×');
+      const deleteButtons = screen.getAllByTitle('Supprimer cette note');
       expect(deleteButtons).toHaveLength(3);
 
       // Supprimer le premier tag1

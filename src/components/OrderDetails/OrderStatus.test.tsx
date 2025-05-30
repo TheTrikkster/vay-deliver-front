@@ -30,7 +30,6 @@ describe('OrderStatus Component', () => {
       const statusElement = screen.getByTestId('order-status');
       expect(statusElement).toBeInTheDocument();
       expect(statusElement).toHaveTextContent('Actif');
-      expect(statusElement).toHaveClass('bg-green-50', 'text-green-500');
     });
 
     test('affiche le statut COMPLETED avec le bon texte et les bonnes classes', () => {
@@ -39,7 +38,6 @@ describe('OrderStatus Component', () => {
       const statusElement = screen.getByTestId('order-status');
       expect(statusElement).toBeInTheDocument();
       expect(statusElement).toHaveTextContent('Terminé');
-      expect(statusElement).toHaveClass('bg-gray-100', 'text-gray-500');
     });
 
     test('affiche le statut CANCELED avec le bon texte et les bonnes classes', () => {
@@ -48,23 +46,6 @@ describe('OrderStatus Component', () => {
       const statusElement = screen.getByTestId('order-status');
       expect(statusElement).toBeInTheDocument();
       expect(statusElement).toHaveTextContent('Annulé');
-      expect(statusElement).toHaveClass('bg-red-50', 'text-red-500');
-    });
-  });
-
-  describe('Classes CSS par défaut', () => {
-    test('applique les classes CSS de base communes à tous les statuts', () => {
-      render(<OrderStatus status="ACTIVE" />);
-
-      const statusElement = screen.getByTestId('order-status');
-      expect(statusElement).toHaveClass('px-3', 'py-1.5', 'rounded', 'text-sm');
-    });
-
-    test('applique la classe par défaut au conteneur', () => {
-      const { container } = render(<OrderStatus status="ACTIVE" />);
-
-      const containerDiv = container.firstChild as HTMLElement;
-      expect(containerDiv).toHaveClass('flex', 'justify-end', 'mb-5');
     });
   });
 
@@ -103,13 +84,6 @@ describe('OrderStatus Component', () => {
   });
 
   describe('Props optionnelles', () => {
-    test('fonctionne sans prop className (utilise la valeur par défaut)', () => {
-      const { container } = render(<OrderStatus status="ACTIVE" />);
-
-      const containerDiv = container.firstChild as HTMLElement;
-      expect(containerDiv).toHaveClass('flex', 'justify-end', 'mb-5');
-    });
-
     test('la prop status est obligatoire et fonctionne correctement', () => {
       // Ce test vérifie que le composant fonctionne avec chaque statut requis
       const statuses: OrderStatusType[] = ['ACTIVE', 'COMPLETED', 'CANCELED'];

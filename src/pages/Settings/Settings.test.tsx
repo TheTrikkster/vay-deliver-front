@@ -9,10 +9,17 @@ import { settingsApi } from '../../api/services/settingsApi';
 jest.mock('../../api/services/settingsApi', () => ({
   settingsApi: {
     getSettings: jest.fn().mockResolvedValue({
-      data: { siteStatus: 'OFFLINE', offlineMessage: 'Site en maintenance' },
+      data: {
+        siteStatus: 'OFFLINE',
+        offlineMessage: 'Site en maintenance',
+      },
     }),
-    updateStatus: jest.fn().mockResolvedValue({}),
-    updateOfflineMessage: jest.fn().mockResolvedValue({}),
+    updateStatus: jest.fn().mockResolvedValue({
+      data: { success: true },
+    }),
+    updateOfflineMessage: jest.fn().mockResolvedValue({
+      data: { success: true },
+    }),
   },
 }));
 jest.mock('@aws-amplify/ui-react', () => ({
@@ -45,6 +52,8 @@ const mockStore = configureStore([]);
 
 describe('Settings Component', () => {
   let store: any;
+  let originalError: any;
+
   const renderComponent = () =>
     render(
       <Provider store={store}>
@@ -54,9 +63,21 @@ describe('Settings Component', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+
+    // Mock console.error pour éviter les erreurs de test dans la sortie
+    originalError = console.error;
+    console.error = jest.fn();
+
     store = mockStore({
       client: { siteStatus: 'OFFLINE', offlineMessage: 'Site en maintenance' },
     });
+  });
+
+  afterEach(() => {
+    // Restaurer console.error après chaque test
+    if (originalError) {
+      console.error = originalError;
+    }
   });
 
   it('renders static parts and initial offline state', async () => {

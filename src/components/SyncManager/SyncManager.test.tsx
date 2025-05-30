@@ -1,5 +1,5 @@
-import React from 'react';
-import { render, cleanup, act } from '@testing-library/react';
+import { act } from 'react';
+import { render, cleanup } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import { SyncManager } from './SyncManager';
@@ -311,6 +311,10 @@ describe('SyncManager', () => {
     // Configurer productsApi.create pour qu'il rejette la promesse
     (productsApi.create as jest.Mock).mockRejectedValueOnce(new Error('Erreur de connexion'));
 
+    // Mocker console.error pour éviter l'affichage de l'erreur pendant le test
+    const originalError = console.error;
+    console.error = jest.fn();
+
     // Configurer le store avec une opération POST en attente
     store = mockStore({
       products: {
@@ -344,13 +348,25 @@ describe('SyncManager', () => {
     // Vérifier que productsApi.create a été appelé
     expect(productsApi.create).toHaveBeenCalled();
 
+    // Vérifier que console.error a été appelé avec le bon message
+    expect(console.error).toHaveBeenCalledWith(
+      expect.stringContaining('Erreur lors de la synchronisation des produits')
+    );
+
     // Vérifier que l'opération n'a pas été supprimée
     expect(store.dispatch).not.toHaveBeenCalledWith(removeProductPendingOperation(0));
+
+    // Restaurer console.error
+    console.error = originalError;
   });
 
   test('devrait gérer les erreurs lors de la synchronisation des commandes', async () => {
     // Configurer ordersApi.addTagToOrders pour qu'il rejette la promesse
     (ordersApi.addTagToOrders as jest.Mock).mockRejectedValueOnce(new Error('Erreur de connexion'));
+
+    // Mocker console.error pour éviter l'affichage de l'erreur pendant le test
+    const originalError = console.error;
+    console.error = jest.fn();
 
     // Configurer le store avec une opération POST de commande en attente
     store = mockStore({
@@ -387,8 +403,16 @@ describe('SyncManager', () => {
     // Vérifier que ordersApi.addTagToOrders a été appelé
     expect(ordersApi.addTagToOrders).toHaveBeenCalled();
 
+    // Vérifier que console.error a été appelé avec le bon message
+    expect(console.error).toHaveBeenCalledWith(
+      expect.stringContaining('Erreur lors de la synchronisation des commandes')
+    );
+
     // Vérifier que l'opération n'a pas été supprimée
     expect(store.dispatch).not.toHaveBeenCalledWith(removeOrderPendingOperation(0));
+
+    // Restaurer console.error
+    console.error = originalError;
   });
 
   test('devrait ignorer les méthodes non supportées pour les produits', async () => {

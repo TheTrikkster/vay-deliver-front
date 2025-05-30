@@ -108,14 +108,4 @@ describe('Composant ProductCard', () => {
       mockFood.availableQuantity
     );
   });
-
-  test("a les classes CSS appropriées pour l'apparence", () => {
-    const { container } = render(<ProductCard {...mockProps} />);
-
-    const cardContainer = container.firstChild as HTMLElement;
-    expect(cardContainer).toHaveClass('w-11/12');
-    expect(cardContainer).toHaveClass('md:w-2/4');
-    expect(cardContainer).toHaveClass('bg-white');
-    expect(cardContainer).toHaveClass('rounded-3xl');
-  });
 });

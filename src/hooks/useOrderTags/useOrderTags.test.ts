@@ -1,4 +1,5 @@
-import { renderHook, act } from '@testing-library/react-hooks';
+import { act } from 'react';
+import { renderHook } from '@testing-library/react-hooks';
 import { useOrderTags } from './useOrderTags';
 import { ordersApi } from '../../api/services/ordersApi';
 import type { AxiosResponse } from 'axios';

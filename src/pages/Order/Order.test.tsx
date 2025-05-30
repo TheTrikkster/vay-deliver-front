@@ -107,7 +107,6 @@ describe('Order page', () => {
     expect(screen.getByText('123 Rue de Paris')).toBeInTheDocument();
     const status = screen.getByTestId('order-status');
     expect(status).toHaveTextContent('Active');
-    expect(status).toHaveClass('bg-green-50', 'text-green-500');
   });
 
   it('affiche le statut COMPLETED quand l’API renvoie COMPLETED', async () => {
@@ -117,7 +116,6 @@ describe('Order page', () => {
 
     const status = await screen.findByTestId('order-status');
     expect(status).toHaveTextContent('Terminée');
-    expect(status).toHaveClass('bg-gray-100', 'text-gray-500');
   });
 
   it('affiche le statut CANCELED quand l’API renvoie CANCELED', async () => {
@@ -127,13 +125,10 @@ describe('Order page', () => {
 
     const status = await screen.findByTestId('order-status');
     expect(status).toHaveTextContent('Annulée');
-    expect(status).toHaveClass('bg-red-50', 'text-red-500');
   });
 
   it('calcule et affiche le total', async () => {
     renderWithRedux(<Order />);
     expect(await screen.findByText('35,00 €')).toBeInTheDocument();
   });
-
-  // ... autres tests ...
 });

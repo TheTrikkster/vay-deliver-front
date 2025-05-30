@@ -120,8 +120,6 @@ function Products() {
 
   const currentProduct = currentItems.find(item => item.id === quantityToEdit.id);
 
-  console.log({ error });
-
   if (loading) {
     return <Loading />;
   }

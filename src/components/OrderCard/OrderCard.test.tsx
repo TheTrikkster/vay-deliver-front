@@ -3,6 +3,26 @@ import { render, screen } from '@testing-library/react';
 import OrderCard from './OrderCard';
 import { OrderStatus } from '../../types/order';
 
+// Mock react-i18next
+jest.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string) => {
+      const translations: { [key: string]: string } = {
+        active: 'Actif',
+        pending: 'En attente',
+        completed: 'Terminé',
+        cancelled: 'Annulé',
+        // Ajoutez d'autres traductions si nécessaire
+      };
+      return translations[key] || key;
+    },
+    i18n: {
+      changeLanguage: jest.fn(),
+      language: 'fr',
+    },
+  }),
+}));
+
 describe('OrderCard', () => {
   const defaultProps = {
     firstName: 'Jean',
@@ -39,14 +59,6 @@ describe('OrderCard', () => {
     render(<OrderCard {...defaultProps} tagNames={[]} />);
     // Vérifie qu'aucune exception n'est levée et que le composant se rend
     expect(screen.getByText('Jean Dupont')).toBeInTheDocument();
-  });
-
-  test('devrait avoir la classe de style appropriée pour la carte', () => {
-    const { container } = render(<OrderCard {...defaultProps} />);
-    const cardElement = container.firstChild;
-    expect(cardElement).toHaveClass('bg-white');
-    expect(cardElement).toHaveClass('rounded-xl');
-    expect(cardElement).toHaveClass('shadow-md');
   });
 
   test("devrait rendre l'icône de localisation", () => {

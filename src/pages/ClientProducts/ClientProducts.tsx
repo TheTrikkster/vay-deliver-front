@@ -37,11 +37,7 @@ function ClientProducts() {
       try {
         const response = await productsApi.getClientProducts(currentPage);
 
-        console.log('/////////////////////////////////////////');
-        console.log(response.data, 'israil');
-
         if (response.data.siteStatus === 'OFFLINE') {
-          console.log(response.data, 'israil AAAAAAAAA');
           setSiteStatus('OFFLINE');
           setOfflineMessage(response.data.offlineMessage);
           dispatch(clearClientOrder());
@@ -51,7 +47,6 @@ function ClientProducts() {
           setError(null);
         }
       } catch (error) {
-        console.log('Error fetching products:', error);
         setError(t('errorLoading'));
       } finally {
         setIsLoading(false);
@@ -66,9 +61,6 @@ function ClientProducts() {
       onAdd: (_id: string) => {
         const product = products.find(p => p._id === _id);
         if (!product) return;
-
-        console.log('///AZEAZEZAEAZ');
-        console.log({ product });
 
         const currentQuantity = cart[_id] || 0;
         const addQuantity =
@@ -111,8 +103,6 @@ function ClientProducts() {
       }, 0),
     [products, cart]
   );
-
-  // console.log({ products });
 
   const handleCheckout = () => {
     // dispatch(checkoutClientOrder());

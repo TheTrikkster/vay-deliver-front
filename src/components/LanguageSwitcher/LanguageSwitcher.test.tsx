@@ -1,5 +1,5 @@
-import React from 'react';
-import { render, screen, fireEvent, act, cleanup } from '@testing-library/react';
+import { act } from 'react';
+import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import LanguageSwitcher from './LanguageSwitcher';
 
 // Mock react-i18next before imports

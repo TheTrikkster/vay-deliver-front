@@ -130,7 +130,6 @@ export function useProductsInventory(itemsPerPage = 30) {
       try {
         await productsApi.forceDelete(id);
       } catch (err: any) {
-        console.log('Error deleting item:', err);
         dispatch(setError(t('deleteError')));
         fetchInventory(currentPage);
       }
