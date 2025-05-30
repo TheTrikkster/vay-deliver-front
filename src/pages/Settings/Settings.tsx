@@ -70,18 +70,18 @@ function Settings() {
         <div className="bg-white md:rounded-lg md:shadow-sm md:p-6">
           <div className="flex flex-col space-y-4 md:flex-row md:items-center md:justify-between md:space-y-0 md:mb-6">
             <h1 className="text-xl md:text-2xl font-semibold text-gray-800">{t('title')}</h1>
-            <div className="flex items-center justify-between md:space-x-4">
+            <div className="h-8 flex items-center justify-between md:space-x-4">
               <LanguageSwitcher />
               <button
                 onClick={signOut}
-                className="text-sm text-red-600 hover:text-white hover:bg-red-600 border border-red-200 rounded px-4 py-2 transition-colors"
+                className="h-[46px] text-sm text-red-600 hover:text-white hover:bg-red-600 border border-red-200 rounded px-4 py-2 transition-colors"
               >
                 {t('logout')}
               </button>
             </div>
           </div>
 
-          <div className="flex items-center justify-center gap-6 mt-4 mb-10">
+          <div className="flex items-center justify-center gap-6 my-10">
             <h2 className="text-base md:text-lg font-medium text-gray-800">
               {status === 'ONLINE' ? t('siteEnabled') : t('siteDisabled')}
             </h2>
@@ -98,7 +98,7 @@ function Settings() {
             >
               <span
                 className={`inline-block h-5 w-5 transform rounded-full bg-white transition-transform shadow-sm md:h-6 md:w-6 ${
-                  status === 'ONLINE' ? 'translate-x-7' : 'translate-x-1'
+                  status === 'ONLINE' ? 'translate-x-6 md:translate-x-7' : 'translate-x-1'
                 }`}
               />
             </button>
