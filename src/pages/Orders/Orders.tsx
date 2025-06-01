@@ -34,8 +34,6 @@ function Orders() {
     // actions
     toggleSelectionMode,
     toggleOrderSelection,
-    selectAllOrders,
-    clearSelection,
     addTag,
     setPage,
   } = useOrders({ limit: 30 });
@@ -109,20 +107,13 @@ function Orders() {
             <div className="px-4 py-4 flex justify-between items-center">
               {isSelectionMode ? (
                 <>
+                  <div></div>
+                  <span className="text-base">{selectedOrderIds.length}</span>
                   <button
                     onClick={() => toggleSelectionMode(false)}
                     className="text-base font-medium"
                   >
                     {t('cancel')}
-                  </button>
-                  <span className="text-base">{selectedOrderIds.length}</span>
-                  <button
-                    onClick={
-                      selectedOrderIds.length !== orders.length ? selectAllOrders : clearSelection
-                    }
-                    className="text-base font-medium"
-                  >
-                    {selectedOrderIds.length !== orders.length ? t('selectAll') : t('deselectAll')}
                   </button>
                 </>
               ) : (

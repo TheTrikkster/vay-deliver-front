@@ -193,6 +193,8 @@ describe('Orders', () => {
     await waitFor(() => {
       expect(screen.getByRole('button', { name: /Annuler/i })).toBeInTheDocument();
       expect(screen.getByText('0')).toBeInTheDocument();
+      // Vérifier qu'il n'y a plus de bouton "sélectionner tout"
+      expect(screen.queryByRole('button', { name: /Sélectionner tout/i })).not.toBeInTheDocument();
     });
   });
 
