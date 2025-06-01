@@ -17,7 +17,8 @@ const OrderTagsSection = ({ orderId, tagNames, onTagsUpdated }: OrderTagsSection
   const [tagToDelete, setTagToDelete] = useState<string>('');
 
   const { addTag, removeTag, loading } = useOrderTags({
-    onSuccess: onTagsUpdated,
+    onAddTagSuccess: onTagsUpdated,
+    onRemoveTagSuccess: onTagsUpdated,
   });
 
   const handleAddTag = async (tagName: string) => {

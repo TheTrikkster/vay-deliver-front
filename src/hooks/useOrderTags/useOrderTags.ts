@@ -2,12 +2,13 @@ import { useState } from 'react';
 import { ordersApi } from '../../api/services/ordersApi';
 
 interface UseOrderTagsProps {
-  onSuccess?: () => void;
+  onAddTagSuccess?: (tagName: string, orderIds: string[]) => void;
+  onRemoveTagSuccess?: (tagName: string, orderId: string) => void;
   onError?: (error: any) => void;
 }
 
 export const useOrderTags = (props?: UseOrderTagsProps) => {
-  const { onSuccess, onError } = props || {};
+  const { onAddTagSuccess, onRemoveTagSuccess, onError } = props || {};
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -20,7 +21,10 @@ export const useOrderTags = (props?: UseOrderTagsProps) => {
 
       const response = await ordersApi.addTagToOrders([tagName], normalizedOrderIds);
       setLoading(false);
-      onSuccess?.();
+
+      // Appeler le callback de succès spécifique à addTag
+      onAddTagSuccess?.(tagName, normalizedOrderIds);
+
       return response.data;
     } catch (err) {
       setLoading(false);
@@ -38,7 +42,10 @@ export const useOrderTags = (props?: UseOrderTagsProps) => {
     try {
       const response = await ordersApi.removeTagFromOrders(orderId, tagName);
       setLoading(false);
-      onSuccess?.();
+
+      // Appeler le callback de succès spécifique à removeTag
+      onRemoveTagSuccess?.(tagName, orderId);
+
       return response.data;
     } catch (err) {
       setLoading(false);

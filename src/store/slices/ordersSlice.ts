@@ -166,6 +166,25 @@ export const ordersSlice = createSlice({
       state.currentFilters = buildFilterString(state.filtersObject);
       state.currentPage = 1;
     },
+    updateOrderTags: (
+      state,
+      { payload }: PayloadAction<{ tagName: string; orderIds: string[] }>
+    ) => {
+      const { tagName, orderIds } = payload;
+      state.orders = state.orders.map(order =>
+        orderIds.includes(order._id)
+          ? { ...order, tagNames: Array.from(new Set([...(order.tagNames || []), tagName])) }
+          : order
+      );
+    },
+    removeOrderTag: (state, { payload }: PayloadAction<{ tagName: string; orderId: string }>) => {
+      const { tagName, orderId } = payload;
+      state.orders = state.orders.map(order =>
+        order._id === orderId
+          ? { ...order, tagNames: (order.tagNames || []).filter(t => t !== tagName) }
+          : order
+      );
+    },
   },
   extraReducers: builder => {
     builder
@@ -226,6 +245,8 @@ export const {
   selectAllOrders,
   resetError,
   setAddress,
+  updateOrderTags,
+  removeOrderTag,
 } = ordersSlice.actions;
 
 // Selectors

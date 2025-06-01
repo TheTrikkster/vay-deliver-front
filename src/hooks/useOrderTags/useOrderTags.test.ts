@@ -26,8 +26,8 @@ describe('useOrderTags hook', () => {
   describe('addTag', () => {
     it('should call addTagToOrders with single id string and update states on success', async () => {
       mockedOrdersApi.addTagToOrders.mockResolvedValueOnce(mockSuccessData);
-      const onSuccess = jest.fn();
-      const { result, waitForNextUpdate } = renderHook(() => useOrderTags({ onSuccess }));
+      const onAddTagSuccess = jest.fn();
+      const { result, waitForNextUpdate } = renderHook(() => useOrderTags({ onAddTagSuccess }));
 
       let response;
       act(() => {
@@ -42,7 +42,7 @@ describe('useOrderTags hook', () => {
       expect(mockedOrdersApi.addTagToOrders).toHaveBeenCalledWith([tagName], [singleOrderId]);
       expect(result.current.loading).toBe(false);
       expect(result.current.error).toBeNull();
-      expect(onSuccess).toHaveBeenCalled();
+      expect(onAddTagSuccess).toHaveBeenCalledWith(tagName, [singleOrderId]);
       await expect(response).resolves.toBe(mockSuccessData.data);
     });
 
@@ -71,8 +71,8 @@ describe('useOrderTags hook', () => {
   describe('removeTag', () => {
     it('should call removeTagFromOrders and update states on success', async () => {
       mockedOrdersApi.removeTagFromOrders.mockResolvedValueOnce(mockSuccessData);
-      const onSuccess = jest.fn();
-      const { result, waitForNextUpdate } = renderHook(() => useOrderTags({ onSuccess }));
+      const onRemoveTagSuccess = jest.fn();
+      const { result, waitForNextUpdate } = renderHook(() => useOrderTags({ onRemoveTagSuccess }));
 
       let response;
       act(() => {
@@ -85,7 +85,7 @@ describe('useOrderTags hook', () => {
       expect(mockedOrdersApi.removeTagFromOrders).toHaveBeenCalledWith(singleOrderId, tagName);
       expect(result.current.loading).toBe(false);
       expect(result.current.error).toBeNull();
-      expect(onSuccess).toHaveBeenCalled();
+      expect(onRemoveTagSuccess).toHaveBeenCalledWith(tagName, singleOrderId);
       await expect(response).resolves.toBe(mockSuccessData.data);
     });
 

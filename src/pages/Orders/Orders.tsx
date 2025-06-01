@@ -84,6 +84,20 @@ function Orders() {
     [isSelectionMode, toggleOrderSelection, navigate]
   );
 
+  // Gestion de l'ajout de tag
+  const handleAddTag = useCallback(
+    async (tagName: string, orderIds: string[] | string) => {
+      try {
+        await addTag(tagName, orderIds);
+        setIsAddTagModalOpen(false);
+      } catch (error) {
+        console.error('Error adding tag:', error);
+        // Le modal reste ouvert en cas d'erreur
+      }
+    },
+    [addTag]
+  );
+
   if (loading) return <Loading />;
 
   return (
@@ -181,7 +195,7 @@ function Orders() {
             <AddTagModal
               isOpen={isAddTagModalOpen}
               onClose={() => setIsAddTagModalOpen(false)}
-              onConfirm={(tag, ids) => addTag(tag, ids)}
+              onConfirm={handleAddTag}
               selectedOrderIds={selectedOrderIds}
             />
           </div>
