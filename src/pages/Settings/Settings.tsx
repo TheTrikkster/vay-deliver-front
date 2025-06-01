@@ -19,6 +19,7 @@ function Settings() {
   const siteOnline = useAppSelector(selectClientSiteStatus);
   const offlineMessage = useAppSelector(selectClientOfflineMessage);
   const dispatch = useAppDispatch();
+
   const [status, setStatus] = useState(siteOnline);
   const [message, setMessage] = useState(offlineMessage);
   const [showToast, setShowToast] = useState(false);
