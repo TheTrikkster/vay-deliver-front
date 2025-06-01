@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 import configureStore from 'redux-mock-store';
@@ -41,6 +41,9 @@ jest.mock('react-i18next', () => ({
 }));
 
 const mockStore = configureStore([]);
+
+// Fonction utilitaire pour attendre que toutes les promesses se résolvent
+const flushPromises = () => new Promise(resolve => setTimeout(resolve, 0));
 
 describe('ClientProducts Component', () => {
   let store: any;
@@ -94,34 +97,58 @@ describe('ClientProducts Component', () => {
     });
     (productsApi.getClientProducts as jest.Mock).mockReturnValueOnce(loadingPromise);
 
-    render(
-      <Provider store={store}>
-        <BrowserRouter>
-          <ClientProducts />
-        </BrowserRouter>
-      </Provider>
-    );
+    await act(async () => {
+      render(
+        <Provider store={store}>
+          <BrowserRouter>
+            <ClientProducts />
+          </BrowserRouter>
+        </Provider>
+      );
+      await flushPromises();
+    });
 
     // Vérifier la présence du spinner pendant le chargement
     expect(screen.getByTestId('spinner')).toBeInTheDocument();
 
-    // Résoudre la promesse pour éviter des fuites de mémoire dans les tests
-    resolvePromise({
-      data: {
-        products: [],
-        totalPages: 0,
-      },
+    // Résoudre la promesse avec des données valides pour que le loading se termine
+    await act(async () => {
+      resolvePromise({
+        data: {
+          products: [
+            {
+              _id: '1',
+              name: 'Test Product',
+              price: 1000,
+              minOrder: 1,
+              description: 'Description du produit test',
+              unitExpression: 'шт',
+            },
+          ],
+          totalPages: 1,
+          siteStatus: 'ONLINE',
+        },
+      });
+      await flushPromises();
+    });
+
+    // Attendre que le loading disparaisse
+    await waitFor(() => {
+      expect(screen.queryByTestId('spinner')).not.toBeInTheDocument();
     });
   });
 
   it('devrait afficher les produits après le chargement', async () => {
-    render(
-      <Provider store={store}>
-        <BrowserRouter>
-          <ClientProducts />
-        </BrowserRouter>
-      </Provider>
-    );
+    await act(async () => {
+      render(
+        <Provider store={store}>
+          <BrowserRouter>
+            <ClientProducts />
+          </BrowserRouter>
+        </Provider>
+      );
+      await flushPromises();
+    });
 
     await waitFor(() => {
       expect(screen.getByText('Test Product')).toBeInTheDocument();
@@ -137,13 +164,16 @@ describe('ClientProducts Component', () => {
       new Error('Erreur de chargement')
     );
 
-    render(
-      <Provider store={store}>
-        <BrowserRouter>
-          <ClientProducts />
-        </BrowserRouter>
-      </Provider>
-    );
+    await act(async () => {
+      render(
+        <Provider store={store}>
+          <BrowserRouter>
+            <ClientProducts />
+          </BrowserRouter>
+        </Provider>
+      );
+      await flushPromises();
+    });
 
     await waitFor(() => {
       expect(screen.getByTestId('error-message')).toBeInTheDocument();
@@ -178,13 +208,16 @@ describe('ClientProducts Component', () => {
       },
     });
 
-    render(
-      <Provider store={store}>
-        <BrowserRouter>
-          <ClientProducts />
-        </BrowserRouter>
-      </Provider>
-    );
+    await act(async () => {
+      render(
+        <Provider store={store}>
+          <BrowserRouter>
+            <ClientProducts />
+          </BrowserRouter>
+        </Provider>
+      );
+      await flushPromises();
+    });
 
     // Attendre que les produits soient chargés
     await waitFor(() => {
@@ -193,7 +226,10 @@ describe('ClientProducts Component', () => {
 
     // Trouver le bouton d'ajout par son aria-label
     const addButton = screen.getByLabelText('Ajouter Test Product au panier');
-    fireEvent.click(addButton);
+    await act(async () => {
+      fireEvent.click(addButton);
+      await flushPromises();
+    });
 
     // Vérifier que l'action a été dispatchée
     await waitFor(() => {
@@ -221,13 +257,16 @@ describe('ClientProducts Component', () => {
       },
     });
 
-    render(
-      <Provider store={store}>
-        <BrowserRouter>
-          <ClientProducts />
-        </BrowserRouter>
-      </Provider>
-    );
+    await act(async () => {
+      render(
+        <Provider store={store}>
+          <BrowserRouter>
+            <ClientProducts />
+          </BrowserRouter>
+        </Provider>
+      );
+      await flushPromises();
+    });
 
     await waitFor(() => {
       const checkoutButton = screen.getByTestId('checkout-button');

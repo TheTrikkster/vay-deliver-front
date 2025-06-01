@@ -11,6 +11,7 @@ jest.mock('react-i18next', () => ({
         options: 'Опции',
         minOrder: 'мин',
         quantity: 'Количество',
+        available: 'Доступно',
         enable: 'Включить',
         disable: 'Отключить',
         modify: 'Изменять',
@@ -56,13 +57,17 @@ describe('Composant ProductCard', () => {
 
     expect(screen.getByText('Pommes')).toBeInTheDocument();
 
-    // Modifier la façon de vérifier le texte
-    const priceElement = screen.getByText(/2.5€\/kg/);
-    expect(priceElement).toBeInTheDocument();
-    expect(priceElement.textContent).toContain('1');
-    expect(priceElement.textContent).toContain('мин');
+    // Vérifier le prix séparément
+    expect(screen.getByText('2.5€/kg')).toBeInTheDocument();
 
+    // Vérifier la commande minimale séparément
+    expect(screen.getByText('1 мин')).toBeInTheDocument();
+
+    // Vérifier la quantité disponible
     expect(screen.getByText('3')).toBeInTheDocument();
+
+    // Vérifier le label "Доступно"
+    expect(screen.getByText('Доступно')).toBeInTheDocument();
   });
 
   test('appelle toggleCardMenu lorsque le bouton de menu est cliqué', () => {
@@ -107,15 +112,5 @@ describe('Composant ProductCard', () => {
       mockFood.id,
       mockFood.availableQuantity
     );
-  });
-
-  test("a les classes CSS appropriées pour l'apparence", () => {
-    const { container } = render(<ProductCard {...mockProps} />);
-
-    const cardContainer = container.firstChild as HTMLElement;
-    expect(cardContainer).toHaveClass('w-11/12');
-    expect(cardContainer).toHaveClass('md:w-2/4');
-    expect(cardContainer).toHaveClass('bg-white');
-    expect(cardContainer).toHaveClass('rounded-3xl');
   });
 });

@@ -29,7 +29,6 @@ function Settings() {
       try {
         const settings = await settingsApi.getSettings();
 
-        console.log({ settings });
         dispatch(setSiteStatus(settings.data.siteStatus));
         dispatch(setOfflineMessage(settings.data.offlineMessage));
         setStatus(settings.data.siteStatus);

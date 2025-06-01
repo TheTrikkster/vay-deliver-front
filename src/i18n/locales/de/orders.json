@@ -6,5 +6,6 @@
   "addNote": "Notiz hinzufügen",
   "noOrders": "Keine Bestellungen gefunden",
   "getOrdersError": "Bestellungen konnten nicht geladen werden",
-  "addTagError": "Fehler beim Hinzufügen des Tags"
+  "addTagError": "Fehler beim Hinzufügen des Tags",
+  "distance": "Entfernung"
 }

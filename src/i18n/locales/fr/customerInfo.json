@@ -1,0 +1,15 @@
+{
+  "navigateTo": "Naviguer vers",
+  "call": "Appeler",
+  "whatsappMessage": "Message WhatsApp",
+  "continueDeliveries": "Continuer les livraisons depuis cette adresse",
+  "currentPositionSelected": "Position actuelle sélectionnée - Voir toutes les commandes",
+  "clickToNavigate": "Cliquer pour naviguer",
+  "clickToCall": "Cliquer pour appeler",
+  "sendMessage": "Envoyer un message",
+  "clickForWhatsApp": "Cliquer pour WhatsApp",
+  "continueRoute": "Continuer le parcours",
+  "currentPosition": "Position actuelle",
+  "deliveryInProgress": "Livraison en cours ici",
+  "nextDelivery": "Passer à la livraison suivante"
+}

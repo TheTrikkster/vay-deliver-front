@@ -90,6 +90,10 @@ import addressInputFR from './locales/fr/addressInput.json';
 import addressInputEN from './locales/en/addressInput.json';
 import addressInputRU from './locales/ru/addressInput.json';
 import addressInputDE from './locales/de/addressInput.json';
+import customerInfoFR from './locales/fr/customerInfo.json';
+import customerInfoEN from './locales/en/customerInfo.json';
+import customerInfoRU from './locales/ru/customerInfo.json';
+import customerInfoDE from './locales/de/customerInfo.json';
 
 // Les ressources contiennent les traductions par langue et par namespace
 const resources = {
@@ -116,6 +120,7 @@ const resources = {
     settings: settingsFR,
     completedOrder: completedOrderFR,
     addressInput: addressInputFR,
+    customerInfo: customerInfoFR,
   },
   en: {
     common: commonEN,
@@ -140,6 +145,7 @@ const resources = {
     settings: settingsEN,
     completedOrder: completedOrderEN,
     addressInput: addressInputEN,
+    customerInfo: customerInfoEN,
   },
   ru: {
     menu: menuRU,
@@ -163,6 +169,7 @@ const resources = {
     settings: settingsRU,
     completedOrder: completedOrderRU,
     addressInput: addressInputRU,
+    customerInfo: customerInfoRU,
   },
   de: {
     menu: menuDE,
@@ -186,6 +193,7 @@ const resources = {
     settings: settingsDE,
     completedOrder: completedOrderDE,
     addressInput: addressInputDE,
+    customerInfo: customerInfoDE,
   },
 };
 
@@ -226,6 +234,7 @@ i18n
       'settings',
       'completedOrder',
       'addressInput',
+      'customerInfo',
     ],
     defaultNS: 'common',
 

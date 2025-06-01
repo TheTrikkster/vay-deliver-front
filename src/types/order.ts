@@ -38,8 +38,6 @@ export interface Tag {
 export type OrderStatus = 'ACTIVE' | 'COMPLETED' | 'CANCELED';
 
 export type Position = {
-  lat: string;
-  lng: string;
   address: string;
 };
 

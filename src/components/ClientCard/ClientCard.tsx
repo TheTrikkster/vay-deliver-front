@@ -6,28 +6,28 @@ import { sumCurrency } from '../../utils/sumCurrency';
 const ClientCard: React.FC<ClientCardProps> = memo(({ product, quantity, cartActions }) => {
   const { t } = useTranslation('clientCard');
 
-  if (!product) return <div className="bg-gray-100 rounded-3xl p-6">{t('productUnavailable')}</div>;
+  if (!product) return <div className="bg-gray-100 rounded-2xl p-6">{t('productUnavailable')}</div>;
 
   const { _id, name, description, minOrder, price, unitExpression } = product;
   const { onAdd, onRemove } = cartActions;
 
   return (
-    <article aria-label={t('ariaLabel', { name })} className="bg-white rounded-3xl p-6 shadow-sm">
-      <h2 className="text-base font-semibold mb-2">{name}</h2>
-      <p className="text-sm text-gray-600 mb-6">{description}</p>
+    <article aria-label={t('ariaLabel', { name })} className="bg-white rounded-2xl p-6 shadow-sm">
+      <h2 className="text-xl font-semibold text-gray-900 mb-3">{name}</h2>
+      <p className="text-base text-gray-600 mb-6 leading-relaxed">{description}</p>
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-3">
         <div className="flex items-center text-gray-600">
-          <span className="text-sm font-semibold">{t('minOrder')}</span>
-          <span className="ml-1 text-sm font-semibold">
+          <span className="text-base font-semibold">{t('minOrder')}</span>
+          <span className="ml-2 text-base font-semibold">
             {minOrder} {unitExpression}
           </span>
         </div>
 
         <div className="flex items-center">
-          <span className="text-sm text-gray-600 font-semibold">{t('price')}</span>
-          <span className="ml-1 text-sm text-[#4F46E5] font-semibold">
-            {sumCurrency({ value: price })}
+          <span className="text-base text-gray-600 font-semibold">{t('price')}</span>
+          <span className="ml-2 text-base text-[#4F46E5] font-semibold">
+            {sumCurrency({ value: price })} / {unitExpression}
           </span>
         </div>
       </div>
@@ -36,7 +36,7 @@ const ClientCard: React.FC<ClientCardProps> = memo(({ product, quantity, cartAct
         <button
           aria-label={t('ariaAddToCart', { name })}
           onClick={() => onAdd(_id)}
-          className="w-full text-[#4355DA] font-bold border border-[#4355DA] py-3 rounded-full text-base mt-6 hover:bg-gray-100 transition-colors"
+          className="w-full text-[#4355DA] font-bold border border-[#4355DA] py-3 rounded-full text-l mt-6 hover:bg-gray-100 transition-colors"
         >
           {t('add')}
         </button>
@@ -87,7 +87,7 @@ const ClientCard: React.FC<ClientCardProps> = memo(({ product, quantity, cartAct
               </svg>
             )}
           </button>
-          <span className="font-medium text-lg">{quantity}</span>
+          <span className="font-semibold text-l text-gray-900">{quantity}</span>
           <button
             onClick={() => onAdd(_id)}
             className="p-[18px] pl-10 text-[#4F46E5] font-medium hover:bg-gray-50"

@@ -30,7 +30,7 @@ const defaultFilters: {
 } = {
   status: 'ACTIVE',
   tagNames: [],
-  position: { lat: '', lng: '', address: '' },
+  position: { address: '' },
 };
 jest.mock('../../store/hooks', () => ({
   useAppDispatch: () => mockDispatch,

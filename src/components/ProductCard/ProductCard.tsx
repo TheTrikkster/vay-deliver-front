@@ -25,7 +25,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const { t } = useTranslation('productCard');
 
   return (
-    <div className="min-w-[343px] w-11/12 md:w-2/4 bg-white rounded-3xl p-5 relative shadow-md">
+    <div className="min-w-[343px] w-11/12 md:w-2/4 bg-white rounded-2xl p-5 relative shadow-md">
       <div className="flex justify-between items-start mb-2">
         <h3 className="text-lg md:text-2xl font-semibold text-[#333333]">{product.name}</h3>
         <button
@@ -64,26 +64,44 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </button>
       </div>
 
-      {/* Prix/Unité */}
-      <div className=" text-sm md:text-base">
-        <p className="text-[#9DA0A5] mb-1 text-sm">
-          {product.price}€/{product.unitExpression} | {product.minOrder} {t('minOrder')}
-        </p>
-        <p className="text-[#9DA0A5] mb-4 text-sm">{product.description}</p>
+      {/* Prix/Unité - Style amélioré */}
+      <div className="text-sm md:text-base mb-4">
+        <div className="flex items-center gap-2 mb-2">
+          <span className="text-green-500 font-semibold text-base md:text-lg">
+            {product.price}€/{product.unitExpression}
+          </span>
+          <span className="text-green-500 font-semibold text-base md:text-lg">
+            {product.minOrder} {t('minOrder')}
+          </span>
+        </div>
+        <p className="text-[#9DA0A5] text-sm">{product.description}</p>
       </div>
 
-      <div className="flex w-full justify-between items-center bg-[#F5F5F5] rounded-xl p-[12px] md:px-6 md:py-3">
-        {/* Champ de quantité (rendu cliquable) */}
-        <div
-          className="bg-gray-50 rounded-2xl cursor-pointer"
-          onClick={() => openQuantityPopup(product.id, product.availableQuantity)}
-        >
+      <div
+        className="flex w-full justify-between items-center rounded p-[12px] md:px-6 md:py-3"
+        style={{
+          borderRadius: '6px',
+          background: 'linear-gradient(90deg, #F7F8FA 0%, #FDFDFD 100%)',
+        }}
+      >
+        {/* Champ de quantité avec label "Disponible" */}
+        <div className="flex items-center gap-3">
           <div
-            className="min-w-16 w-fit bg-white border border-[#D6D9E2] rounded-lg text-base text-center md:text-xl py-1.5 px-2.5 font-medium"
-            aria-label={t('quantity')}
+            className="bg-gray-50 rounded-2xl cursor-pointer"
+            onClick={() => openQuantityPopup(product.id, product.availableQuantity)}
           >
-            {product.availableQuantity}
+            <div
+              className="min-w-16 w-fit bg-white rounded flex items-center justify-center py-1.5 px-2.5 font-medium text-base md:text-xl shadow-sm"
+              style={{
+                borderRadius: '4px',
+                boxShadow: '0px 2px 4px 0px rgba(0, 0, 0, 0.08)',
+              }}
+              aria-label={t('quantity')}
+            >
+              {product.availableQuantity}
+            </div>
           </div>
+          <span className="text-[#9DA0A5] text-sm">{t('available')}</span>
         </div>
 
         {/* Toggle switch */}
@@ -100,6 +118,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
             className={`relative inline-flex h-7 md:h-8 w-12 md:w-14 items-center rounded-full transition-colors focus:outline-none ${
               product.status == ProductStatus.ACTIVE ? 'bg-[#22C55D]' : 'bg-[#9DA0A5]'
             }`}
+            style={{
+              boxShadow: '0px 2px 4px 0px rgba(0, 0, 0, 0.08)',
+            }}
             aria-pressed={product.status === ProductStatus.ACTIVE}
             aria-label={product.status === ProductStatus.ACTIVE ? t('disable') : t('enable')}
           >
@@ -117,22 +138,53 @@ const ProductCard: React.FC<ProductCardProps> = ({
       {/* Menu contextuel */}
       {isCardMenuOpen && (
         <div
-          className="absolute w-36 right-4 top-12 w-48 bg-neutral-100 rounded shadow-lg z-10 max-h-[calc(100vh-100px)]"
+          className="absolute right-4 top-12 bg-white rounded-lg shadow-xl border border-gray-200 w-48 overflow-hidden z-10"
           ref={menuRef}
-          style={{ maxWidth: 'calc(100% - 2rem)', overflow: 'auto' }}
         >
           <div>
             <Link
               to={`/modify-product/${product.id}`}
-              className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+              className="w-full text-left py-3 px-4 hover:bg-blue-50 flex items-center gap-3 border-b border-gray-100 transition-colors"
             >
-              {t('modify')}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-blue-500"
+              >
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+              <span className="font-medium">{t('modify')}</span>
             </Link>
             <button
               onClick={e => handleDelete(product.id, e)}
-              className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50"
+              className="w-full text-left py-3 px-4 hover:bg-red-50 flex items-center gap-3 transition-colors"
             >
-              {t('delete')}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="text-red-500"
+              >
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                <line x1="10" y1="11" x2="10" y2="17"></line>
+                <line x1="14" y1="11" x2="14" y2="17"></line>
+              </svg>
+              <span className="font-medium text-red-600">{t('delete')}</span>
             </button>
           </div>
         </div>

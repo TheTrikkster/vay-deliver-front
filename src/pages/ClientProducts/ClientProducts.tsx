@@ -37,11 +37,7 @@ function ClientProducts() {
       try {
         const response = await productsApi.getClientProducts(currentPage);
 
-        console.log('/////////////////////////////////////////');
-        console.log(response.data, 'israil');
-
         if (response.data.siteStatus === 'OFFLINE') {
-          console.log(response.data, 'israil AAAAAAAAA');
           setSiteStatus('OFFLINE');
           setOfflineMessage(response.data.offlineMessage);
           dispatch(clearClientOrder());
@@ -51,7 +47,6 @@ function ClientProducts() {
           setError(null);
         }
       } catch (error) {
-        console.log('Error fetching products:', error);
         setError(t('errorLoading'));
       } finally {
         setIsLoading(false);
@@ -66,9 +61,6 @@ function ClientProducts() {
       onAdd: (_id: string) => {
         const product = products.find(p => p._id === _id);
         if (!product) return;
-
-        console.log('///AZEAZEZAEAZ');
-        console.log({ product });
 
         const currentQuantity = cart[_id] || 0;
         const addQuantity =
@@ -111,8 +103,6 @@ function ClientProducts() {
       }, 0),
     [products, cart]
   );
-
-  // console.log({ products });
 
   const handleCheckout = () => {
     // dispatch(checkoutClientOrder());
@@ -167,7 +157,7 @@ function ClientProducts() {
       {products.length === 0 ? (
         <div className="text-center py-8 text-gray-500">{t('noProducts')}</div>
       ) : (
-        <section className="p-4">
+        <section className="mt-5">
           <ul className="flex flex-col justify-center items-center gap-4 pb-5">
             {(Array.isArray(products) ? products : []).map(product => (
               <li key={product._id} className="min-w-[343px] w-11/12 md:w-2/4">

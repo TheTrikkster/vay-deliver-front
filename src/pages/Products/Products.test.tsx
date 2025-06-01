@@ -5,7 +5,7 @@ jest.mock('react-redux', () => ({
   useDispatch: () => jest.fn(),
 }));
 
-import { render, screen, fireEvent, within } from '@testing-library/react';
+import { render, screen, fireEvent, within, act } from '@testing-library/react';
 import Products from './Products';
 import { useProductsInventory } from '../../hooks/useProductsInventory/useProductsInventory';
 
@@ -84,7 +84,9 @@ describe('Products', () => {
   });
 
   it('devrait afficher les produits correctement', () => {
-    render(<Products />);
+    act(() => {
+      render(<Products />);
+    });
 
     expect(screen.getByText('Pommes')).toBeInTheDocument();
 
@@ -119,7 +121,9 @@ describe('Products', () => {
       setCurrentPage: jest.fn(),
     });
 
-    render(<Products />);
+    act(() => {
+      render(<Products />);
+    });
 
     expect(screen.getByText('Вы должны добавить продукт')).toBeInTheDocument();
     expect(screen.getByText('Добавить продукт')).toBeInTheDocument();
@@ -137,7 +141,9 @@ describe('Products', () => {
       setCurrentPage: jest.fn(),
     });
 
-    render(<Products />);
+    act(() => {
+      render(<Products />);
+    });
 
     // Trouver le spinner par sa classe et non par le rôle
     const spinner = screen.getByTestId('spinner');
@@ -157,7 +163,9 @@ describe('Products', () => {
       setCurrentPage: jest.fn(),
     });
 
-    render(<Products />);
+    act(() => {
+      render(<Products />);
+    });
 
     expect(screen.getByText('Erreur lors du chargement des données')).toBeInTheDocument();
   });
@@ -176,7 +184,9 @@ describe('Products', () => {
       setCurrentPage: jest.fn(),
     });
 
-    render(<Products />);
+    act(() => {
+      render(<Products />);
+    });
 
     // Simulons l'appel à openQuantityPopup
     const instance = screen.getByText('Pommes').closest('div');
@@ -184,25 +194,31 @@ describe('Products', () => {
 
     // Si quantityField est trouvé, cliquez dessus pour ouvrir le popup
     if (quantityField && quantityField.parentElement) {
-      fireEvent.click(quantityField.parentElement);
+      act(() => {
+        fireEvent.click(quantityField.parentElement!);
+      });
 
       // Vérifier que le popup est ouvert
       expect(screen.getByText('Товар в наличии')).toBeInTheDocument();
 
       // Modifier la valeur
       const input = screen.getByRole('spinbutton');
-      fireEvent.change(input, { target: { value: '15' } });
+      act(() => {
+        fireEvent.change(input, { target: { value: '15' } });
+      });
 
       // Cliquer sur "Confirmer"
-      fireEvent.click(screen.getByText('Подтвердить'));
+      act(() => {
+        fireEvent.click(screen.getByText('Подтвердить'));
+      });
 
       // Vérifier que updateItemQuantity a été appelé avec les bonnes valeurs
       expect(mockUpdateItemQuantity).toHaveBeenCalledWith(1, 15);
     }
   });
 
-  it('devrait ouvrir le popup de confirmation et appeler deleteItem après confirmation', () => {
-    const mockDeleteItem = jest.fn();
+  it('devrait ouvrir le popup de confirmation et appeler deleteItem après confirmation', async () => {
+    const mockDeleteItem = jest.fn().mockResolvedValue(undefined);
     (useProductsInventory as jest.Mock).mockReturnValue({
       loading: false,
       error: null,
@@ -214,15 +230,21 @@ describe('Products', () => {
       setCurrentPage: jest.fn(),
     });
 
-    render(<Products />);
+    act(() => {
+      render(<Products />);
+    });
 
     // Trouver et ouvrir le menu pour le premier élément
     const menuButtons = screen.getAllByLabelText('options');
-    fireEvent.click(menuButtons[0]);
+    act(() => {
+      fireEvent.click(menuButtons[0]);
+    });
 
     // Cliquer sur le bouton Supprimer dans le menu
     const deleteButton = screen.getByText('Удалить');
-    fireEvent.click(deleteButton);
+    act(() => {
+      fireEvent.click(deleteButton);
+    });
 
     // Vérifier que le popup de confirmation est affiché
     const confirmationPopup = screen.getByText('Подтверждение удаления').closest('div');
@@ -237,7 +259,11 @@ describe('Products', () => {
     // Trouver le bouton Удалить à l'intérieur du popup de confirmation
     if (confirmationPopup) {
       const confirmDeleteButton = within(confirmationPopup).getByText('Удалить');
-      fireEvent.click(confirmDeleteButton);
+      await act(async () => {
+        fireEvent.click(confirmDeleteButton);
+        // Attendre que la promesse se résolve
+        await new Promise(resolve => setTimeout(resolve, 0));
+      });
     }
 
     // Vérifier que deleteItem a été appelé avec l'ID correct
@@ -247,7 +273,7 @@ describe('Products', () => {
     // expect(screen.queryByText('Подтверждение удаления')).not.toBeInTheDocument();
   });
 
-  it('devrait fermer le popup de confirmation sans supprimer lors du clic sur Annuler', () => {
+  it('devrait fermer le popup de confirmation sans supprimer lors du clic sur Annuler', async () => {
     const mockDeleteItem = jest.fn();
     (useProductsInventory as jest.Mock).mockReturnValue({
       loading: false,
@@ -260,15 +286,21 @@ describe('Products', () => {
       setCurrentPage: jest.fn(),
     });
 
-    render(<Products />);
+    act(() => {
+      render(<Products />);
+    });
 
     // Trouver et ouvrir le menu pour le premier élément
     const menuButtons = screen.getAllByLabelText('options');
-    fireEvent.click(menuButtons[0]);
+    act(() => {
+      fireEvent.click(menuButtons[0]);
+    });
 
     // Cliquer sur le bouton Supprimer dans le menu
     const deleteButton = screen.getByText('Удалить');
-    fireEvent.click(deleteButton);
+    act(() => {
+      fireEvent.click(deleteButton);
+    });
 
     // Vérifier que le popup de confirmation est affiché
     const confirmationPopup = screen.getByText('Подтверждение удаления').closest('div');
@@ -278,7 +310,11 @@ describe('Products', () => {
     if (confirmationPopup) {
       // Utiliser une fonction de correspondance plus flexible pour trouver le bouton Annuler
       const cancelButton = within(confirmationPopup).getByText(content => content === 'Отменить');
-      fireEvent.click(cancelButton);
+      await act(async () => {
+        fireEvent.click(cancelButton);
+        // Attendre que l'état se mette à jour
+        await new Promise(resolve => setTimeout(resolve, 0));
+      });
     }
 
     // Vérifier que deleteItem n'a pas été appelé
@@ -301,7 +337,9 @@ describe('Products', () => {
       setCurrentPage: mockSetCurrentPage,
     });
 
-    render(<Products />);
+    act(() => {
+      render(<Products />);
+    });
 
     // Vérifier que la pagination est affichée
     const pageButtons = screen.getAllByRole('button', { name: /^[0-9]+$/ });
@@ -309,7 +347,9 @@ describe('Products', () => {
 
     // Cliquer sur le bouton de page 2
     const page2Button = screen.getByRole('button', { name: '2' });
-    fireEvent.click(page2Button);
+    act(() => {
+      fireEvent.click(page2Button);
+    });
 
     // Vérifier que setCurrentPage a été appelé avec 2
     expect(mockSetCurrentPage).toHaveBeenCalledWith(2);

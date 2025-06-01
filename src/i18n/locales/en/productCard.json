@@ -2,6 +2,7 @@
   "options": "Options",
   "minOrder": "min",
   "quantity": "Quantity",
+  "available": "Available",
   "enable": "Enable",
   "disable": "Disable",
   "modify": "Modify",

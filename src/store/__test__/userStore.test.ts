@@ -42,13 +42,11 @@ describe('Store Configuration', () => {
         currentPage: 1,
         error: null,
         filtersObject: {
-          position: {
-            address: '',
-            lat: '',
-            lng: '',
-          },
           status: 'ACTIVE',
           tagNames: [],
+          position: {
+            address: '',
+          },
         },
         isOnline: true,
         isSelectionMode: false,

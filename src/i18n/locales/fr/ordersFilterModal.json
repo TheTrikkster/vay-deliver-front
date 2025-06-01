@@ -3,6 +3,7 @@
   "orders": "Commandes",
   "active": "Actives",
   "completed": "Terminées",
+  "canceled": "Annulées",
   "all": "Toutes",
   "addressSort": "Tri par adresse",
   "enterAddress": "Entrez une adresse ou un nom de ville",

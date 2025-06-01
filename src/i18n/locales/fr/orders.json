@@ -6,5 +6,6 @@
   "addNote": "Ajouter une note",
   "noOrders": "Aucune commande trouvée",
   "getOrdersError": "Impossible de charger les commandes",
-  "addTagError": "Erreur lors de l’ajout du tag"
+  "addTagError": "Erreur lors de l'ajout du tag",
+  "distance": "Distance"
 }

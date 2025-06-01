@@ -3,6 +3,7 @@
   "orders": "Orders",
   "active": "Active",
   "completed": "Completed",
+  "canceled": "Canceled",
   "all": "All",
   "addressSort": "Sort by address",
   "enterAddress": "Enter an address or city name",

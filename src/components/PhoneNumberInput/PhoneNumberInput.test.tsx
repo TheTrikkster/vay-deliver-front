@@ -1,5 +1,5 @@
-import React from 'react';
-import { render, screen, fireEvent, act } from '@testing-library/react';
+import { act } from 'react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { PhoneNumberInput } from './PhoneNumberInput';
 import { CountryCode } from 'libphonenumber-js';
 

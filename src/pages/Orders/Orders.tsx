@@ -28,15 +28,49 @@ function Orders() {
     isSelectionMode,
     selectedOrderIds,
     tagError,
+    filtersObject,
+    distanceMatrix,
 
     // actions
     toggleSelectionMode,
     toggleOrderSelection,
-    selectAllOrders,
-    clearSelection,
     addTag,
     setPage,
   } = useOrders({ limit: 30 });
+
+  // 3) Fonction pour obtenir la distance d'une commande
+  const getOrderDistance = useCallback(
+    (orderId: string): string | undefined => {
+      if (!distanceMatrix || !filtersObject.position.address) {
+        return undefined;
+      }
+
+      // Le distanceMatrix contient destinations (array d'IDs) et distances (array de distances en mètres)
+      const { destinations, distances } = distanceMatrix;
+
+      if (!destinations || !distances) {
+        return undefined;
+      }
+
+      // Trouver l'index de cette commande dans le tableau destinations
+      const orderIndex = destinations.indexOf(orderId);
+
+      if (orderIndex === -1 || orderIndex >= distances.length) {
+        return undefined;
+      }
+
+      // Récupérer la distance en mètres et la convertir en format lisible
+      const distanceInMeters = distances[orderIndex];
+
+      if (distanceInMeters < 1000) {
+        return `${distanceInMeters} m`;
+      } else {
+        const distanceInKm = (distanceInMeters / 1000).toFixed(1);
+        return `${distanceInKm} km`;
+      }
+    },
+    [distanceMatrix, filtersObject.position.address]
+  );
 
   // 3) Gestion du clic sur une carte
   const handleCardClick = useCallback(
@@ -48,6 +82,20 @@ function Orders() {
       }
     },
     [isSelectionMode, toggleOrderSelection, navigate]
+  );
+
+  // Gestion de l'ajout de tag
+  const handleAddTag = useCallback(
+    async (tagName: string, orderIds: string[] | string) => {
+      try {
+        await addTag(tagName, orderIds);
+        setIsAddTagModalOpen(false);
+      } catch (error) {
+        console.error('Error adding tag:', error);
+        // Le modal reste ouvert en cas d'erreur
+      }
+    },
+    [addTag]
   );
 
   if (loading) return <Loading />;
@@ -73,20 +121,13 @@ function Orders() {
             <div className="px-4 py-4 flex justify-between items-center">
               {isSelectionMode ? (
                 <>
+                  <div></div>
+                  <span className="text-base">{selectedOrderIds.length}</span>
                   <button
                     onClick={() => toggleSelectionMode(false)}
                     className="text-base font-medium"
                   >
                     {t('cancel')}
-                  </button>
-                  <span className="text-base">{selectedOrderIds.length}</span>
-                  <button
-                    onClick={
-                      selectedOrderIds.length !== orders.length ? selectAllOrders : clearSelection
-                    }
-                    className="text-base font-medium"
-                  >
-                    {selectedOrderIds.length !== orders.length ? t('selectAll') : t('deselectAll')}
                   </button>
                 </>
               ) : (
@@ -128,6 +169,7 @@ function Orders() {
                     status={order.status as OrderStatus}
                     isSelectionMode={isSelectionMode}
                     isSelected={selectedOrderIds.includes(order._id)}
+                    distance={getOrderDistance(order._id)}
                   />
                 </div>
               ))
@@ -153,7 +195,7 @@ function Orders() {
             <AddTagModal
               isOpen={isAddTagModalOpen}
               onClose={() => setIsAddTagModalOpen(false)}
-              onConfirm={(tag, ids) => addTag(tag, ids)}
+              onConfirm={handleAddTag}
               selectedOrderIds={selectedOrderIds}
             />
           </div>
