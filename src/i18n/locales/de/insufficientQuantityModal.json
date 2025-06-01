@@ -3,7 +3,7 @@
   "tableHeaderProduct": "Produkt",
   "tableHeaderRequested": "Angefordert",
   "tableHeaderAvailable": "Verfügbar",
-  "orderPrompt": "Die verfügbare Menge bestellen?",
+  "orderPrompt": "Verfügbare Menge bestellen?",
   "cancel": "Abbrechen",
   "confirm": "Bestätigen"
 }

@@ -22,55 +22,45 @@ export default function InsufficientQuantityModal({
   const { t } = useTranslation('insufficientQuantityModal');
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-      <div className="bg-white rounded-2xl px-4 py-8 w-full max-w-lg mx-4">
-        <h1 className="text-lg md:text-2xl font-semibold text-gray-800 mb-6 text-center">
-          {t('modalTitle')}
-        </h1>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-2xl p-6 w-full max-w-md mx-4">
+        <h2 className="text-xl font-medium text-gray-900 mb-6 text-center">{t('modalTitle')}</h2>
 
-        <table className="table-auto w-full mb-6 border-separate border-spacing-y-2">
-          <thead>
-            <tr>
-              <th className="w-[50%] py-2 text-sm md:text-lg font-medium text-gray-800 text-left">
-                {t('tableHeaderProduct')}
-              </th>
-              <th className="w-[25%] px-4 py-2 text-sm md:text-lg font-medium text-gray-800 text-center">
-                {t('tableHeaderRequested')}
-              </th>
-              <th className="w-[25%] py-2 text-sm md:text-lg font-medium text-gray-800 text-center">
-                {t('tableHeaderAvailable')}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {products.map(product => (
-              <tr key={product.details.productName}>
-                <td className="py-1 text-gray-800 text-sm md:text-base text-left">
-                  {product.details.productName}
-                </td>
-                <td className="px-4 py-1 text-sm md:text-base font-semibold text-red-600 text-center">
-                  {product.details.requestedQuantity} {product.details.unit}
-                </td>
-                <td className="py-1 text-sm md:text-base text-gray-800 text-center">
-                  {product.details.availableQuantity} {product.details.unit}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div className="space-y-4 mb-6">
+          {products.map(product => (
+            <div key={product.details.productName} className="border rounded-lg p-4">
+              <h3 className="font-medium text-gray-900 mb-3">{product.details.productName}</h3>
 
-        <p className="text-gray-800 text-base text-center mb-6">{t('orderPrompt')}</p>
+              <div className="flex justify-between text-sm">
+                <div>
+                  <span className="text-gray-600">{t('tableHeaderRequested')}: </span>
+                  <span className="font-medium text-red-600">
+                    {product.details.requestedQuantity} {product.details.unit}
+                  </span>
+                </div>
+                <div>
+                  <span className="text-gray-600">{t('tableHeaderAvailable')}: </span>
+                  <span className="font-medium text-green-600">
+                    {product.details.availableQuantity} {product.details.unit}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
 
-        <div className="flex space-x-4">
+        <p className="text-gray-600 text-center mb-6">{t('orderPrompt')}</p>
+
+        <div className="flex gap-3">
           <button
             onClick={onClose}
-            className="flex-1 py-4 rounded-lg bg-gray-100 text-gray-800 text-lg font-medium hover:bg-gray-200"
+            className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-700 transition-colors"
           >
             {t('cancel')}
           </button>
           <button
             onClick={onConfirm}
-            className="flex-1 py-4 rounded-lg bg-green-500 text-white text-lg font-medium hover:bg-green-600"
+            className="flex-1 py-3 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors"
           >
             {t('confirm')}
           </button>

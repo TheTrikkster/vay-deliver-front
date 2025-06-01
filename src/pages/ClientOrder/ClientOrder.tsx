@@ -195,14 +195,17 @@ function ClientOrder() {
 
               {/* Liste des articles avec table */}
               <div className="mb-7 overflow-hidden">
+                {/* Ligne séparatrice du haut */}
+                <div className="border-t border-dashed border-[#000] mb-0"></div>
+
                 <table className="w-full">
                   <colgroup>
                     <col className="w-[50%]" />
                     <col className="w-[25%]" />
                     <col className="w-[25%]" />
                   </colgroup>
-                  <tbody className="border-y border-dashed border-[#000]">
-                    {products.map(item => (
+                  <tbody>
+                    {products.map((item, index) => (
                       <tr key={item._id}>
                         <td className="py-3 text-gray-800">{item.name}</td>
                         <td className="py-3 text-gray-600 whitespace-nowrap">
@@ -216,10 +219,16 @@ function ClientOrder() {
                   </tbody>
                   <tfoot>
                     <tr>
-                      <td colSpan={2} className="pt-4 text-base font-bold">
+                      <td colSpan={3} className="p-0">
+                        {/* Ligne séparatrice du bas */}
+                        <div className="border-t border-dashed border-[#000] mb-4"></div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td colSpan={2} className="text-base font-bold">
                         {t('total')}
                       </td>
-                      <td className="pt-4 text-lg font-bold text-right whitespace-nowrap">
+                      <td className="text-lg font-bold text-right whitespace-nowrap">
                         {sumCurrency({ value: total })}
                       </td>
                     </tr>
@@ -375,7 +384,7 @@ function ClientOrder() {
                     }
                   }}
                   error={
-                    // only once “touched” and *not* currently focused
+                    // only once "touched" and *not* currently focused
                     phoneTouched &&
                     focusedField !== FORM_FIELDS.PHONE_NUMBER &&
                     (errors.phoneNumber ??
