@@ -3,5 +3,13 @@
   "call": "Позвонить",
   "whatsappMessage": "Сообщение WhatsApp",
   "continueDeliveries": "Продолжить доставки с этого адреса",
-  "currentPositionSelected": "Текущая позиция выбрана - Посмотреть все заказы"
+  "currentPositionSelected": "Текущая позиция выбрана - Посмотреть все заказы",
+  "clickToNavigate": "Нажмите для навигации",
+  "clickToCall": "Нажмите для звонка",
+  "sendMessage": "Отправить сообщение",
+  "clickForWhatsApp": "Нажмите для WhatsApp",
+  "continueRoute": "Продолжить маршрут",
+  "currentPosition": "Текущая позиция",
+  "deliveryInProgress": "Доставка в процессе",
+  "nextDelivery": "Перейти к следующей доставке"
 }

@@ -3,5 +3,13 @@
   "call": "Call",
   "whatsappMessage": "WhatsApp Message",
   "continueDeliveries": "Continue deliveries from this address",
-  "currentPositionSelected": "Current position selected - View all orders"
+  "currentPositionSelected": "Current position selected - View all orders",
+  "clickToNavigate": "Click to navigate",
+  "clickToCall": "Click to call",
+  "sendMessage": "Send message",
+  "clickForWhatsApp": "Click for WhatsApp",
+  "continueRoute": "Continue route",
+  "currentPosition": "Current position",
+  "deliveryInProgress": "Delivery in progress here",
+  "nextDelivery": "Go to next delivery"
 }
