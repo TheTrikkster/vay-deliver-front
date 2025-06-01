@@ -28,7 +28,7 @@ const AddTagModal: React.FC<AddTagModalProps> = ({
       setTagName('');
       onClose();
     } catch (error) {
-      console.error(error);
+      // console.error(error);
     }
   }, [tagName, orderId, selectedOrderIds, onConfirm, onClose]);
 

@@ -5,7 +5,6 @@ import Loading from '../../components/Loading';
 import Menu from '../../components/Menu/Menu';
 import ConfirmModal from '../../components/ConfirmModal';
 import CustomerInfo from '../../components/OrderDetails/CustomerInfo';
-import OrderStatus from '../../components/OrderDetails/OrderStatus';
 import OrderItems from '../../components/OrderDetails/OrderItems';
 import OrderTagsSection from '../../components/OrderTagsSection/OrderTagsSection';
 import OrderActions from '../../components/OrderActions/OrderActions';
@@ -39,11 +38,11 @@ const Order: React.FC = () => {
       <Menu />
       <button
         onClick={() => navigate(-1)}
-        className="absolute top-4 left-4 p-2.5 rounded-full transition-colors z-10 md:bg-white md:shadow-sm md:border md:border-gray-200 hover:bg-gray-50"
+        className="absolute top-4 left-4 p-3 rounded-full transition-all duration-200 z-10 md:bg-white md:shadow-sm md:border md:border-gray-200 hover:bg-gray-50 hover:shadow-md active:scale-95"
       >
         <svg
-          width="20"
-          height="20"
+          width="18"
+          height="18"
           viewBox="0 0 24 24"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
@@ -52,10 +51,8 @@ const Order: React.FC = () => {
         </svg>
       </button>
 
-      <div className="flex justify-center mt-10 pb-28">
-        <div className="min-w-[343px] w-full md:w-5/12 bg-white rounded-2xl p-6 md:shadow-md max-w-[500px] md:mx-0 mx-4">
-          <OrderStatus status={orderDetails.status as OrderStatusType} />
-
+      <div className="flex justify-center mt-6 md:mt-8 pb-32 md:pb-28 px-4 md:px-0">
+        <div className="min-w-[343px] w-full md:w-5/12 bg-white rounded-2xl md:rounded-3xl p-5 md:p-8 md:shadow-lg max-w-[500px] space-y-6">
           <CustomerInfo
             firstName={orderDetails.firstName}
             lastName={orderDetails.lastName}

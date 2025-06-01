@@ -1,8 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { AddressQuickSet } from '../shared/AddressQuickSet';
 import { useAddressFilter } from '../../hooks/useAddressFilter';
 import { OrderStatus } from '../../types/order';
+import OrderStatusComponent from './OrderStatus';
 
 interface CustomerInfoProps {
   firstName: string;
@@ -19,10 +19,8 @@ const CustomerInfo = ({
   phoneNumber,
   orderStatus,
 }: CustomerInfoProps) => {
-  const { t } = useTranslation('order');
   const { t: tCustomer } = useTranslation('customerInfo');
   const { filtersObject, setFilterAddress, currentAddress } = useAddressFilter();
-  const navigate = useNavigate();
 
   const shouldShowAddressFilter =
     orderStatus === 'ACTIVE' &&
@@ -38,17 +36,20 @@ const CustomerInfo = ({
 
   return (
     <>
-      {/* En-tête avec le nom du client */}
-      <div className="flex flex-col mb-6 gap-5">
-        <div className="flex items-center gap-3">
+      {/* En-tête avec le nom du client et le statut */}
+      <div className="flex flex-col mb-8 gap-5">
+        <div className="flex items-center justify-between gap-3">
           <h2 className="text-2xl font-semibold text-gray-900 m-0">
             {firstName} {lastName}
           </h2>
+          {orderStatus && (
+            <OrderStatusComponent status={orderStatus} className="flex justify-end" />
+          )}
         </div>
       </div>
 
       {/* Informations de contact */}
-      <div className="flex flex-col gap-3 mb-6">
+      <div className="flex flex-col gap-3 mb-8">
         <div className="bg-gray-50 rounded-2xl cursor-pointer">
           <div
             className="w-full px-4 py-3 bg-white rounded flex items-center gap-3 shadow-sm"
@@ -118,7 +119,7 @@ const CustomerInfo = ({
       </div>
 
       {/* Boutons d'action pour le livreur */}
-      <div className="mb-4">
+      <div className="mb-6">
         {/* WhatsApp */}
         <div className="bg-gray-50 rounded-2xl cursor-pointer">
           <div
@@ -154,7 +155,7 @@ const CustomerInfo = ({
       {/* Continuer la livraison d'ici */}
       {shouldShowAddressFilter && (
         <div
-          className={`bg-gray-50 rounded-2xl cursor-pointer mb-6 ${isCurrentAddress ? 'bg-blue-50' : ''}`}
+          className={`bg-gray-50 rounded-2xl cursor-pointer ${isCurrentAddress ? 'bg-blue-50' : ''}`}
         >
           <div
             className={`w-full px-4 py-3 ${isCurrentAddress ? 'bg-blue-100' : 'bg-white'} rounded flex items-center gap-3 shadow-sm`}
