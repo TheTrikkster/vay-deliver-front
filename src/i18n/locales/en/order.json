@@ -19,5 +19,7 @@
   "confirmCancel": "Are you sure you want to cancel this order?",
   "confirmComplete": "Are you sure you want to mark this order as completed?",
   "deleteTag": "Delete tag",
-  "deleteTagConfirmation": "Are you sure you want to delete this tag?"
+  "deleteTagConfirmation": "Are you sure you want to delete this tag?",
+  "confirm": "Confirm",
+  "deleting": "Deleting..."
 }

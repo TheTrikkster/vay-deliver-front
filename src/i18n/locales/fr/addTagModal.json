@@ -2,5 +2,7 @@
   "title": "Nouvelle note",
   "placeholder": "Entrez le texte de la note",
   "cancel": "Annuler",
-  "confirm": "Confirmer"
+  "confirm": "Confirmer",
+  "adding": "Ajout...",
+  "error": "Erreur lors de l'ajout de la note"
 }

@@ -19,5 +19,7 @@
   "confirmCancel": "Sind Sie sicher, dass Sie diese Bestellung stornieren möchten?",
   "confirmComplete": "Sind Sie sicher, dass Sie diese Bestellung als abgeschlossen markieren möchten?",
   "deleteTag": "Tag löschen",
-  "deleteTagConfirmation": "Sind Sie sicher, dass Sie diesen Tag löschen möchten?"
+  "deleteTagConfirmation": "Sind Sie sicher, dass Sie diesen Tag löschen möchten?",
+  "confirm": "Bestätigen",
+  "deleting": "Löschen..."
 }

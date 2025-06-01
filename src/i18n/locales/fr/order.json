@@ -19,5 +19,7 @@
   "confirmCancel": "Êtes-vous sûr de vouloir annuler cette commande ?",
   "confirmComplete": "Êtes-vous sûr de vouloir marquer cette commande comme terminée ?",
   "deleteTag": "Supprimer l'étiquette",
-  "deleteTagConfirmation": "Êtes-vous sûr de vouloir supprimer cette étiquette ?"
+  "deleteTagConfirmation": "Êtes-vous sûr de vouloir supprimer cette étiquette ?",
+  "confirm": "Confirmer",
+  "deleting": "Suppression..."
 }

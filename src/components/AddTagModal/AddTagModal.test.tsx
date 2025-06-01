@@ -98,6 +98,9 @@ describe('AddTagModal', () => {
   });
 
   it('should not close modal and keep textarea on onConfirm error', async () => {
+    // Spy pour masquer le console.error lors de ce test intentionnel d'erreur
+    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
     const errorConfirm = jest.fn(() => Promise.reject(new Error('fail')));
     render(<AddTagModal {...defaultProps} onConfirm={errorConfirm} orderId="1" />);
     const textarea = screen.getByPlaceholderText('placeholder');
@@ -110,5 +113,8 @@ describe('AddTagModal', () => {
     await waitFor(() => expect(errorConfirm).toHaveBeenCalled());
     expect(mockOnClose).toHaveBeenCalledTimes(0);
     expect(textarea).toHaveValue('Err');
+
+    // Nettoyer le spy
+    consoleErrorSpy.mockRestore();
   });
 });
