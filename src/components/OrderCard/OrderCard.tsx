@@ -31,13 +31,17 @@ const OrderCard: React.FC<OrderCardProps> = ({
       {isSelectionMode && (
         <div className="absolute top-5 right-5">
           <div
-            className="w-6 h-6 rounded-md border-2 flex items-center justify-center border-green-500 bg-white"
+            className={`w-6 h-6 rounded-md border-2 flex items-center justify-center transition-all duration-200 cursor-pointer ${
+              isSelected
+                ? 'bg-green-500 border-green-500'
+                : 'border-gray-300 bg-white hover:border-green-400'
+            }`}
             role="checkbox"
             aria-checked={isSelected}
             tabIndex={isSelectionMode ? 0 : -1}
           >
             {isSelected && (
-              <svg className="w-4 h-4 text-green-500" viewBox="0 0 20 20" fill="currentColor">
+              <svg className="w-4 h-4 text-white" viewBox="0 0 20 20" fill="currentColor">
                 <path
                   fillRule="evenodd"
                   d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"

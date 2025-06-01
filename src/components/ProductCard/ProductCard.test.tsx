@@ -11,6 +11,7 @@ jest.mock('react-i18next', () => ({
         options: 'Опции',
         minOrder: 'мин',
         quantity: 'Количество',
+        available: 'Доступно',
         enable: 'Включить',
         disable: 'Отключить',
         modify: 'Изменять',
@@ -56,13 +57,17 @@ describe('Composant ProductCard', () => {
 
     expect(screen.getByText('Pommes')).toBeInTheDocument();
 
-    // Modifier la façon de vérifier le texte
-    const priceElement = screen.getByText(/2.5€\/kg/);
-    expect(priceElement).toBeInTheDocument();
-    expect(priceElement.textContent).toContain('1');
-    expect(priceElement.textContent).toContain('мин');
+    // Vérifier le prix séparément
+    expect(screen.getByText('2.5€/kg')).toBeInTheDocument();
 
+    // Vérifier la commande minimale séparément
+    expect(screen.getByText('1 мин')).toBeInTheDocument();
+
+    // Vérifier la quantité disponible
     expect(screen.getByText('3')).toBeInTheDocument();
+
+    // Vérifier le label "Доступно"
+    expect(screen.getByText('Доступно')).toBeInTheDocument();
   });
 
   test('appelle toggleCardMenu lorsque le bouton de menu est cliqué', () => {

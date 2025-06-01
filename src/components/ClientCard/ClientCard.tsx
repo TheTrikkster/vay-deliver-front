@@ -36,7 +36,7 @@ const ClientCard: React.FC<ClientCardProps> = memo(({ product, quantity, cartAct
         <button
           aria-label={t('ariaAddToCart', { name })}
           onClick={() => onAdd(_id)}
-          className="w-full text-[#4355DA] font-bold border border-[#4355DA] py-3 rounded-full text-lg mt-6 hover:bg-gray-100 transition-colors"
+          className="w-full text-[#4355DA] font-bold border border-[#4355DA] py-3 rounded-full text-l mt-6 hover:bg-gray-100 transition-colors"
         >
           {t('add')}
         </button>
@@ -87,7 +87,7 @@ const ClientCard: React.FC<ClientCardProps> = memo(({ product, quantity, cartAct
               </svg>
             )}
           </button>
-          <span className="font-semibold text-xl text-gray-900">{quantity}</span>
+          <span className="font-semibold text-l text-gray-900">{quantity}</span>
           <button
             onClick={() => onAdd(_id)}
             className="p-[18px] pl-10 text-[#4F46E5] font-medium hover:bg-gray-50"

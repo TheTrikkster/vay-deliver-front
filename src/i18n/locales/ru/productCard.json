@@ -2,6 +2,7 @@
   "options": "Опции",
   "minOrder": "мин",
   "quantity": "Количество",
+  "available": "Доступно",
   "enable": "Включить",
   "disable": "Отключить",
   "modify": "Изменять",

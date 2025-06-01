@@ -64,26 +64,44 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </button>
       </div>
 
-      {/* Prix/Unité */}
-      <div className=" text-sm md:text-base">
-        <p className="text-[#9DA0A5] mb-1 text-sm">
-          {product.price}€/{product.unitExpression} | {product.minOrder} {t('minOrder')}
-        </p>
-        <p className="text-[#9DA0A5] mb-4 text-sm">{product.description}</p>
+      {/* Prix/Unité - Style amélioré */}
+      <div className="text-sm md:text-base mb-4">
+        <div className="flex items-center gap-2 mb-2">
+          <span className="text-green-500 font-semibold text-base md:text-lg">
+            {product.price}€/{product.unitExpression}
+          </span>
+          <span className="text-green-500 font-semibold text-base md:text-lg">
+            {product.minOrder} {t('minOrder')}
+          </span>
+        </div>
+        <p className="text-[#9DA0A5] text-sm">{product.description}</p>
       </div>
 
-      <div className="flex w-full justify-between items-center bg-[#F5F5F5] rounded-xl p-[12px] md:px-6 md:py-3">
-        {/* Champ de quantité (rendu cliquable) */}
-        <div
-          className="bg-gray-50 rounded-2xl cursor-pointer"
-          onClick={() => openQuantityPopup(product.id, product.availableQuantity)}
-        >
+      <div
+        className="flex w-full justify-between items-center rounded p-[12px] md:px-6 md:py-3"
+        style={{
+          borderRadius: '6px',
+          background: 'linear-gradient(90deg, #F7F8FA 0%, #FDFDFD 100%)',
+        }}
+      >
+        {/* Champ de quantité avec label "Disponible" */}
+        <div className="flex items-center gap-3">
           <div
-            className="min-w-16 w-fit bg-white border border-[#D6D9E2] rounded-lg text-base text-center md:text-xl py-1.5 px-2.5 font-medium"
-            aria-label={t('quantity')}
+            className="bg-gray-50 rounded-2xl cursor-pointer"
+            onClick={() => openQuantityPopup(product.id, product.availableQuantity)}
           >
-            {product.availableQuantity}
+            <div
+              className="min-w-16 w-fit bg-white rounded flex items-center justify-center py-1.5 px-2.5 font-medium text-base md:text-xl shadow-sm"
+              style={{
+                borderRadius: '4px',
+                boxShadow: '0px 2px 4px 0px rgba(0, 0, 0, 0.08)',
+              }}
+              aria-label={t('quantity')}
+            >
+              {product.availableQuantity}
+            </div>
           </div>
+          <span className="text-[#9DA0A5] text-sm">{t('available')}</span>
         </div>
 
         {/* Toggle switch */}
@@ -100,6 +118,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
             className={`relative inline-flex h-7 md:h-8 w-12 md:w-14 items-center rounded-full transition-colors focus:outline-none ${
               product.status == ProductStatus.ACTIVE ? 'bg-[#22C55D]' : 'bg-[#9DA0A5]'
             }`}
+            style={{
+              boxShadow: '0px 2px 4px 0px rgba(0, 0, 0, 0.08)',
+            }}
             aria-pressed={product.status === ProductStatus.ACTIVE}
             aria-label={product.status === ProductStatus.ACTIVE ? t('disable') : t('enable')}
           >
