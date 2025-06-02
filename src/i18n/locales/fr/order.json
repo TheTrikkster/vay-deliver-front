@@ -21,5 +21,7 @@
   "deleteTag": "Supprimer l'étiquette",
   "deleteTagConfirmation": "Êtes-vous sûr de vouloir supprimer cette étiquette ?",
   "confirm": "Confirmer",
-  "deleting": "Suppression..."
+  "deleting": "Suppression...",
+  "completing": "Finalisation...",
+  "canceling": "Annulation..."
 }

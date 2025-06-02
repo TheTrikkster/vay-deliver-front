@@ -10,5 +10,25 @@
   "price": "Price: 18 *",
   "requiredFields": "Fields marked with * are required.",
   "cancel": "Cancel",
-  "confirm": "Confirm"
+  "confirm": "Confirm",
+  "creating": "Creating...",
+  "updating": "Updating...",
+  "labels": {
+    "productName": "Product name",
+    "description": "Description",
+    "unitMeasure": "Unit of measure",
+    "availableQuantity": "Available quantity",
+    "minOrderVolume": "Minimum order volume",
+    "maxOrderVolume": "Maximum order volume",
+    "price": "Price"
+  },
+  "placeholders": {
+    "productName": "Enter product name",
+    "description": "Describe your product",
+    "unitMeasure": "e.g: Piece, Gram, Kg",
+    "availableQuantity": "Quantity in figures",
+    "minOrderVolume": "Minimum in figures",
+    "maxOrderVolume": "Maximum in figures (optional)",
+    "price": "Price in euros"
+  }
 }

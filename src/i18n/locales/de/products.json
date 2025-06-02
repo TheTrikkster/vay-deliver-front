@@ -10,5 +10,6 @@
   "forceDeleteConfirmation": "Erzwingende Löschbestätigung",
   "forceDeleteConfirmationText": "Sind Sie sicher, dass Sie diesen Artikel erzwingen löschen möchten ?",
   "delete": "Löschen",
+  "deleting": "Löschen...",
   "productNoLongerExists": "Das Produkt existiert nicht mehr oder wurde gelöscht"
 }

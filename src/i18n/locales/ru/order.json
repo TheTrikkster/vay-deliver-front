@@ -21,5 +21,7 @@
   "deleteTag": "Удалить тег",
   "deleteTagConfirmation": "Вы уверены, что хотите удалить этот тег?",
   "confirm": "Подтвердить",
-  "deleting": "Удаление..."
+  "deleting": "Удаление...",
+  "completing": "Завершение...",
+  "canceling": "Отмена..."
 }

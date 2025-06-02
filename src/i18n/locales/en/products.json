@@ -10,5 +10,6 @@
   "forceDeleteConfirmation": "Force delete confirmation",
   "forceDeleteConfirmationText": "Are you sure you want to force delete this item ?",
   "delete": "Delete",
+  "deleting": "Deleting...",
   "productNoLongerExists": "The product no longer exists or has been deleted"
 }

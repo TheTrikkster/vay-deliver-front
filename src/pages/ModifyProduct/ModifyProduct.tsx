@@ -20,6 +20,7 @@ function ModifyProduct() {
   const loading = useSelector(selectProductsLoading);
   const [productData, setProductData] = useState<Product | null>(null);
   const [getError, setGetError] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchProductData = async () => {
@@ -38,9 +39,10 @@ function ModifyProduct() {
     if (id) {
       fetchProductData();
     }
-  }, [id, dispatch]);
+  }, [id, dispatch, t]);
 
   const handleUpdateProduct = async (updatedProductData: Product) => {
+    setIsSubmitting(true);
     dispatch(setError(null));
 
     try {
@@ -74,6 +76,8 @@ function ModifyProduct() {
     } catch (error) {
       console.error('Erreur lors de la mise à jour du produit:', error);
       dispatch(setError(t('unableToUpdateProduct')));
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -95,6 +99,7 @@ function ModifyProduct() {
       onSubmit={handleUpdateProduct}
       isEditing={true}
       isLoading={loading}
+      isSubmitting={isSubmitting}
     />
   );
 }

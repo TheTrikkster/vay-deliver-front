@@ -10,7 +10,7 @@ import Menu from '../../components/Menu/Menu';
 import { useDispatch } from 'react-redux';
 import { setError } from '../../store/slices/productsSlice';
 import Loading from '../../components/Loading';
-import DeleteProductModal from '../../components/DeleteProductModal';
+import UnifiedConfirmModal from '../../components/UnifiedConfirmModal';
 
 function Products() {
   const { t } = useTranslation('products');
@@ -24,6 +24,8 @@ function Products() {
   const [isDeletePopupOpen, setIsDeletePopupOpen] = useState<boolean>(false);
   const [itemToDelete, setItemToDelete] = useState<number | null>(null);
   const [forceOpen, setForceOpen] = useState<boolean>(false);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
+  const [isForceDeleting, setIsForceDeleting] = useState<boolean>(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const {
     loading,
@@ -56,22 +58,26 @@ function Products() {
 
   const confirmDelete = useCallback(async () => {
     if (itemToDelete !== null) {
+      setIsDeleting(true);
       try {
         await deleteItem(itemToDelete);
         setItemToDelete(null);
+        setIsDeletePopupOpen(false);
       } catch (error: any) {
         if (error.message === 'activeOrder') {
+          setIsDeletePopupOpen(false);
           setForceOpen(true);
         }
         console.error('Error deleting product:', error);
       } finally {
-        setIsDeletePopupOpen(false);
+        setIsDeleting(false);
       }
     }
   }, [deleteItem, itemToDelete]);
 
   const forceDelete = useCallback(async () => {
     if (itemToDelete !== null) {
+      setIsForceDeleting(true);
       try {
         await forceDeleteItem(itemToDelete);
         setItemToDelete(null);
@@ -79,9 +85,11 @@ function Products() {
         dispatch(setError(null));
       } catch (error) {
         console.error('Error deleting product:', error);
+      } finally {
+        setIsForceDeleting(false);
       }
     }
-  }, [deleteItem, itemToDelete]);
+  }, [forceDeleteItem, itemToDelete, dispatch]);
 
   const toggleCardMenu = useCallback((id: number, e: React.MouseEvent) => {
     e.preventDefault();
@@ -225,25 +233,33 @@ function Products() {
       )}
 
       {isDeletePopupOpen && (
-        <DeleteProductModal
+        <UnifiedConfirmModal
+          isOpen={isDeletePopupOpen}
           title={t('deleteConfirmation')}
           message={t('deleteConfirmationText')}
-          cancelText={t('cancel')}
-          confirmText={t('delete')}
           onClose={() => setIsDeletePopupOpen(false)}
           onConfirm={confirmDelete}
-          variant="normal"
+          variant="danger"
+          isLoading={isDeleting}
+          cancelText={t('cancel')}
+          confirmText={t('delete')}
+          loadingText={t('deleting')}
+          translationNamespace="products"
         />
       )}
       {forceOpen && (
-        <DeleteProductModal
+        <UnifiedConfirmModal
+          isOpen={forceOpen}
           title={t('forceDeleteConfirmation')}
           message={t('forceDeleteConfirmationText')}
-          cancelText={t('cancel')}
-          confirmText={t('delete')}
           onClose={() => setForceOpen(false)}
           onConfirm={forceDelete}
           variant="danger"
+          isLoading={isForceDeleting}
+          cancelText={t('cancel')}
+          confirmText={t('delete')}
+          loadingText={t('deleting')}
+          translationNamespace="products"
         />
       )}
     </div>

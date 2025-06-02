@@ -10,5 +10,6 @@
   "forceDeleteConfirmation": "Подтверждение принудительного удаления",
   "forceDeleteConfirmationText": "Вы уверены, что хотите принудительно удалить этот элемент ?",
   "delete": "Удалить",
+  "deleting": "Удаление...",
   "productNoLongerExists": "Продукт больше не существует или был удален"
 }

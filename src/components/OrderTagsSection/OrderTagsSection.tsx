@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import AddTagModal from '../AddTagModal/AddTagModal';
 import { useOrderTags } from '../../hooks/useOrderTags/useOrderTags';
+import UnifiedConfirmModal from '../UnifiedConfirmModal';
 
 interface OrderTagsSectionProps {
   orderId: string;
@@ -195,38 +196,20 @@ const OrderTagsSection = ({ orderId, tagNames, onTagsUpdated }: OrderTagsSection
         onConfirm={handleAddTag}
       />
 
-      {/* Modal de confirmation personnalisé avec loading state */}
-      {isConfirmModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
-            <h2 className="text-xl font-semibold mb-4">{t('deleteTag')}</h2>
-            <p className="text-gray-600 mb-6">{t('deleteTagConfirmation')}</p>
-            <div className="flex justify-center items-center gap-2">
-              <button
-                onClick={cancelDeleteTag}
-                disabled={isDeleting}
-                className="flex-1 px-4 py-2 text-gray-600 hover:bg-gray-100 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {t('cancel')}
-              </button>
-              <button
-                onClick={confirmDeleteTag}
-                disabled={isDeleting}
-                className="flex-1 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed relative"
-              >
-                {isDeleting ? (
-                  <div className="flex items-center justify-center gap-2">
-                    <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
-                    <span>{t('deleting')}</span>
-                  </div>
-                ) : (
-                  t('confirm')
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Modal de confirmation avec UnifiedConfirmModal */}
+      <UnifiedConfirmModal
+        isOpen={isConfirmModalOpen}
+        onClose={cancelDeleteTag}
+        onConfirm={confirmDeleteTag}
+        title={t('deleteTag')}
+        message={t('deleteTagConfirmation')}
+        variant="danger"
+        isLoading={isDeleting}
+        cancelText={t('cancel')}
+        confirmText={t('confirm')}
+        loadingText={t('deleting')}
+        translationNamespace="orderTagsSection"
+      />
     </div>
   );
 };

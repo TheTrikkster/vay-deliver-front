@@ -26,6 +26,7 @@ export const useOrder = ({ id }: { id: string }) => {
   const [error, setError] = useState<string | null>(null);
   const [currentAction, setCurrentAction] = useState<ActionType | null>(null);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
+  const [isActionLoading, setIsActionLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -93,17 +94,22 @@ export const useOrder = ({ id }: { id: string }) => {
 
   const handleConfirmAction = async () => {
     let success = false;
+    setIsActionLoading(true);
 
-    switch (currentAction) {
-      case 'COMPLETE':
-        success = await handleUpdateStatus('COMPLETED');
-        break;
-      case 'CANCEL':
-        success = await handleUpdateStatus('CANCELED');
-        break;
-      case 'DELETE':
-        success = await handleDeleteOrder();
-        break;
+    try {
+      switch (currentAction) {
+        case 'COMPLETE':
+          success = await handleUpdateStatus('COMPLETED');
+          break;
+        case 'CANCEL':
+          success = await handleUpdateStatus('CANCELED');
+          break;
+        case 'DELETE':
+          success = await handleDeleteOrder();
+          break;
+      }
+    } finally {
+      setIsActionLoading(false);
     }
 
     setIsConfirmModalOpen(false);
@@ -136,6 +142,23 @@ export const useOrder = ({ id }: { id: string }) => {
     }
   };
 
+  const getLoadingText = () => {
+    switch (currentAction) {
+      case 'COMPLETE':
+        return 'completing';
+      case 'CANCEL':
+        return 'canceling';
+      case 'DELETE':
+        return 'deleting';
+      default:
+        return 'completing';
+    }
+  };
+
+  const getVariant = () => {
+    return currentAction === 'DELETE' ? 'danger' : 'normal';
+  };
+
   const refreshOrderDetails = async () => {
     try {
       const response = await ordersApi.getById(id);
@@ -159,5 +182,8 @@ export const useOrder = ({ id }: { id: string }) => {
     setIsConfirmModalOpen,
     getConfirmationInfo,
     refreshOrderDetails,
+    isActionLoading,
+    getLoadingText,
+    getVariant,
   };
 };

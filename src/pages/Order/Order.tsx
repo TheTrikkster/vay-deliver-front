@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Loading from '../../components/Loading';
 import Menu from '../../components/Menu/Menu';
-import ConfirmModal from '../../components/ConfirmModal';
+import UnifiedConfirmModal from '../../components/UnifiedConfirmModal';
 import CustomerInfo from '../../components/OrderDetails/CustomerInfo';
 import OrderItems from '../../components/OrderDetails/OrderItems';
 import OrderTagsSection from '../../components/OrderTagsSection/OrderTagsSection';
@@ -27,6 +27,9 @@ const Order: React.FC = () => {
     setIsConfirmModalOpen,
     getConfirmationInfo,
     refreshOrderDetails,
+    isActionLoading,
+    getLoadingText,
+    getVariant,
   } = useOrder({ id: id || '' });
 
   if (loading) {
@@ -76,13 +79,21 @@ const Order: React.FC = () => {
         onActionClick={handleActionClick}
       />
 
-      <ConfirmModal
-        isOpen={isConfirmModalOpen}
-        onClose={() => setIsConfirmModalOpen(false)}
-        onConfirm={handleConfirmAction}
-        title={t(getConfirmationInfo().title)}
-        message={t(getConfirmationInfo().message)}
-      />
+      {isConfirmModalOpen && (
+        <UnifiedConfirmModal
+          isOpen={isConfirmModalOpen}
+          title={t(getConfirmationInfo().title)}
+          message={t(getConfirmationInfo().message)}
+          onClose={() => setIsConfirmModalOpen(false)}
+          onConfirm={handleConfirmAction}
+          variant={getVariant()}
+          isLoading={isActionLoading}
+          cancelText={t('cancel')}
+          confirmText={t('confirm')}
+          loadingText={t(getLoadingText())}
+          translationNamespace="order"
+        />
+      )}
     </div>
   ) : (
     <div
