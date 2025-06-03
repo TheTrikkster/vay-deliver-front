@@ -23,5 +23,14 @@
   "confirm": "Confirmer",
   "deleting": "Suppression...",
   "completing": "Finalisation...",
-  "canceling": "Annulation..."
+  "canceling": "Annulation...",
+  "continueRouteTitle": "Continuer le parcours",
+  "continueRouteMessage": "Comment souhaitez-vous traiter cette commande avant de continuer le parcours ?",
+  "terminateOrder": "Terminer la commande",
+  "cancelOrder": "Annuler la commande",
+  "back": "Retour",
+  "continueRouteComplete": "Terminer et continuer",
+  "continueRouteCompleteMessage": "Marquer cette commande comme terminée et continuer le parcours ?",
+  "continueRouteCancel": "Annuler et continuer",
+  "continueRouteCancelMessage": "Annuler cette commande et continuer le parcours ?"
 }
