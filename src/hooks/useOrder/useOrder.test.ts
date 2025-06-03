@@ -10,6 +10,14 @@ jest.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
 }));
 
+// Mock useAddressFilter complètement
+const mockSetFilterAddress = jest.fn();
+jest.mock('../useAddressFilter', () => ({
+  useAddressFilter: () => ({
+    setFilterAddress: mockSetFilterAddress,
+  }),
+}));
+
 jest.mock('../../api/services/ordersApi');
 const mockedOrdersApi = ordersApi as jest.Mocked<typeof ordersApi>;
 
@@ -17,7 +25,7 @@ describe('useOrder hook', () => {
   const orderId = 'order123';
 
   const extendedOrder = {
-    id: orderId,
+    _id: orderId,
     status: 'PENDING',
     firstName: 'John',
     lastName: 'Doe',
@@ -84,6 +92,7 @@ describe('useOrder hook', () => {
       mockedOrdersApi.getById.mockResolvedValueOnce({
         data: { ...extendedOrder, items: [] },
       } as any);
+
       const { result } = renderHook(() => useOrder({ id: orderId }));
 
       await waitFor(() => {
@@ -95,6 +104,7 @@ describe('useOrder hook', () => {
 
     it('should sum item prices * quantities', async () => {
       mockedOrdersApi.getById.mockResolvedValueOnce({ data: extendedOrder } as any);
+
       const { result } = renderHook(() => useOrder({ id: orderId }));
 
       await waitFor(() => {
@@ -113,6 +123,7 @@ describe('useOrder hook', () => {
 
     it('updates status on success', async () => {
       mockedOrdersApi.updateStatus.mockResolvedValue({} as AxiosResponse);
+
       const { result } = renderHook(() => useOrder({ id: orderId }));
 
       await waitFor(() => {
@@ -138,6 +149,7 @@ describe('useOrder hook', () => {
       console.error = jest.fn();
 
       mockedOrdersApi.updateStatus.mockRejectedValue(new Error('Update error'));
+
       const { result } = renderHook(() => useOrder({ id: orderId }));
 
       await waitFor(() => {
@@ -171,6 +183,7 @@ describe('useOrder hook', () => {
 
     it('deletes order and navigates back on success', async () => {
       mockedOrdersApi.deleteOrder.mockResolvedValue({} as AxiosResponse);
+
       const { result } = renderHook(() => useOrder({ id: orderId }));
 
       await waitFor(() => {
@@ -198,6 +211,7 @@ describe('useOrder hook', () => {
       console.error = jest.fn();
 
       mockedOrdersApi.deleteOrder.mockRejectedValue(new Error('Delete error'));
+
       const { result } = renderHook(() => useOrder({ id: orderId }));
 
       await waitFor(() => {
@@ -228,6 +242,7 @@ describe('useOrder hook', () => {
 
     it('should open and confirm COMPLETE action', async () => {
       mockedOrdersApi.updateStatus.mockResolvedValue({} as any);
+
       const { result } = renderHook(() => useOrder({ id: orderId }));
 
       await waitFor(() => {
@@ -268,6 +283,7 @@ describe('useOrder hook', () => {
   describe('refreshOrderDetails', () => {
     it('refreshes details on success', async () => {
       mockedOrdersApi.getById.mockResolvedValueOnce({ data: extendedOrder } as any);
+
       const { result } = renderHook(() => useOrder({ id: orderId }));
 
       await waitFor(() => {
@@ -291,6 +307,7 @@ describe('useOrder hook', () => {
       console.error = jest.fn();
 
       mockedOrdersApi.getById.mockResolvedValueOnce({ data: extendedOrder } as any);
+
       const { result } = renderHook(() => useOrder({ id: orderId }));
 
       await waitFor(() => {
