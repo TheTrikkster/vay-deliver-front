@@ -94,6 +94,10 @@ import customerInfoFR from './locales/fr/customerInfo.json';
 import customerInfoEN from './locales/en/customerInfo.json';
 import customerInfoRU from './locales/ru/customerInfo.json';
 import customerInfoDE from './locales/de/customerInfo.json';
+import insufficientQuantityModalFR from './locales/fr/insufficientQuantityModal.json';
+import insufficientQuantityModalEN from './locales/en/insufficientQuantityModal.json';
+import insufficientQuantityModalRU from './locales/ru/insufficientQuantityModal.json';
+import insufficientQuantityModalDE from './locales/de/insufficientQuantityModal.json';
 
 // Les ressources contiennent les traductions par langue et par namespace
 const resources = {
@@ -121,6 +125,7 @@ const resources = {
     completedOrder: completedOrderFR,
     addressInput: addressInputFR,
     customerInfo: customerInfoFR,
+    insufficientQuantityModal: insufficientQuantityModalFR,
   },
   en: {
     common: commonEN,
@@ -146,6 +151,7 @@ const resources = {
     completedOrder: completedOrderEN,
     addressInput: addressInputEN,
     customerInfo: customerInfoEN,
+    insufficientQuantityModal: insufficientQuantityModalEN,
   },
   ru: {
     menu: menuRU,
@@ -170,6 +176,7 @@ const resources = {
     completedOrder: completedOrderRU,
     addressInput: addressInputRU,
     customerInfo: customerInfoRU,
+    insufficientQuantityModal: insufficientQuantityModalRU,
   },
   de: {
     menu: menuDE,
@@ -194,6 +201,7 @@ const resources = {
     completedOrder: completedOrderDE,
     addressInput: addressInputDE,
     customerInfo: customerInfoDE,
+    insufficientQuantityModal: insufficientQuantityModalDE,
   },
 };
 
@@ -235,6 +243,7 @@ i18n
       'completedOrder',
       'addressInput',
       'customerInfo',
+      'insufficientQuantityModal',
     ],
     defaultNS: 'common',
 

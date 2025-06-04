@@ -7,25 +7,23 @@ import OrderTagsSection from './OrderTagsSection';
 jest.mock('../AddTagModal/AddTagModal', () => {
   return function MockAddTagModal({ isOpen, onClose, onConfirm, orderId }: any) {
     if (!isOpen) return null;
+
+    const handleConfirm = async () => {
+      try {
+        await onConfirm('nouveau-tag');
+        // Simuler la fermeture automatique après succès (comme le vrai AddTagModal)
+        onClose();
+      } catch (error) {
+        // En cas d'erreur, ne pas fermer le modal
+        // Ne pas faire de console.error pour éviter de polluer la sortie des tests
+      }
+    };
+
     return (
       <div data-testid="add-tag-modal">
-        <button onClick={() => onConfirm('nouveau-tag')}>Confirmer</button>
+        <button onClick={handleConfirm}>Confirmer</button>
         <button onClick={onClose}>Fermer</button>
         <span>Order ID: {orderId}</span>
-      </div>
-    );
-  };
-});
-
-jest.mock('../ConfirmModal', () => {
-  return function MockConfirmModal({ isOpen, onClose, onConfirm, title, message }: any) {
-    if (!isOpen) return null;
-    return (
-      <div data-testid="confirm-modal">
-        <h3>{title}</h3>
-        <p>{message}</p>
-        <button onClick={onConfirm}>Confirmer</button>
-        <button onClick={onClose}>Annuler</button>
       </div>
     );
   };
@@ -49,6 +47,8 @@ jest.mock('react-i18next', () => ({
         deleteTag: 'Supprimer le tag',
         deleteTagConfirmation: 'Êtes-vous sûr de vouloir supprimer ce tag ?',
         noNotesAdded: 'Aucune note ajoutée',
+        cancel: 'Annuler',
+        confirm: 'Confirmer',
       };
       return translations[key] || key;
     },
@@ -206,9 +206,11 @@ describe('OrderTagsSection Component', () => {
         fireEvent.click(deleteButtons[0]);
       });
 
-      expect(screen.getByTestId('confirm-modal')).toBeInTheDocument();
+      // Chercher les éléments du modal personnalisé
       expect(screen.getByText('Supprimer le tag')).toBeInTheDocument();
       expect(screen.getByText('Êtes-vous sûr de vouloir supprimer ce tag ?')).toBeInTheDocument();
+      expect(screen.getByText('Confirmer')).toBeInTheDocument();
+      expect(screen.getByText('Annuler')).toBeInTheDocument();
     });
 
     test('ferme la modale de confirmation quand on clique sur Annuler', async () => {
@@ -219,13 +221,13 @@ describe('OrderTagsSection Component', () => {
       await act(async () => {
         fireEvent.click(deleteButtons[0]);
       });
-      expect(screen.getByTestId('confirm-modal')).toBeInTheDocument();
+      expect(screen.getByText('Supprimer le tag')).toBeInTheDocument();
 
       // Annuler
       await act(async () => {
         fireEvent.click(screen.getByText('Annuler'));
       });
-      expect(screen.queryByTestId('confirm-modal')).not.toBeInTheDocument();
+      expect(screen.queryByText('Supprimer le tag')).not.toBeInTheDocument();
     });
 
     test('appelle removeTag avec les bons paramètres', async () => {
@@ -262,7 +264,34 @@ describe('OrderTagsSection Component', () => {
       });
 
       await waitFor(() => {
-        expect(screen.queryByTestId('confirm-modal')).not.toBeInTheDocument();
+        expect(screen.queryByText('Supprimer le tag')).not.toBeInTheDocument();
+      });
+    });
+
+    test('gère la suppression du bon tag quand il y a des doublons', async () => {
+      mockRemoveTag.mockResolvedValue(undefined);
+      const duplicateTags = ['tag1', 'tag1', 'tag2'];
+      render(<OrderTagsSection {...defaultProps} tagNames={duplicateTags} />);
+
+      const deleteButtons = screen.getAllByTitle('Supprimer cette note');
+      expect(deleteButtons).toHaveLength(3);
+
+      // Supprimer le premier tag1
+      await act(async () => {
+        fireEvent.click(deleteButtons[0]);
+      });
+
+      await act(async () => {
+        fireEvent.click(screen.getByText('Confirmer'));
+      });
+
+      expect(mockRemoveTag).toHaveBeenCalledWith('order-123', 'tag1');
+
+      // Vérifier qu'il reste encore un tag1 et le tag2
+      await waitFor(() => {
+        const remainingTags = screen.getAllByText('tag1');
+        expect(remainingTags).toHaveLength(1); // Encore un tag1
+        expect(screen.getByText('tag2')).toBeInTheDocument();
       });
     });
   });
@@ -366,25 +395,6 @@ describe('OrderTagsSection Component', () => {
       specialTags.forEach(tag => {
         expect(screen.getByText(tag)).toBeInTheDocument();
       });
-    });
-
-    test('gère la suppression du bon tag quand il y a des doublons', async () => {
-      const duplicateTags = ['tag1', 'tag1', 'tag2'];
-      render(<OrderTagsSection {...defaultProps} tagNames={duplicateTags} />);
-
-      const deleteButtons = screen.getAllByTitle('Supprimer cette note');
-      expect(deleteButtons).toHaveLength(3);
-
-      // Supprimer le premier tag1
-      await act(async () => {
-        fireEvent.click(deleteButtons[0]);
-      });
-
-      await act(async () => {
-        fireEvent.click(screen.getByText('Confirmer'));
-      });
-
-      expect(mockRemoveTag).toHaveBeenCalledWith('order-123', 'tag1');
     });
   });
 });

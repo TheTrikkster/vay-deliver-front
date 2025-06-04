@@ -19,5 +19,18 @@
   "confirmCancel": "Вы уверены, что хотите отменить этот заказ?",
   "confirmComplete": "Вы уверены, что хотите отметить этот заказ как завершенный?",
   "deleteTag": "Удалить тег",
-  "deleteTagConfirmation": "Вы уверены, что хотите удалить этот тег?"
+  "deleteTagConfirmation": "Вы уверены, что хотите удалить этот тег?",
+  "confirm": "Подтвердить",
+  "deleting": "Удаление...",
+  "completing": "Завершение...",
+  "canceling": "Отмена...",
+  "continueRouteTitle": "Продолжить маршрут",
+  "continueRouteMessage": "Как вы хотите обработать этот заказ перед продолжением маршрута?",
+  "terminateOrder": "Завершить заказ",
+  "cancelOrder": "Отменить заказ",
+  "back": "Назад",
+  "continueRouteComplete": "Завершить и продолжить",
+  "continueRouteCompleteMessage": "Отметить этот заказ как завершенный и продолжить маршрут?",
+  "continueRouteCancel": "Отменить и продолжить",
+  "continueRouteCancelMessage": "Отменить этот заказ и продолжить маршрут?"
 }

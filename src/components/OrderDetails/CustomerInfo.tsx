@@ -10,6 +10,7 @@ interface CustomerInfoProps {
   address: string;
   phoneNumber: number | string;
   orderStatus?: OrderStatus;
+  onContinueRoute?: (action: 'COMPLETE' | 'CANCEL') => void;
 }
 
 const CustomerInfo = ({
@@ -18,6 +19,7 @@ const CustomerInfo = ({
   address,
   phoneNumber,
   orderStatus,
+  onContinueRoute,
 }: CustomerInfoProps) => {
   const { t: tCustomer } = useTranslation('customerInfo');
   const { filtersObject, setFilterAddress, currentAddress } = useAddressFilter();
@@ -30,8 +32,13 @@ const CustomerInfo = ({
   const isCurrentAddress = currentAddress === address;
 
   const handleContinueFromHere = () => {
-    setFilterAddress(address);
-    // Suppression de la redirection automatique - l'utilisateur reste sur la page
+    // Si onContinueRoute est fourni, on déclenche le workflow avec modal
+    if (onContinueRoute) {
+      onContinueRoute('COMPLETE'); // On commence par déclencher l'action "continuer"
+    } else {
+      // Comportement par défaut existant
+      setFilterAddress(address);
+    }
   };
 
   return (

@@ -7,11 +7,11 @@ jest.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
-        modalTitle: 'Quantité insuffisante',
+        modalTitle: 'Stock insuffisant',
         tableHeaderProduct: 'Produit',
         tableHeaderRequested: 'Demandé',
         tableHeaderAvailable: 'Disponible',
-        orderPrompt: 'Que souhaitez-vous faire ?',
+        orderPrompt: 'Commander la quantité disponible ?',
         cancel: 'Annuler',
         confirm: 'Confirmer',
       };
@@ -56,38 +56,38 @@ describe('InsufficientQuantityModal', () => {
     render(
       <InsufficientQuantityModal products={mockProducts} onClose={onClose} onConfirm={onConfirm} />
     );
-    expect(screen.getByText('Quantité insuffisante')).toBeInTheDocument();
+    expect(screen.getByText('Stock insuffisant')).toBeInTheDocument();
   });
 
-  it('affiche les en-têtes de la table', () => {
+  it('affiche les labels des quantités', () => {
     render(
       <InsufficientQuantityModal products={mockProducts} onClose={onClose} onConfirm={onConfirm} />
     );
-    expect(screen.getByText('Produit')).toBeInTheDocument();
-    expect(screen.getByText('Demandé')).toBeInTheDocument();
-    expect(screen.getByText('Disponible')).toBeInTheDocument();
+    expect(screen.getAllByText(/Demandé:/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Disponible:/).length).toBeGreaterThan(0);
   });
 
   it('rend correctement chaque produit avec quantités et unités', () => {
     render(
       <InsufficientQuantityModal products={mockProducts} onClose={onClose} onConfirm={onConfirm} />
     );
-    mockProducts.forEach(p => {
-      const { productName, requestedQuantity, availableQuantity, unit } = p.details;
-      const nameCell = screen.getByText(productName);
-      const requestedCell = screen.getByText(new RegExp(`${requestedQuantity} ${unit}`));
-      const availableCell = screen.getByText(new RegExp(`${availableQuantity} ${unit}`));
-      expect(nameCell).toBeInTheDocument();
-      expect(requestedCell).toBeInTheDocument();
-      expect(availableCell).toBeInTheDocument();
-    });
+
+    // Vérifier que les noms des produits sont affichés
+    expect(screen.getByText('Produit A')).toBeInTheDocument();
+    expect(screen.getByText('Produit B')).toBeInTheDocument();
+
+    // Vérifier que les quantités sont affichées avec les bonnes unités
+    expect(screen.getByText('5 kg')).toBeInTheDocument();
+    expect(screen.getByText('3 kg')).toBeInTheDocument();
+    expect(screen.getByText('2 pcs')).toBeInTheDocument();
+    expect(screen.getByText('0 pcs')).toBeInTheDocument();
   });
 
   it('affiche le prompt de commande', () => {
     render(
       <InsufficientQuantityModal products={mockProducts} onClose={onClose} onConfirm={onConfirm} />
     );
-    expect(screen.getByText('Que souhaitez-vous faire ?')).toBeInTheDocument();
+    expect(screen.getByText('Commander la quantité disponible ?')).toBeInTheDocument();
   });
 
   it('appelle onClose lorsque le bouton Annuler est cliqué', () => {
@@ -110,6 +110,17 @@ describe('InsufficientQuantityModal', () => {
     const { container } = render(
       <InsufficientQuantityModal products={mockProducts} onClose={onClose} onConfirm={onConfirm} />
     );
-    expect(container.firstChild).toHaveClass('fixed inset-0 bg-black bg-opacity-40');
+    expect(container.firstChild).toHaveClass('fixed inset-0 bg-black bg-opacity-50');
+  });
+
+  it('affiche les produits dans des cartes avec bordure', () => {
+    render(
+      <InsufficientQuantityModal products={mockProducts} onClose={onClose} onConfirm={onConfirm} />
+    );
+    const productCards = screen.getAllByText(/Produit [AB]/).map(el => el.closest('.border'));
+    expect(productCards).toHaveLength(2);
+    productCards.forEach(card => {
+      expect(card).toHaveClass('border', 'rounded-lg', 'p-4');
+    });
   });
 });

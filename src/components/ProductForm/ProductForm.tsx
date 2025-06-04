@@ -11,6 +11,7 @@ interface ProductFormProps {
   onSubmit: (productData: Product) => void;
   isEditing: boolean;
   isLoading?: boolean;
+  isSubmitting?: boolean;
 }
 
 type ProductType = {
@@ -23,7 +24,13 @@ type ProductType = {
   price: string;
 };
 
-function ProductForm({ initialValues, onSubmit, isEditing, isLoading = false }: ProductFormProps) {
+function ProductForm({
+  initialValues,
+  onSubmit,
+  isEditing,
+  isLoading = false,
+  isSubmitting = false,
+}: ProductFormProps) {
   const { t } = useTranslation('productForm');
   const error = useSelector(selectProductsError);
   const [product, setProduct] = useState<ProductType>({
@@ -97,72 +104,127 @@ function ProductForm({ initialValues, onSubmit, isEditing, isLoading = false }: 
 
         <form role="form" onSubmit={handleSubmit}>
           <div className="space-y-4">
-            <input
-              type="text"
-              name="name"
-              value={product.name}
-              onChange={handleChange}
-              className="w-full p-3 border border-[#9DA0A5] rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent placeholder-gray-400 focus:placeholder-transparent transition-all"
-              placeholder={t('productName')}
-              required
-            />
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                {t('labels.productName')} <span className="text-red-500">*</span>
+              </label>
+              <input
+                id="name"
+                type="text"
+                name="name"
+                value={product.name}
+                onChange={handleChange}
+                className="w-full p-3 border border-[#9DA0A5] rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent placeholder-gray-400 focus:placeholder-transparent transition-all"
+                placeholder={t('placeholders.productName')}
+                required
+                disabled={isSubmitting}
+              />
+            </div>
 
-            <textarea
-              name="description"
-              value={product.description}
-              onChange={handleChange}
-              className="w-full p-3 border border-[#9DA0A5] rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent min-h-[100px] placeholder-gray-400 focus:placeholder-transparent transition-all"
-              placeholder={t('description')}
-            />
+            <div>
+              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+                {t('labels.description')}
+              </label>
+              <textarea
+                id="description"
+                name="description"
+                value={product.description}
+                onChange={handleChange}
+                className="w-full p-3 border border-[#9DA0A5] rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent min-h-[100px] placeholder-gray-400 focus:placeholder-transparent transition-all"
+                placeholder={t('placeholders.description')}
+                disabled={isSubmitting}
+              />
+            </div>
 
-            <input
-              type="text"
-              name="unitExpression"
-              value={product.unitExpression}
-              onChange={handleChange}
-              className="w-full p-3 border border-[#9DA0A5] rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent placeholder-gray-400 focus:placeholder-transparent transition-all"
-              placeholder={t('unitMeasure')}
-              required
-            />
+            <div>
+              <label
+                htmlFor="unitExpression"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                {t('labels.unitMeasure')} <span className="text-red-500">*</span>
+              </label>
+              <input
+                id="unitExpression"
+                type="text"
+                name="unitExpression"
+                value={product.unitExpression}
+                onChange={handleChange}
+                className="w-full p-3 border border-[#9DA0A5] rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent placeholder-gray-400 focus:placeholder-transparent transition-all"
+                placeholder={t('placeholders.unitMeasure')}
+                required
+                disabled={isSubmitting}
+              />
+            </div>
 
-            <input
-              type="number"
-              name="availableQuantity"
-              value={product.availableQuantity}
-              onChange={handleChange}
-              className="w-full p-3 border border-[#9DA0A5] rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent placeholder-gray-400 focus:placeholder-transparent transition-all"
-              placeholder={t('availableQuantity')}
-              required
-            />
+            <div>
+              <label
+                htmlFor="availableQuantity"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                {t('labels.availableQuantity')} <span className="text-red-500">*</span>
+              </label>
+              <input
+                id="availableQuantity"
+                type="number"
+                name="availableQuantity"
+                value={product.availableQuantity}
+                onChange={handleChange}
+                className="w-full p-3 border border-[#9DA0A5] rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent placeholder-gray-400 focus:placeholder-transparent transition-all"
+                placeholder={t('placeholders.availableQuantity')}
+                required
+                disabled={isSubmitting}
+              />
+            </div>
 
-            <input
-              type="number"
-              name="minOrder"
-              value={product.minOrder}
-              onChange={handleChange}
-              className="w-full p-3 border border-[#9DA0A5] rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent placeholder-gray-400 focus:placeholder-transparent transition-all"
-              placeholder={t('minOrderVolume')}
-              required
-            />
+            <div>
+              <label htmlFor="minOrder" className="block text-sm font-medium text-gray-700 mb-1">
+                {t('labels.minOrderVolume')} <span className="text-red-500">*</span>
+              </label>
+              <input
+                id="minOrder"
+                type="number"
+                name="minOrder"
+                value={product.minOrder}
+                onChange={handleChange}
+                className="w-full p-3 border border-[#9DA0A5] rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent placeholder-gray-400 focus:placeholder-transparent transition-all"
+                placeholder={t('placeholders.minOrderVolume')}
+                required
+                disabled={isSubmitting}
+              />
+            </div>
 
-            <input
-              type="number"
-              name="maxOrder"
-              value={product.maxOrder}
-              onChange={handleChange}
-              className="w-full p-3 border border-[#9DA0A5] rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent placeholder-gray-400 focus:placeholder-transparent transition-all"
-              placeholder={t('maxOrderVolume')}
-            />
+            <div>
+              <label htmlFor="maxOrder" className="block text-sm font-medium text-gray-700 mb-1">
+                {t('labels.maxOrderVolume')}
+              </label>
+              <input
+                id="maxOrder"
+                type="number"
+                name="maxOrder"
+                value={product.maxOrder}
+                onChange={handleChange}
+                className="w-full p-3 border border-[#9DA0A5] rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent placeholder-gray-400 focus:placeholder-transparent transition-all"
+                placeholder={t('placeholders.maxOrderVolume')}
+                disabled={isSubmitting}
+              />
+            </div>
 
-            <input
-              type="number"
-              name="price"
-              value={product.price}
-              onChange={handleChange}
-              className="w-full p-3 border border-[#9DA0A5] rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent placeholder-gray-400 focus:placeholder-transparent transition-all"
-              placeholder={t('price')}
-              required
-            />
+            <div>
+              <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">
+                {t('labels.price')} <span className="text-red-500">*</span>
+              </label>
+              <input
+                id="price"
+                type="number"
+                name="price"
+                value={product.price}
+                onChange={handleChange}
+                className="w-full p-3 border border-[#9DA0A5] rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400 focus:border-transparent placeholder-gray-400 focus:placeholder-transparent transition-all"
+                placeholder={t('placeholders.price')}
+                required
+                disabled={isSubmitting}
+              />
+            </div>
           </div>
 
           <p className="text-sm text-gray-500 mt-3">{t('requiredFields')}</p>
@@ -170,15 +232,23 @@ function ProductForm({ initialValues, onSubmit, isEditing, isLoading = false }: 
           <div className="flex gap-4 mt-5">
             <Link
               to="/admin-products"
-              className="flex-1 text-center p-4 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
+              className={`flex-1 text-center p-4 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors ${isSubmitting ? 'pointer-events-none opacity-50' : ''}`}
             >
               {t('cancel')}
             </Link>
             <button
               type="submit"
-              className="flex-1 p-4 bg-[#22C55D] text-white rounded-lg hover:bg-[#1FAA4F] transition-colors"
+              disabled={isSubmitting}
+              className="flex-1 p-4 bg-[#22C55D] text-white rounded-lg hover:bg-[#1FAA4F] transition-colors disabled:opacity-50 disabled:bg-[#22C55D] disabled:hover:bg-[#22C55D] disabled:cursor-not-allowed relative"
             >
-              {t('confirm')}
+              {isSubmitting ? (
+                <div className="flex items-center justify-center gap-2">
+                  <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                  <span>{isEditing ? t('updating') : t('creating')}</span>
+                </div>
+              ) : (
+                t('confirm')
+              )}
             </button>
           </div>
         </form>

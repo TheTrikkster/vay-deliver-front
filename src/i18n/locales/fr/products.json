@@ -10,5 +10,6 @@
   "forceDeleteConfirmation": "Confirmation de suppression forcée",
   "forceDeleteConfirmationText": "Êtes-vous sûr de vouloir supprimer de façon forcée cet élément ?",
   "delete": "Supprimer",
+  "deleting": "Suppression...",
   "productNoLongerExists": "Le produit n'existe plus ou a été supprimé"
 }

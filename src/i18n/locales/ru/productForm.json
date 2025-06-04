@@ -10,5 +10,25 @@
   "price": "Цена : 18 *",
   "requiredFields": "Поля, отмеченные *, обязательны для заполнения.",
   "cancel": "Отменить",
-  "confirm": "Подтвердить"
+  "confirm": "Подтвердить",
+  "creating": "Создание...",
+  "updating": "Обновление...",
+  "labels": {
+    "productName": "Название продукта",
+    "description": "Описание",
+    "unitMeasure": "Единица измерения",
+    "availableQuantity": "Доступное количество",
+    "minOrderVolume": "Минимальный объем заказа",
+    "maxOrderVolume": "Максимальный объем заказа",
+    "price": "Цена"
+  },
+  "placeholders": {
+    "productName": "Введите название продукта",
+    "description": "Опишите ваш продукт",
+    "unitMeasure": "напр: Штука, Грамм, Кг",
+    "availableQuantity": "Количество в цифрах",
+    "minOrderVolume": "Минимум в цифрах",
+    "maxOrderVolume": "Максимум в цифрах (необязательно)",
+    "price": "Цена в евро"
+  }
 }

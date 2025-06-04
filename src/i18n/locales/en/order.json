@@ -19,5 +19,18 @@
   "confirmCancel": "Are you sure you want to cancel this order?",
   "confirmComplete": "Are you sure you want to mark this order as completed?",
   "deleteTag": "Delete tag",
-  "deleteTagConfirmation": "Are you sure you want to delete this tag?"
+  "deleteTagConfirmation": "Are you sure you want to delete this tag?",
+  "confirm": "Confirm",
+  "deleting": "Deleting...",
+  "completing": "Completing...",
+  "canceling": "Canceling...",
+  "continueRouteTitle": "Continue Route",
+  "continueRouteMessage": "How would you like to handle this order before continuing the route?",
+  "terminateOrder": "Complete Order",
+  "cancelOrder": "Cancel Order",
+  "back": "Back",
+  "continueRouteComplete": "Complete and Continue",
+  "continueRouteCompleteMessage": "Mark this order as completed and continue the route?",
+  "continueRouteCancel": "Cancel and Continue",
+  "continueRouteCancelMessage": "Cancel this order and continue the route?"
 }

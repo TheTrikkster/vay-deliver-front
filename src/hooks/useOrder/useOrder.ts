@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ordersApi } from '../../api/services/ordersApi';
 import { ActionType, Order, OrderStatus } from '../../types/order';
 import { sumCurrency } from '../../utils/sumCurrency';
+import { useAddressFilter } from '../useAddressFilter';
 
 // Type enrichi pour les items avec les détails du produit
 interface OrderItemExtended {
@@ -21,11 +22,14 @@ interface OrderExtended extends Omit<Order, 'items'> {
 
 export const useOrder = ({ id }: { id: string }) => {
   const navigate = useNavigate();
+  const { setFilterAddress } = useAddressFilter();
   const [orderDetails, setOrderDetails] = useState<OrderExtended | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [currentAction, setCurrentAction] = useState<ActionType | null>(null);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
+  const [isActionLoading, setIsActionLoading] = useState<boolean>(false);
+  const [isContinueRouteModalOpen, setIsContinueRouteModalOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -91,19 +95,61 @@ export const useOrder = ({ id }: { id: string }) => {
     setIsConfirmModalOpen(true);
   };
 
+  const handleContinueRouteAction = (action: 'COMPLETE' | 'CANCEL') => {
+    setCurrentAction(action);
+    setIsContinueRouteModalOpen(true);
+  };
+
+  const handleConfirmContinueRoute = async () => {
+    let success = false;
+    setIsActionLoading(true);
+
+    try {
+      switch (currentAction) {
+        case 'COMPLETE':
+          success = await handleUpdateStatus('COMPLETED');
+          break;
+        case 'CANCEL':
+          success = await handleUpdateStatus('CANCELED');
+          break;
+        default:
+          setIsActionLoading(false);
+          return false;
+      }
+
+      if (success && orderDetails) {
+        // Injecter l'adresse dans le filtre pour mettre à jour le parcours
+        setFilterAddress(orderDetails.address);
+        // Rediriger vers la liste des orders
+        navigate('/admin-orders');
+      }
+    } finally {
+      setIsActionLoading(false);
+    }
+
+    setIsContinueRouteModalOpen(false);
+    setCurrentAction(null);
+    return success;
+  };
+
   const handleConfirmAction = async () => {
     let success = false;
+    setIsActionLoading(true);
 
-    switch (currentAction) {
-      case 'COMPLETE':
-        success = await handleUpdateStatus('COMPLETED');
-        break;
-      case 'CANCEL':
-        success = await handleUpdateStatus('CANCELED');
-        break;
-      case 'DELETE':
-        success = await handleDeleteOrder();
-        break;
+    try {
+      switch (currentAction) {
+        case 'COMPLETE':
+          success = await handleUpdateStatus('COMPLETED');
+          break;
+        case 'CANCEL':
+          success = await handleUpdateStatus('CANCELED');
+          break;
+        case 'DELETE':
+          success = await handleDeleteOrder();
+          break;
+      }
+    } finally {
+      setIsActionLoading(false);
     }
 
     setIsConfirmModalOpen(false);
@@ -136,6 +182,43 @@ export const useOrder = ({ id }: { id: string }) => {
     }
   };
 
+  const getContinueRouteConfirmationInfo = () => {
+    switch (currentAction) {
+      case 'COMPLETE':
+        return {
+          title: 'continueRouteComplete',
+          message: 'continueRouteCompleteMessage',
+        };
+      case 'CANCEL':
+        return {
+          title: 'continueRouteCancel',
+          message: 'continueRouteCancelMessage',
+        };
+      default:
+        return {
+          title: '',
+          message: '',
+        };
+    }
+  };
+
+  const getLoadingText = () => {
+    switch (currentAction) {
+      case 'COMPLETE':
+        return 'completing';
+      case 'CANCEL':
+        return 'canceling';
+      case 'DELETE':
+        return 'deleting';
+      default:
+        return 'completing';
+    }
+  };
+
+  const getVariant = () => {
+    return currentAction === 'DELETE' ? 'danger' : 'normal';
+  };
+
   const refreshOrderDetails = async () => {
     try {
       const response = await ordersApi.getById(id);
@@ -154,10 +237,19 @@ export const useOrder = ({ id }: { id: string }) => {
     total: calculateTotal(),
     handleActionClick,
     handleConfirmAction,
+    handleContinueRouteAction,
+    handleConfirmContinueRoute,
     currentAction,
+    setCurrentAction,
     isConfirmModalOpen,
     setIsConfirmModalOpen,
+    isContinueRouteModalOpen,
+    setIsContinueRouteModalOpen,
     getConfirmationInfo,
+    getContinueRouteConfirmationInfo,
     refreshOrderDetails,
+    isActionLoading,
+    getLoadingText,
+    getVariant,
   };
 };

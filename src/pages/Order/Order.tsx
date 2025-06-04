@@ -3,7 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import Loading from '../../components/Loading';
 import Menu from '../../components/Menu/Menu';
-import ConfirmModal from '../../components/ConfirmModal';
+import UnifiedConfirmModal from '../../components/UnifiedConfirmModal';
+import ContinueRouteModal from '../../components/ContinueRouteModal/ContinueRouteModal';
 import CustomerInfo from '../../components/OrderDetails/CustomerInfo';
 import OrderItems from '../../components/OrderDetails/OrderItems';
 import OrderTagsSection from '../../components/OrderTagsSection/OrderTagsSection';
@@ -23,11 +24,34 @@ const Order: React.FC = () => {
     total,
     handleActionClick,
     handleConfirmAction,
+    handleContinueRouteAction,
+    handleConfirmContinueRoute,
+    currentAction,
     isConfirmModalOpen,
     setIsConfirmModalOpen,
+    isContinueRouteModalOpen,
+    setIsContinueRouteModalOpen,
     getConfirmationInfo,
     refreshOrderDetails,
+    isActionLoading,
+    getLoadingText,
+    getVariant,
+    setCurrentAction,
   } = useOrder({ id: id || '' });
+
+  const handleContinueRoute = (action: 'COMPLETE' | 'CANCEL') => {
+    handleContinueRouteAction(action);
+  };
+
+  const handleCompleteAndContinue = async () => {
+    setCurrentAction('COMPLETE');
+    await handleConfirmContinueRoute();
+  };
+
+  const handleCancelAndContinue = async () => {
+    setCurrentAction('CANCEL');
+    await handleConfirmContinueRoute();
+  };
 
   if (loading) {
     return <Loading />;
@@ -59,6 +83,7 @@ const Order: React.FC = () => {
             address={orderDetails.address}
             phoneNumber={orderDetails.phoneNumber}
             orderStatus={orderDetails.status as OrderStatusType}
+            onContinueRoute={handleContinueRoute}
           />
 
           <OrderItems items={orderDetails.items} total={total} />
@@ -76,12 +101,31 @@ const Order: React.FC = () => {
         onActionClick={handleActionClick}
       />
 
-      <ConfirmModal
-        isOpen={isConfirmModalOpen}
-        onClose={() => setIsConfirmModalOpen(false)}
-        onConfirm={handleConfirmAction}
-        title={t(getConfirmationInfo().title)}
-        message={t(getConfirmationInfo().message)}
+      {/* Modal de confirmation standard */}
+      {isConfirmModalOpen && (
+        <UnifiedConfirmModal
+          isOpen={isConfirmModalOpen}
+          title={t(getConfirmationInfo().title)}
+          message={t(getConfirmationInfo().message)}
+          onClose={() => setIsConfirmModalOpen(false)}
+          onConfirm={handleConfirmAction}
+          variant={getVariant()}
+          isLoading={isActionLoading}
+          cancelText={t('cancel')}
+          confirmText={t('confirm')}
+          loadingText={t(getLoadingText())}
+          translationNamespace="order"
+        />
+      )}
+
+      {/* Modal pour continuer le parcours */}
+      <ContinueRouteModal
+        isOpen={isContinueRouteModalOpen}
+        onClose={() => setIsContinueRouteModalOpen(false)}
+        onComplete={handleCompleteAndContinue}
+        onCancel={handleCancelAndContinue}
+        isLoading={isActionLoading}
+        currentAction={currentAction as 'COMPLETE' | 'CANCEL' | null}
       />
     </div>
   ) : (

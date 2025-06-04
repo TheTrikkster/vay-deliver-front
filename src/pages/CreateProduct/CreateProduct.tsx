@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProductForm from '../../components/ProductForm/ProductForm';
 import { Product, ProductStatus, InventoryProduct } from '../../types/product';
@@ -18,9 +18,12 @@ function CreateProduct() {
   const dispatch = useDispatch();
   const isOnline = useSelector(selectIsOnline);
   const { t } = useTranslation('createProduct');
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const handleCreateProduct = async (productData: Product) => {
+    setIsSubmitting(true);
     dispatch(setError(null));
+
     // Préparer les données pour l'API
     const formattedData = {
       name: productData.name,
@@ -81,10 +84,14 @@ function CreateProduct() {
     } catch (error) {
       dispatch(setError(t('productNoLongerExists')));
       dispatch(deleteProductsItem(tempProduct.id));
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  return <ProductForm onSubmit={handleCreateProduct} isEditing={false} />;
+  return (
+    <ProductForm onSubmit={handleCreateProduct} isEditing={false} isSubmitting={isSubmitting} />
+  );
 }
 
 export default CreateProduct;

@@ -19,5 +19,18 @@
   "confirmCancel": "Sind Sie sicher, dass Sie diese Bestellung stornieren möchten?",
   "confirmComplete": "Sind Sie sicher, dass Sie diese Bestellung als abgeschlossen markieren möchten?",
   "deleteTag": "Tag löschen",
-  "deleteTagConfirmation": "Sind Sie sicher, dass Sie diesen Tag löschen möchten?"
+  "deleteTagConfirmation": "Sind Sie sicher, dass Sie diesen Tag löschen möchten?",
+  "confirm": "Bestätigen",
+  "deleting": "Löschen...",
+  "completing": "Abschließen...",
+  "canceling": "Stornieren...",
+  "continueRouteTitle": "Route fortsetzen",
+  "continueRouteMessage": "Wie möchten Sie diese Bestellung behandeln, bevor Sie die Route fortsetzen?",
+  "terminateOrder": "Bestellung abschließen",
+  "cancelOrder": "Bestellung stornieren",
+  "back": "Zurück",
+  "continueRouteComplete": "Abschließen und fortsetzen",
+  "continueRouteCompleteMessage": "Diese Bestellung als abgeschlossen markieren und Route fortsetzen?",
+  "continueRouteCancel": "Stornieren und fortsetzen",
+  "continueRouteCancelMessage": "Diese Bestellung stornieren und Route fortsetzen?"
 }

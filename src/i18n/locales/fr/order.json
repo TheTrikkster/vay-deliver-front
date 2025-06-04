@@ -19,5 +19,18 @@
   "confirmCancel": "Êtes-vous sûr de vouloir annuler cette commande ?",
   "confirmComplete": "Êtes-vous sûr de vouloir marquer cette commande comme terminée ?",
   "deleteTag": "Supprimer l'étiquette",
-  "deleteTagConfirmation": "Êtes-vous sûr de vouloir supprimer cette étiquette ?"
+  "deleteTagConfirmation": "Êtes-vous sûr de vouloir supprimer cette étiquette ?",
+  "confirm": "Confirmer",
+  "deleting": "Suppression...",
+  "completing": "Finalisation...",
+  "canceling": "Annulation...",
+  "continueRouteTitle": "Continuer le parcours",
+  "continueRouteMessage": "Comment souhaitez-vous traiter cette commande avant de continuer le parcours ?",
+  "terminateOrder": "Terminer la commande",
+  "cancelOrder": "Annuler la commande",
+  "back": "Retour",
+  "continueRouteComplete": "Terminer et continuer",
+  "continueRouteCompleteMessage": "Marquer cette commande comme terminée et continuer le parcours ?",
+  "continueRouteCancel": "Annuler et continuer",
+  "continueRouteCancelMessage": "Annuler cette commande et continuer le parcours ?"
 }

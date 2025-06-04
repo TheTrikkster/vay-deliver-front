@@ -2,5 +2,7 @@
   "title": "Neue Notiz",
   "placeholder": "Geben Sie den Notiztext ein",
   "cancel": "Abbrechen",
-  "confirm": "Bestätigen"
+  "confirm": "Bestätigen",
+  "adding": "Hinzufügen...",
+  "error": "Fehler beim Hinzufügen der Notiz"
 }
